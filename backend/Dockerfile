@@ -30,8 +30,9 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV=production
 
-# Install wget for health checks
-RUN apk add --no-cache wget
+# Update npm to fix CVE-2025-64756 (glob vulnerability) and install wget for health checks
+RUN npm install -g npm@latest && \
+    apk add --no-cache wget
 
 # Copy built files and production dependencies
 COPY --from=builder /app/backend/dist ./dist

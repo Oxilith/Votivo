@@ -16,7 +16,7 @@ import { ApiClient, ApiClientError } from '../api/ApiClient';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+globalThis.fetch = mockFetch;
 
 describe('ApiClient', () => {
   let client: ApiClient;

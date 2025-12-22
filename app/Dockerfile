@@ -1,6 +1,9 @@
 # Stage 1: Build
 FROM node:22-alpine AS builder
 
+# Update npm to fix CVE-2025-64756 (glob vulnerability)
+RUN npm install -g npm@latest
+
 WORKDIR /app
 
 # Copy shared package first

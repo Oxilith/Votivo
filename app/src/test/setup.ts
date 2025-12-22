@@ -45,7 +45,7 @@ URL.createObjectURL = vi.fn(() => 'blob:mock-url');
 URL.revokeObjectURL = vi.fn();
 
 // Mock fetch for API calls
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 // Clean up after each test
 afterEach(() => {
