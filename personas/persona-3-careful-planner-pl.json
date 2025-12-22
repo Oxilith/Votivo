@@ -1,0 +1,24 @@
+{
+  "peak_energy_times": [
+    "mid_morning",
+    "afternoon"
+  ],
+  "low_energy_times": [
+    "late_night",
+    "early_morning"
+  ],
+  "energy_consistency": 4,
+  "energy_drains": "- Niespodziewane zmiany planów\n- Konflikty i konfrontacje\n- Podejmowanie decyzji bez wystarczających informacji\n- Sytuacje w których mogę wypaść głupio\n- Otwarte pytania bez jasnej odpowiedzi",
+  "energy_restores": "- Spokojny czas z książką lub puzzlami\n- Porządkowanie i sprzątanie mojej przestrzeni\n- Gotowanie posiłku który dobrze znam\n- Spędzanie czasu z moim małym gronem zaufanych ludzi\n- Posiadanie jasnego planu na dzień",
+  "mood_triggers_negative": ["uncertainty", "conflict", "overwhelm", "criticism", "lack_of_control"],
+  "motivation_reliability": 4,
+  "willpower_pattern": "never_start",
+  "identity_statements": "Jestem osobą, która myśli zanim zacznie działać. Jestem osobą, której inni powierzają odpowiedzialność. Jestem osobą, która unika niepotrzebnego ryzyka. Jestem osobą, która ceni stabilność. Jestem osobą, która jest może zbyt ostrożna. Jestem osobą, która zastanawia się czy nie grała zbyt bezpiecznie.",
+  "others_describe": "Powiedzieliby, że jestem niezawodny, osoba na którą można liczyć. Powiedzieliby, że jestem przemyślany i ostrożny. Niektórzy mogliby powiedzieć, że jestem zbyt cichy albo trudny do odczytania. Kilku mogłoby powiedzieć, że powinienem się wyluzować. Moja rodzina mówi, że za dużo się martwię.",
+  "automatic_behaviors": "- Szczegółowo researchu'ję przed każdym zakupem\n- Przychodzę wcześniej wszędzie\n- Robię listy i sprawdzam je wielokrotnie\n- Unikam zabierania głosu w grupach chyba że jestem pewny\n- Mówię 'muszę się zastanowić' żeby kupić sobie czas\n- Trzymam się restauracji i miejsc które znam",
+  "keystone_behaviors": "- Cotygodniowe planowanie posiłków (redukuje codzienne decyzje)\n- Poranna rutyna (taka sama każdego dnia)\n- Podsumowanie dnia i przygotowanie na jutro",
+  "core_values": ["security", "integrity", "mastery", "balance", "service"],
+  "natural_strengths": "- Dbałość o szczegóły\n- Wywiązywanie się z zobowiązań\n- Przewidywanie problemów zanim się pojawią\n- Tworzenie systemów i procesów\n- Cierpliwość i stabilność",
+  "resistance_patterns": "- Zabieranie głosu w danym momencie\n- Podejmowanie ryzyka nawet gdy szanse są dobre\n- Bycie spontanicznym\n- Akceptowanie 'wystarczająco dobrego' zamiast idealnego\n- Podążanie za tym czego naprawdę chcę zamiast tego co bezpieczne",
+  "identity_clarity": 3
+}

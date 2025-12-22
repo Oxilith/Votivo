@@ -1,0 +1,24 @@
+{
+  "peak_energy_times": [
+    "mid_morning",
+    "afternoon"
+  ],
+  "low_energy_times": [
+    "late_night",
+    "early_morning"
+  ],
+  "energy_consistency": 4,
+  "energy_drains": "- Unexpected changes to plans\n- Conflict or confrontation\n- Making decisions without enough information\n- Situations where I might look foolish\n- Open-ended questions with no clear answer",
+  "energy_restores": "- Quiet time with a book or puzzle\n- Organizing and tidying my space\n- Cooking a meal I know well\n- Spending time with my small circle of trusted people\n- Having a clear plan for the day",
+  "mood_triggers_negative": ["uncertainty", "conflict", "overwhelm", "criticism", "lack_of_control"],
+  "motivation_reliability": 4,
+  "willpower_pattern": "never_start",
+  "identity_statements": "I am someone who thinks before acting. I am someone others trust with responsibility. I am someone who avoids unnecessary risks. I am someone who values stability. I am someone who might be too cautious. I am someone who wonders if I've played it too safe.",
+  "others_describe": "They'd say I'm reliable, the person you can count on. They'd say I'm thoughtful and careful. Some might say I'm too quiet or hard to read. A few might say I need to loosen up. My family says I worry too much.",
+  "automatic_behaviors": "- Research extensively before any purchase\n- Arrive early to everything\n- Make lists and check them multiple times\n- Avoid speaking up in groups unless I'm certain\n- Say 'let me think about it' to buy time\n- Stick to restaurants and places I know",
+  "keystone_behaviors": "- Weekly meal planning (reduces daily decisions)\n- Morning routine (same every day)\n- End-of-day review and tomorrow's preparation",
+  "core_values": ["security", "integrity", "mastery", "balance", "service"],
+  "natural_strengths": "- Attention to detail\n- Following through on commitments\n- Anticipating problems before they happen\n- Creating systems and processes\n- Being patient and steady",
+  "resistance_patterns": "- Speaking up in the moment\n- Taking risks even when odds are good\n- Being spontaneous\n- Accepting good enough instead of perfect\n- Pursuing what I actually want instead of what's safe",
+  "identity_clarity": 3
+}

@@ -1,0 +1,25 @@
+{
+  "peak_energy_times": [
+    "night",
+    "late_night"
+  ],
+  "low_energy_times": [
+    "early_morning",
+    "mid_morning",
+    "midday"
+  ],
+  "energy_consistency": 3,
+  "energy_drains": "- Rigid schedules and deadlines\n- Administrative tasks, paperwork, anything boring\n- People who don't get me\n- Fluorescent lighting and sterile environments\n- Having to explain myself repeatedly",
+  "energy_restores": "- Deep conversations about ideas\n- Making something with my hands\n- Being in nature, especially near water\n- Music - both listening and playing\n- Starting something new and exciting",
+  "mood_triggers_negative": ["boredom", "criticism", "isolation", "lack_of_control", "comparison"],
+  "motivation_reliability": 2,
+  "willpower_pattern": "start_stop",
+  "identity_statements": "I am someone who sees connections others miss. I am someone with too many interests. I am someone who feels deeply. I am someone who starts more than I finish. I am someone who needs meaning in my work. I am someone who is probably too sensitive.",
+  "others_describe": "They'd say I'm interesting to talk to, maybe a bit intense. They'd say I'm creative but unreliable. My close friends would say I'm deeply loyal. Some would say I'm chaotic or flaky. Someone once said I have 'too many tabs open in my brain.'",
+  "automatic_behaviors": "- Stay up way too late on random rabbit holes\n- Start new projects when current ones get hard\n- Forget to eat when I'm in flow\n- Overshare with strangers\n- Rearrange my space when I'm stuck\n- Buy supplies for hobbies I'll abandon",
+  "keystone_behaviors": "- Morning pages / journaling (when I actually do it)\n- Making music, even for 10 minutes\n- Connecting with one person I care about",
+  "core_values": ["creativity", "authenticity", "connection", "wisdom", "adventure"],
+  "natural_strengths": "- Generating ideas quickly\n- Making people feel understood\n- Seeing patterns and possibilities\n- Adapting to new situations\n- Finding beauty in unexpected places",
+  "resistance_patterns": "- Following through on long-term projects\n- Keeping a consistent schedule\n- Staying in one career/path\n- Not taking criticism personally\n- Finishing what I start",
+  "identity_clarity": 2
+}

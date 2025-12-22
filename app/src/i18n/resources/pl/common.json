@@ -1,0 +1,315 @@
+{
+  "header": {
+    "title": "Fundamenty Tożsamości",
+    "buttons": {
+      "import": "Importuj",
+      "export": "Eksportuj",
+      "exportResponses": "Eksportuj odpowiedzi",
+      "exportAnalysis": "Eksportuj analizę"
+    },
+    "errors": {
+      "importFailed": "Nie udało się zaimportować pliku"
+    },
+    "theme": {
+      "toggleDark": "Przełącz na tryb ciemny",
+      "toggleLight": "Przełącz na tryb jasny"
+    },
+    "language": {
+      "en": "English",
+      "pl": "Polski"
+    }
+  },
+  "assessment": {
+    "welcome": {
+      "title": "Witamy",
+      "subtitle": "Ocena Fundamentów Tożsamości",
+      "heading": "Zanim zaprojektujesz kim chcesz zostać...",
+      "subheading": "Musisz zrozumieć kim już jesteś.",
+      "description": "Ta ocena prowadzi Cię przez dwie podstawowe fazy:\n\n**Faza 1: Świadomość Stanu** — Zrozumienie jak funkcjonujesz (Twoje wzorce energii, nastroju i motywacji)\n\n**Faza 2: Mapowanie Tożsamości** — Zrozumienie kim aktualnie jesteś (Twoja rzeczywista tożsamość ujawniona przez zachowanie)\n\nWiększość ludzi pomija te kroki i przechodzi od razu do wyznaczania celów. Dlatego większość celów nie udaje się osiągnąć. Zmiana tożsamości nie polega na stawaniu się kimś innym — chodzi o stawanie się bardziej sobą.\n\nZajmie to około 15-20 minut szczerej refleksji. Nie ma złych odpowiedzi.",
+      "buttonText": "Rozpocznij ocenę"
+    },
+    "phase1": {
+      "title": "Faza 1",
+      "subtitle": "Świadomość Stanu",
+      "description": "Zrozumienie jak funkcjonujesz",
+      "peakEnergy": {
+        "question": "Kiedy zazwyczaj doświadczasz najwyższej energii i jasności umysłu?",
+        "context": "Wybierz wszystkie pasujące. Pomyśl o tym, kiedy najlepiej myślisz, nie kiedy jesteś zmuszony do produktywności.",
+        "options": {
+          "earlyMorning": { "label": "Wczesny ranek (5-8)", "description": "Zanim świat się obudzi" },
+          "midMorning": { "label": "Późny ranek (8-11)", "description": "Po rozruchu" },
+          "midday": { "label": "Południe (11-14)", "description": "Około lunchu" },
+          "afternoon": { "label": "Popołudnie (14-17)", "description": "Po lunchu" },
+          "evening": { "label": "Wieczór (17-20)", "description": "Po pracy" },
+          "night": { "label": "Noc (20-24)", "description": "Późny wieczór" },
+          "lateNight": { "label": "Późna noc (po północy)", "description": "Gdy inni śpią" }
+        }
+      },
+      "lowEnergy": {
+        "question": "Kiedy zazwyczaj doświadczasz najniższej energii lub motywacji?",
+        "context": "Wybierz wszystkie pasujące. Bądź szczery — to nie dotyczy słabości, to praca z naturalnymi rytmami.",
+        "options": {
+          "earlyMorning": { "label": "Wczesny ranek (5-8)", "description": "Trudno wystartować" },
+          "midMorning": { "label": "Późny ranek (8-11)", "description": "Spadek przed lunchem" },
+          "midday": { "label": "Południe (11-14)", "description": "Spadek energii przy lunchu" },
+          "afternoon": { "label": "Popołudnie (14-17)", "description": "Klasyczny spadek" },
+          "evening": { "label": "Wieczór (17-20)", "description": "Wyczerpanie po pracy" },
+          "night": { "label": "Noc (20-24)", "description": "Zmęczenie końca dnia" }
+        }
+      },
+      "energyConsistency": {
+        "question": "Jak stały jest Twój poziom energii z dnia na dzień?",
+        "context": "Pomyśl o typowym tygodniu, nie o wyjątkowych okolicznościach.",
+        "lowLabel": "Bardzo zmienny — inaczej każdego dnia",
+        "highLabel": "Bardzo stały — przewidywalne wzorce"
+      },
+      "energyDrains": {
+        "question": "Jakie czynności lub sytuacje najszybciej wyczerpują Twoją energię?",
+        "context": "Rozważ zarówno oczywiste (trudne spotkania) jak i subtelne (podejmowanie decyzji, przełączanie kontekstu).",
+        "placeholder": "Przykłady: Spotkania jedno po drugim, niejasne zadania, zobowiązania społeczne, zmęczenie decyzyjne..."
+      },
+      "energyRestores": {
+        "question": "Co niezawodnie przywraca Twoją energię?",
+        "context": "Nie to co \"powinno\" ją przywracać, ale co faktycznie działa. Bądź konkretny.",
+        "placeholder": "Przykłady: Samotne spacery, ukończenie zadania, sesje głębokiej pracy, konkretne osoby..."
+      },
+      "moodTriggers": {
+        "question": "Co najczęściej wywołuje u Ciebie negatywną zmianę nastroju?",
+        "context": "Wybierz 3-5 najważniejszych. Zrozumienie wyzwalaczy to pierwszy krok do zarządzania nimi.",
+        "options": {
+          "lackOfProgress": { "label": "Poczucie stagnacji lub nieproduktywności" },
+          "conflict": { "label": "Konflikt międzyludzki lub napięcie" },
+          "uncertainty": { "label": "Niejednoznaczność lub niepewność" },
+          "overwhelm": { "label": "Zbyt wiele wymagań naraz" },
+          "lackOfControl": { "label": "Poczucie braku kontroli" },
+          "poorSleep": { "label": "Słaby sen poprzedniej nocy" },
+          "physical": { "label": "Dyskomfort fizyczny (głód, ból)" },
+          "isolation": { "label": "Zbyt dużo czasu w samotności" },
+          "overstimulation": { "label": "Zbyt dużo interakcji społecznych" },
+          "criticism": { "label": "Krytyka lub negatywna informacja zwrotna" },
+          "comparison": { "label": "Porównywanie się do innych" },
+          "boredom": { "label": "Brak wyzwań lub sensu" }
+        }
+      },
+      "motivationReliability": {
+        "question": "Jak niezawodna jest Twoja motywacja do ważnych zadań?",
+        "context": "Bądź szczery. To nie osąd — zawodna motywacja to właśnie powód, dla którego systemy są ważne.",
+        "lowLabel": "Bardzo zawodna — zależy od nastroju",
+        "highLabel": "Bardzo niezawodna — robię to co planuję"
+      },
+      "willpowerPattern": {
+        "question": "Gdy nie realizujesz zamierzeń, jaki jest najczęstszy wzorzec?",
+        "context": "Wybierz ten, który zdarza się najczęściej.",
+        "options": {
+          "neverStart": { "label": "Nigdy nie zaczynam", "description": "Zadanie wydaje się zbyt duże lub niejasne" },
+          "startStop": { "label": "Zaczynam ale szybko przestaję", "description": "Początkowy rozpęd zanika" },
+          "distraction": { "label": "Rozpraszam się", "description": "Coś innego przyciąga uwagę" },
+          "perfectionism": { "label": "Zbyt dużo myślę i staję", "description": "Perfekcjonizm lub paraliż analityczny" },
+          "energy": { "label": "Brakuje mi energii", "description": "Siła woli się wyczerpuje" },
+          "forget": { "label": "Po prostu zapominam", "description": "Wypada mi z głowy" }
+        }
+      }
+    },
+    "phase2": {
+      "title": "Faza 2",
+      "subtitle": "Mapowanie Tożsamości",
+      "description": "Zrozumienie kim aktualnie jesteś",
+      "intro": {
+        "heading": "Faza 2: Mapowanie Tożsamości",
+        "subheading": "Twoja tożsamość ujawnia się przez zachowania, nie przez intencje.",
+        "description": "Teraz zbadamy kim faktycznie jesteś — nie kim chciałbyś być ani kim myślisz że powinieneś być.\n\nTa faza bada:\n• Jak obecnie się definiujesz\n• Co konsekwentnie robisz (Twoje rzeczywiste nawyki)\n• Co już działa (kluczowe zachowania)\n• Twoje podstawowe wartości i mocne strony\n\nPamiętaj: trwała zmiana buduje na tym kim jesteś, nie przeciwko temu.",
+        "buttonText": "Kontynuuj"
+      },
+      "identityStatements": {
+        "question": "Dokończ to zdanie 5-10 razy: \"Jestem osobą, która...\"",
+        "context": "Pisz stwierdzenia, które są prawdziwe na podstawie Twojego faktycznego zachowania. Nie aspiracje — dowody. Co ktoś by wywnioskował o Tobie obserwując Twoje codzienne życie?",
+        "placeholder": "Jestem osobą, która...\nJestem osobą, która...\nJestem osobą, która...\nJestem osobą, która...\nJestem osobą, która..."
+      },
+      "othersDescribe": {
+        "question": "Jak opisaliby Cię ludzie, którzy dobrze Cię znają?",
+        "context": "Pomyśl co powiedzieliby koledzy, przyjaciele lub rodzina. Jakie wzorce zauważają, których Ty możesz nie widzieć?",
+        "placeholder": "O co ludzie Cię proszą? Czego od Ciebie oczekują? Co ich zaskakuje gdy tego nie robisz?"
+      },
+      "automaticBehaviors": {
+        "question": "Co robisz automatycznie, bez myślenia lub decydowania?",
+        "context": "To są Twoje istniejące nawyki — zarówno pomocne jak i niepomocne. Poranne rutyny, reakcje na stres, jak spędzasz czas przejściowy, itp.",
+        "placeholder": "Przykłady:\n• Sprawdzam telefon zaraz po przebudzeniu\n• Robię kawę przed wszystkim innym\n• Otwieram konkretne aplikacje gdy mi nudno\n• Odpowiadam na wiadomości natychmiast\n• Planuję jutro przed snem"
+      },
+      "keystoneBehaviors": {
+        "question": "Które z Twoich obecnych zachowań tworzą największe pozytywne efekty?",
+        "context": "Kluczowe zachowania wpływają na wiele obszarów życia. Gdy je wykonujesz, inne rzeczy też idą dobrze. Gdy je pomijasz, rzeczy zaczynają się rozpadać.",
+        "placeholder": "Przykłady: Poranne ćwiczenia, codzienne planowanie, regularny sen, tygodniowy przegląd..."
+      },
+      "coreValues": {
+        "question": "Wybierz wartości, które czujesz jako najbardziej istotne dla tego kim jesteś.",
+        "context": "Wybierz maksymalnie 5-7. Nie to co myślisz że powinieneś cenić — to co faktycznie kieruje Twoimi decyzjami i wywołuje dyskomfort gdy jest naruszane.",
+        "options": {
+          "growth": { "label": "Rozwój i Uczenie się" },
+          "autonomy": { "label": "Autonomia i Niezależność" },
+          "mastery": { "label": "Mistrzostwo i Doskonałość" },
+          "impact": { "label": "Wpływ i Wkład" },
+          "connection": { "label": "Więź i Relacje" },
+          "integrity": { "label": "Integralność i Uczciwość" },
+          "creativity": { "label": "Kreatywność i Innowacja" },
+          "security": { "label": "Bezpieczeństwo i Stabilność" },
+          "adventure": { "label": "Przygoda i Nowość" },
+          "balance": { "label": "Równowaga i Harmonia" },
+          "recognition": { "label": "Uznanie i Status" },
+          "service": { "label": "Służba i Pomaganie Innym" },
+          "wisdom": { "label": "Mądrość i Zrozumienie" },
+          "efficiency": { "label": "Efektywność i Optymalizacja" },
+          "authenticity": { "label": "Autentyczność i Ekspresja" },
+          "leadership": { "label": "Przywództwo i Wpływ" }
+        }
+      },
+      "naturalStrengths": {
+        "question": "Co przychodzi Ci naturalnie, z czym inni wydają się zmagać?",
+        "context": "To są Twoje punkty dźwigni. Trwała ewolucja tożsamości wzmacnia mocne strony zamiast walczyć ze słabościami.",
+        "placeholder": "Pomyśl o: O co ludzie Cię proszą? Co jest dla Ciebie łatwe a dla innych trudne?"
+      },
+      "resistancePatterns": {
+        "question": "Co wielokrotnie próbowałeś w sobie zmienić, ale Ci się nie udawało?",
+        "context": "Bez osądzania — to ujawnia gdzie Twoja obecna tożsamość jest silnie zakorzeniona. Te obszary potrzebują mostów tożsamości, nie siły woli.",
+        "placeholder": "Przykłady: Regularność ćwiczeń, poranne rutyny, nawyki żywieniowe, wzorce prokrastynacji..."
+      },
+      "identityClarity": {
+        "question": "Jak jasne jest Twoje poczucie tego kim jesteś?",
+        "context": "Chodzi o samopoznanie, nie pewność siebie.",
+        "lowLabel": "Niejasne — czuję się jak różni ludzie w różnych kontekstach",
+        "highLabel": "Bardzo jasne — mam stabilne poczucie siebie"
+      }
+    },
+    "synthesis": {
+      "title": "Synteza",
+      "subtitle": "Twój Fundament",
+      "heading": "Twój Fundament Tożsamości",
+      "description": "Synteza Twoich wniosków z Fazy 1 i 2. To staje się podstawą do projektowania trwałej zmiany.",
+      "sections": {
+        "operatingRhythm": {
+          "title": "Twój Rytm Działania",
+          "number": "1"
+        },
+        "energyManagement": {
+          "title": "Zarządzanie Energią",
+          "number": "2"
+        },
+        "currentIdentity": {
+          "title": "Obecna Tożsamość",
+          "number": "3"
+        },
+        "behavioralFoundation": {
+          "title": "Fundament Behawioralny",
+          "number": "4"
+        },
+        "valuesStrengths": {
+          "title": "Wartości i Mocne Strony",
+          "number": "5"
+        },
+        "resistancePatterns": {
+          "title": "Wzorce Oporu",
+          "helpText": "Te obszary potrzebują mostów tożsamości, nie siły woli. Faza 3 zajmie się projektowaniem osiągalnych tożsamości przejściowych."
+        }
+      },
+      "labels": {
+        "peakEnergy": "Szczytowa energia:",
+        "lowEnergy": "Niska energia:",
+        "energyConsistency": "Stałość energii:",
+        "motivationReliability": "Niezawodność motywacji:",
+        "primaryFailurePattern": "Główny wzorzec porażki:",
+        "whatDrainsYou": "Co Cię wyczerpuje:",
+        "whatRestoresYou": "Co Cię regeneruje:",
+        "keyMoodTriggers": "Kluczowe wyzwalacze nastroju:",
+        "identityStatements": "Stwierdzenia tożsamości:",
+        "howOthersSeeYou": "Jak widzą Cię inni:",
+        "identityClarity": "Jasność tożsamości:",
+        "automaticBehaviors": "Automatyczne zachowania (obecne nawyki):",
+        "keystoneBehaviors": "Kluczowe zachowania (wysokodźwigniowe):",
+        "coreValues": "Podstawowe wartości:",
+        "naturalStrengths": "Naturalne mocne strony:"
+      },
+      "whatsNext": {
+        "title": "Co dalej?",
+        "description": "Masz teraz mapę swojego obecnego systemu operacyjnego. Faza 3 (Projektowanie Tożsamości) używa tego fundamentu do zaprojektowania kim chcesz się stać — zapewniając że Twoja aspiracyjna tożsamość jest:",
+        "achievable": {
+          "title": "Osiągalna",
+          "description": "realistyczna progresja od miejsca w którym jesteś"
+        },
+        "aligned": {
+          "title": "Dopasowana",
+          "description": "budująca na Twoich wartościach i mocnych stronach"
+        },
+        "bridged": {
+          "title": "Pomostowa",
+          "description": "z tożsamościami przejściowymi czyniącymi ścieżkę wiarygodną"
+        }
+      }
+    },
+    "navigation": {
+      "back": "← Wstecz",
+      "continue": "Kontynuuj →",
+      "complete": "Zakończ ocenę i zobacz analizę AI"
+    }
+  },
+  "insights": {
+    "header": {
+      "title": "Inteligencja Tożsamości",
+      "subtitle": "Analiza Wzorców wspierana AI",
+      "description": "Wykorzystuje Claude do dynamicznej analizy Twoich odpowiedzi — znajdując wzorce, sprzeczności i martwe punkty, których systemy oparte na regułach by przeoczyły."
+    },
+    "buttons": {
+      "exportAnalysis": "Eksportuj analizę",
+      "exportResponses": "Eksportuj odpowiedzi",
+      "backToAssessment": "Powrót do oceny"
+    },
+    "ready": {
+      "title": "Gotowe do analizy",
+      "description": "Kliknij poniżej aby wysłać dane oceny do Claude w celu głębokiej analizy wzorców. Zajmuje to zazwyczaj 10-20 sekund.",
+      "button": "Analizuj moje odpowiedzi"
+    },
+    "loading": {
+      "title": "Analizuję...",
+      "description": "Claude szuka wzorców w Twoich odpowiedziach"
+    },
+    "error": {
+      "title": "Analiza nie powiodła się",
+      "tryAgain": "Spróbuj ponownie",
+      "downloadRaw": "Pobierz surową odpowiedź"
+    },
+    "tabs": {
+      "patterns": "Wzorce",
+      "contradictions": "Sprzeczności",
+      "blindSpots": "Martwe punkty",
+      "leverage": "Dźwignie",
+      "risks": "Ryzyka",
+      "synthesis": "Synteza Tożsamości"
+    },
+    "cards": {
+      "evidence": "Dowody",
+      "theTension": "Napięcie",
+      "vs": "vs",
+      "whatThisMeans": "Co to oznacza",
+      "hypothesis": "Hipoteza",
+      "reframe": "Przeformułowanie",
+      "leveragePoint": "Punkt dźwigni",
+      "reflectionQuestion": "Pytanie do refleksji",
+      "highImpact": "Wysoki wpływ",
+      "mediumImpact": "Średni wpływ"
+    },
+    "synthesisTab": {
+      "whoYouAre": "Kim faktycznie jesteś",
+      "hiddenStrengths": "Ukryte mocne strony",
+      "keyTension": "Kluczowe napięcie",
+      "nextStep": "Twój następny krok tożsamości",
+      "nextStepHelp": "To jest najmniejsza wiarygodna zmiana z miejsca w którym teraz jesteś."
+    },
+    "reanalyze": {
+      "button": "Analizuj ponownie (może znaleźć nowe wzorce)",
+      "description": "Każda analiza może ujawnić inne spostrzeżenia w oparciu o interpretację Claude"
+    }
+  },
+  "common": {
+    "progress": {
+      "stepOf": "{{current}} / {{total}}"
+    }
+  }
+}

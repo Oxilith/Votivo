@@ -1,0 +1,25 @@
+{
+  "peak_energy_times": [
+    "early_morning",
+    "mid_morning"
+  ],
+  "low_energy_times": [
+    "afternoon",
+    "evening",
+    "night"
+  ],
+  "energy_consistency": 2,
+  "energy_drains": "- Back-to-back meetings with no recovery time\n- Saying yes to things I should say no to\n- Other people's emergencies becoming my emergencies\n- Feeling like I'm behind no matter how much I do",
+  "energy_restores": "- Early morning before anyone else is awake\n- Long runs alone\n- Cancelling plans (guilty pleasure)\n- Completing something and crossing it off",
+  "mood_triggers_negative": ["overwhelm", "lack_of_control", "criticism", "lack_of_progress", "poor_sleep"],
+  "motivation_reliability": 4,
+  "willpower_pattern": "energy",
+  "identity_statements": "I am someone who gets things done. I am someone people rely on. I am someone who pushes through when others give up. I am someone who is tired. I am someone who doesn't know how to slow down. I am someone who measures worth by output.",
+  "others_describe": "They'd say I'm dependable, maybe too dependable. They'd say I seem to have it all together. Some might say I'm hard to really know. My partner would say I'm always distracted, never fully present.",
+  "automatic_behaviors": "- Check email before getting out of bed\n- Say 'I'm fine' when asked how I am\n- Take on more than I should in meetings\n- Work during lunch\n- Think about work while trying to fall asleep\n- Apologize for things that aren't my fault",
+  "keystone_behaviors": "- Morning run (when I do it, everything is better)\n- Weekly planning on Sunday\n- Getting 7+ hours of sleep (rare but transformative)",
+  "core_values": ["mastery", "impact", "integrity", "recognition", "efficiency"],
+  "natural_strengths": "- Executing under pressure\n- Seeing the big picture while handling details\n- Making others feel confident in my abilities\n- Working long hours without complaining",
+  "resistance_patterns": "- Setting boundaries (I know I should but I can't)\n- Delegating (it's faster if I just do it myself)\n- Rest without guilt\n- Asking for help",
+  "identity_clarity": 4
+}

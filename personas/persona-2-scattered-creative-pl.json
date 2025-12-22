@@ -1,0 +1,25 @@
+{
+  "peak_energy_times": [
+    "night",
+    "late_night"
+  ],
+  "low_energy_times": [
+    "early_morning",
+    "mid_morning",
+    "midday"
+  ],
+  "energy_consistency": 3,
+  "energy_drains": "- Sztywne harmonogramy i deadline'y\n- Zadania administracyjne, papierkowa robota, wszystko co nudne\n- Ludzie, którzy mnie nie rozumieją\n- Jarzeniówki i sterylne środowiska\n- Konieczność tłumaczenia się w kółko",
+  "energy_restores": "- Głębokie rozmowy o ideach\n- Robienie czegoś własnymi rękami\n- Przebywanie na łonie natury, szczególnie blisko wody\n- Muzyka - zarówno słuchanie jak i granie\n- Zaczynanie czegoś nowego i ekscytującego",
+  "mood_triggers_negative": ["boredom", "criticism", "isolation", "lack_of_control", "comparison"],
+  "motivation_reliability": 2,
+  "willpower_pattern": "start_stop",
+  "identity_statements": "Jestem osobą, która widzi połączenia których inni nie widzą. Jestem osobą z zbyt wieloma zainteresowaniami. Jestem osobą, która głęboko przeżywa. Jestem osobą, która zaczyna więcej niż kończy. Jestem osobą, która potrzebuje sensu w pracy. Jestem osobą, która jest chyba zbyt wrażliwa.",
+  "others_describe": "Powiedzieliby, że jestem ciekawy w rozmowie, może trochę intensywny. Powiedzieliby, że jestem kreatywny ale niezawodny. Moi bliscy przyjaciele powiedzieliby, że jestem głęboko lojalny. Niektórzy powiedzieliby, że jestem chaotyczny albo niesolidny. Ktoś kiedyś powiedział, że mam 'za dużo otwartych kart w głowie'.",
+  "automatic_behaviors": "- Siedzę za długo w nocy wpadając w losowe rabbit hole'y\n- Zaczynam nowe projekty kiedy obecne stają się trudne\n- Zapominam jeść kiedy jestem w flow\n- Za dużo mówię obcym ludziom o sobie\n- Przestawiam rzeczy w pokoju kiedy utknę\n- Kupuję rzeczy do hobby, które porzucę",
+  "keystone_behaviors": "- Poranne strony / dziennik (kiedy faktycznie to robię)\n- Granie muzyki, nawet przez 10 minut\n- Kontakt z kimś na kim mi zależy",
+  "core_values": ["creativity", "authenticity", "connection", "wisdom", "adventure"],
+  "natural_strengths": "- Szybkie generowanie pomysłów\n- Sprawianie, że ludzie czują się zrozumiani\n- Widzenie wzorców i możliwości\n- Adaptacja do nowych sytuacji\n- Znajdowanie piękna w nieoczekiwanych miejscach",
+  "resistance_patterns": "- Doprowadzanie długoterminowych projektów do końca\n- Utrzymywanie stałego harmonogramu\n- Trzymanie się jednej kariery/ścieżki\n- Nie branie krytyki osobiście\n- Kończenie tego co zaczynam",
+  "identity_clarity": 2
+}

@@ -1,0 +1,315 @@
+{
+  "header": {
+    "title": "Identity Foundations",
+    "buttons": {
+      "import": "Import",
+      "export": "Export",
+      "exportResponses": "Export Responses",
+      "exportAnalysis": "Export Analysis"
+    },
+    "errors": {
+      "importFailed": "Failed to import file"
+    },
+    "theme": {
+      "toggleDark": "Switch to dark mode",
+      "toggleLight": "Switch to light mode"
+    },
+    "language": {
+      "en": "English",
+      "pl": "Polski"
+    }
+  },
+  "assessment": {
+    "welcome": {
+      "title": "Welcome",
+      "subtitle": "Identity Foundations Assessment",
+      "heading": "Before You Design Who You Want to Become...",
+      "subheading": "You need to understand who you already are.",
+      "description": "This assessment guides you through two foundational phases:\n\n**Phase 1: State Awareness** — Understanding how you operate (your energy, mood, and motivation patterns)\n\n**Phase 2: Identity Mapping** — Understanding who you currently are (your actual identity revealed through behavior)\n\nMost people skip these steps and jump straight to goal-setting. That's why most goals fail. Identity change isn't about becoming someone else — it's about becoming more fully yourself.\n\nThis takes about 15-20 minutes of honest reflection. There are no right answers.",
+      "buttonText": "Begin Assessment"
+    },
+    "phase1": {
+      "title": "Phase 1",
+      "subtitle": "State Awareness",
+      "description": "Understanding how you operate",
+      "peakEnergy": {
+        "question": "When do you typically experience your highest energy and mental clarity?",
+        "context": "Select all that apply. Think about when you do your best thinking, not when you're forced to be productive.",
+        "options": {
+          "earlyMorning": { "label": "Early morning (5-8am)", "description": "Before the world wakes up" },
+          "midMorning": { "label": "Mid-morning (8-11am)", "description": "After settling in" },
+          "midday": { "label": "Midday (11am-2pm)", "description": "Around lunch time" },
+          "afternoon": { "label": "Afternoon (2-5pm)", "description": "Post-lunch period" },
+          "evening": { "label": "Evening (5-8pm)", "description": "After work hours" },
+          "night": { "label": "Night (8pm-12am)", "description": "Late evening" },
+          "lateNight": { "label": "Late night (after midnight)", "description": "When others sleep" }
+        }
+      },
+      "lowEnergy": {
+        "question": "When do you typically experience your lowest energy or motivation?",
+        "context": "Select all that apply. Be honest — this isn't about weakness, it's about working with your natural rhythms.",
+        "options": {
+          "earlyMorning": { "label": "Early morning (5-8am)", "description": "Hard to start" },
+          "midMorning": { "label": "Mid-morning (8-11am)", "description": "Pre-lunch slump" },
+          "midday": { "label": "Midday (11am-2pm)", "description": "Lunch energy dip" },
+          "afternoon": { "label": "Afternoon (2-5pm)", "description": "The classic slump" },
+          "evening": { "label": "Evening (5-8pm)", "description": "Post-work depletion" },
+          "night": { "label": "Night (8pm-12am)", "description": "End of day fatigue" }
+        }
+      },
+      "energyConsistency": {
+        "question": "How consistent is your energy level from day to day?",
+        "context": "Think about a typical week, not exceptional circumstances.",
+        "lowLabel": "Highly variable — different every day",
+        "highLabel": "Very consistent — predictable patterns"
+      },
+      "energyDrains": {
+        "question": "What activities or situations drain your energy most quickly?",
+        "context": "Consider both obvious drains (difficult meetings) and subtle ones (decision-making, context-switching).",
+        "placeholder": "Examples: Back-to-back meetings, ambiguous tasks, social obligations, decision fatigue..."
+      },
+      "energyRestores": {
+        "question": "What reliably restores your energy?",
+        "context": "Not what \"should\" restore it, but what actually does. Be specific.",
+        "placeholder": "Examples: Solitary walks, completing a task, deep work sessions, specific people..."
+      },
+      "moodTriggers": {
+        "question": "What most commonly triggers a negative mood shift for you?",
+        "context": "Select your top 3-5. Understanding your triggers is the first step to managing them.",
+        "options": {
+          "lackOfProgress": { "label": "Feeling stuck or unproductive" },
+          "conflict": { "label": "Interpersonal conflict or tension" },
+          "uncertainty": { "label": "Ambiguity or uncertainty" },
+          "overwhelm": { "label": "Too many demands at once" },
+          "lackOfControl": { "label": "Feeling out of control" },
+          "poorSleep": { "label": "Poor sleep the night before" },
+          "physical": { "label": "Physical discomfort (hunger, pain)" },
+          "isolation": { "label": "Too much time alone" },
+          "overstimulation": { "label": "Too much social interaction" },
+          "criticism": { "label": "Criticism or negative feedback" },
+          "comparison": { "label": "Comparing yourself to others" },
+          "boredom": { "label": "Lack of challenge or meaning" }
+        }
+      },
+      "motivationReliability": {
+        "question": "How reliable is your motivation for important tasks?",
+        "context": "Be honest. This isn't a judgment — unreliable motivation is precisely why systems matter.",
+        "lowLabel": "Very unreliable — depends on mood",
+        "highLabel": "Very reliable — I do what I plan"
+      },
+      "willpowerPattern": {
+        "question": "When you fail to follow through on intentions, what's the most common pattern?",
+        "context": "Select the one that happens most often.",
+        "options": {
+          "neverStart": { "label": "I never start", "description": "The task feels too big or unclear" },
+          "startStop": { "label": "I start but stop quickly", "description": "Initial momentum fades" },
+          "distraction": { "label": "I get distracted", "description": "Something else captures attention" },
+          "perfectionism": { "label": "I overthink and stall", "description": "Perfectionism or analysis paralysis" },
+          "energy": { "label": "I run out of energy", "description": "Willpower depletes" },
+          "forget": { "label": "I simply forget", "description": "It falls off my radar" }
+        }
+      }
+    },
+    "phase2": {
+      "title": "Phase 2",
+      "subtitle": "Identity Mapping",
+      "description": "Understanding who you currently are",
+      "intro": {
+        "heading": "Phase 2: Identity Mapping",
+        "subheading": "Your identity is revealed through your behaviors, not your intentions.",
+        "description": "Now we'll explore who you actually are — not who you wish you were or who you think you should be.\n\nThis phase examines:\n• How you define yourself now\n• What you consistently do (your actual habits)\n• What's already working (keystone behaviors)\n• Your core values and strengths\n\nRemember: sustainable change builds upon who you are, not against it.",
+        "buttonText": "Continue"
+      },
+      "identityStatements": {
+        "question": "Complete this sentence 5-10 times: \"I am someone who...\"",
+        "context": "Write statements that feel true based on your actual behavior. Not aspirations — evidence. What would someone conclude about you from watching your daily life?",
+        "placeholder": "I am someone who...\nI am someone who...\nI am someone who...\nI am someone who...\nI am someone who..."
+      },
+      "othersDescribe": {
+        "question": "How would people who know you well describe you?",
+        "context": "Think about what colleagues, friends, or family would say. What patterns do they notice that you might miss?",
+        "placeholder": "What do people come to you for? What do they expect from you? What surprises them when you don't do it?"
+      },
+      "automaticBehaviors": {
+        "question": "What do you do automatically, without thinking or deciding?",
+        "context": "These are your existing habits — both helpful and unhelpful. Morning routines, responses to stress, how you spend transition time, etc.",
+        "placeholder": "Examples:\n• Check phone first thing in morning\n• Make coffee before anything else\n• Open specific apps when bored\n• Respond to messages immediately\n• Plan tomorrow before sleep"
+      },
+      "keystoneBehaviors": {
+        "question": "Which of your current behaviors create the biggest positive ripple effects?",
+        "context": "Keystone behaviors affect multiple areas of your life. When you do them, other things tend to go well. When you skip them, things start falling apart.",
+        "placeholder": "Examples: Morning exercise, daily planning, consistent sleep schedule, weekly review..."
+      },
+      "coreValues": {
+        "question": "Select the values that feel most essential to who you are.",
+        "context": "Choose 5-7 maximum. Not what you think you should value — what actually drives your decisions and causes distress when violated.",
+        "options": {
+          "growth": { "label": "Growth & Learning" },
+          "autonomy": { "label": "Autonomy & Independence" },
+          "mastery": { "label": "Mastery & Excellence" },
+          "impact": { "label": "Impact & Contribution" },
+          "connection": { "label": "Connection & Relationships" },
+          "integrity": { "label": "Integrity & Honesty" },
+          "creativity": { "label": "Creativity & Innovation" },
+          "security": { "label": "Security & Stability" },
+          "adventure": { "label": "Adventure & Novelty" },
+          "balance": { "label": "Balance & Harmony" },
+          "recognition": { "label": "Recognition & Status" },
+          "service": { "label": "Service & Helping Others" },
+          "wisdom": { "label": "Wisdom & Understanding" },
+          "efficiency": { "label": "Efficiency & Optimization" },
+          "authenticity": { "label": "Authenticity & Self-expression" },
+          "leadership": { "label": "Leadership & Influence" }
+        }
+      },
+      "naturalStrengths": {
+        "question": "What comes naturally to you that others seem to struggle with?",
+        "context": "These are your leverage points. Sustainable identity evolution amplifies strengths rather than fighting weaknesses.",
+        "placeholder": "Think about: What do people ask for your help with? What feels easy to you but hard for others?"
+      },
+      "resistancePatterns": {
+        "question": "What have you repeatedly tried to change about yourself but failed?",
+        "context": "No judgment — this reveals where your current identity is strongly anchored. These areas need identity bridges, not willpower.",
+        "placeholder": "Examples: Exercise consistency, morning routines, eating habits, procrastination patterns..."
+      },
+      "identityClarity": {
+        "question": "How clear is your sense of who you are?",
+        "context": "This is about self-knowledge, not confidence.",
+        "lowLabel": "Unclear — I feel like different people in different contexts",
+        "highLabel": "Very clear — I have a stable sense of self"
+      }
+    },
+    "synthesis": {
+      "title": "Synthesis",
+      "subtitle": "Your Foundation",
+      "heading": "Your Identity Foundation",
+      "description": "A synthesis of your Phase 1 & Phase 2 insights. This becomes the basis for designing sustainable change.",
+      "sections": {
+        "operatingRhythm": {
+          "title": "Your Operating Rhythm",
+          "number": "1"
+        },
+        "energyManagement": {
+          "title": "Energy Management",
+          "number": "2"
+        },
+        "currentIdentity": {
+          "title": "Current Identity",
+          "number": "3"
+        },
+        "behavioralFoundation": {
+          "title": "Behavioral Foundation",
+          "number": "4"
+        },
+        "valuesStrengths": {
+          "title": "Values & Strengths",
+          "number": "5"
+        },
+        "resistancePatterns": {
+          "title": "Resistance Patterns",
+          "helpText": "These areas need identity bridges, not willpower. Phase 3 will address how to design achievable stepping-stone identities."
+        }
+      },
+      "labels": {
+        "peakEnergy": "Peak energy:",
+        "lowEnergy": "Low energy:",
+        "energyConsistency": "Energy consistency:",
+        "motivationReliability": "Motivation reliability:",
+        "primaryFailurePattern": "Primary failure pattern:",
+        "whatDrainsYou": "What drains you:",
+        "whatRestoresYou": "What restores you:",
+        "keyMoodTriggers": "Key mood triggers:",
+        "identityStatements": "Identity statements:",
+        "howOthersSeeYou": "How others see you:",
+        "identityClarity": "Identity clarity:",
+        "automaticBehaviors": "Automatic behaviors (current habits):",
+        "keystoneBehaviors": "Keystone behaviors (high-leverage):",
+        "coreValues": "Core values:",
+        "naturalStrengths": "Natural strengths:"
+      },
+      "whatsNext": {
+        "title": "What's Next?",
+        "description": "You now have a map of your current operating system. Phase 3 (Identity Design) uses this foundation to design who you want to become — ensuring your aspirational identity is:",
+        "achievable": {
+          "title": "Achievable",
+          "description": "a realistic progression from where you are"
+        },
+        "aligned": {
+          "title": "Aligned",
+          "description": "building on your values and strengths"
+        },
+        "bridged": {
+          "title": "Bridged",
+          "description": "with stepping-stone identities to make the path believable"
+        }
+      }
+    },
+    "navigation": {
+      "back": "← Back",
+      "continue": "Continue →",
+      "complete": "Complete Assessment & View AI Insights"
+    }
+  },
+  "insights": {
+    "header": {
+      "title": "Identity Intelligence",
+      "subtitle": "AI-Powered Pattern Analysis",
+      "description": "This uses Claude to dynamically analyze your assessment responses — finding patterns, contradictions, and blind spots that rule-based systems would miss."
+    },
+    "buttons": {
+      "exportAnalysis": "Export Analysis",
+      "exportResponses": "Export Responses",
+      "backToAssessment": "Back to Assessment"
+    },
+    "ready": {
+      "title": "Ready to Analyze",
+      "description": "Click below to send your assessment data to Claude for deep pattern analysis. This typically takes 10-20 seconds.",
+      "button": "Analyze My Responses"
+    },
+    "loading": {
+      "title": "Analyzing...",
+      "description": "Claude is finding patterns in your responses"
+    },
+    "error": {
+      "title": "Analysis Failed",
+      "tryAgain": "Try Again",
+      "downloadRaw": "Download Raw Response"
+    },
+    "tabs": {
+      "patterns": "Patterns",
+      "contradictions": "Contradictions",
+      "blindSpots": "Blind Spots",
+      "leverage": "Leverage",
+      "risks": "Risks",
+      "synthesis": "Identity Synthesis"
+    },
+    "cards": {
+      "evidence": "Evidence",
+      "theTension": "The Tension",
+      "vs": "vs",
+      "whatThisMeans": "What This Means",
+      "hypothesis": "Hypothesis",
+      "reframe": "Reframe",
+      "leveragePoint": "Leverage Point",
+      "reflectionQuestion": "Reflection Question",
+      "highImpact": "High Impact",
+      "mediumImpact": "Medium Impact"
+    },
+    "synthesisTab": {
+      "whoYouAre": "Who You Actually Are",
+      "hiddenStrengths": "Hidden Strengths",
+      "keyTension": "The Key Tension",
+      "nextStep": "Your Next Identity Step",
+      "nextStepHelp": "This is the smallest believable shift from where you are now."
+    },
+    "reanalyze": {
+      "button": "Re-analyze (may find new patterns)",
+      "description": "Each analysis can surface different insights based on Claude's interpretation"
+    }
+  },
+  "common": {
+    "progress": {
+      "stepOf": "{{current}} / {{total}}"
+    }
+  }
+}

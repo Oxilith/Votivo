@@ -1,0 +1,25 @@
+{
+  "peak_energy_times": [
+    "early_morning",
+    "mid_morning"
+  ],
+  "low_energy_times": [
+    "afternoon",
+    "evening",
+    "night"
+  ],
+  "energy_consistency": 2,
+  "energy_drains": "- Spotkania jedno po drugim bez przerwy na regenerację\n- Mówienie \"tak\" na rzeczy, na które powinienem powiedzieć \"nie\"\n- Cudze problemy stają się moimi problemami\n- Poczucie, że jestem w tyle bez względu na to, ile zrobię",
+  "energy_restores": "- Wczesny poranek zanim ktokolwiek się obudzi\n- Długie samotne bieganie\n- Odwoływanie planów (guilty pleasure)\n- Ukończenie czegoś i skreślenie z listy",
+  "mood_triggers_negative": ["overwhelm", "lack_of_control", "criticism", "lack_of_progress", "poor_sleep"],
+  "motivation_reliability": 4,
+  "willpower_pattern": "energy",
+  "identity_statements": "Jestem osobą, która dowozi. Jestem osobą, na której inni polegają. Jestem osobą, która pcha do przodu gdy inni się poddają. Jestem osobą, która jest zmęczona. Jestem osobą, która nie umie zwolnić. Jestem osobą, która mierzy swoją wartość przez wyniki.",
+  "others_describe": "Powiedzieliby, że jestem niezawodny, może zbyt niezawodny. Powiedzieliby, że wyglądam jakbym miał wszystko pod kontrolą. Niektórzy mogliby powiedzieć, że trudno mnie naprawdę poznać. Moja partnerka powiedziałaby, że zawsze jestem rozproszony, nigdy w pełni obecny.",
+  "automatic_behaviors": "- Sprawdzam maila zanim wstanę z łóżka\n- Mówię \"wszystko ok\" gdy ktoś pyta jak się czuję\n- Biorę na siebie więcej niż powinienem na spotkaniach\n- Pracuję podczas lunchu\n- Myślę o pracy próbując zasnąć\n- Przepraszam za rzeczy, które nie są moją winą",
+  "keystone_behaviors": "- Poranny bieg (kiedy to robię, wszystko idzie lepiej)\n- Planowanie tygodnia w niedzielę\n- Spanie 7+ godzin (rzadko, ale transformacyjne)",
+  "core_values": ["mastery", "impact", "integrity", "recognition", "efficiency"],
+  "natural_strengths": "- Dowożenie pod presją\n- Widzenie szerszej perspektywy jednocześnie ogarniając detale\n- Sprawianie, że inni czują się pewnie co do moich umiejętności\n- Praca po godzinach bez narzekania",
+  "resistance_patterns": "- Stawianie granic (wiem że powinienem ale nie potrafię)\n- Delegowanie (szybciej zrobię to sam)\n- Odpoczynek bez poczucia winy\n- Proszenie o pomoc",
+  "identity_clarity": 4
+}
