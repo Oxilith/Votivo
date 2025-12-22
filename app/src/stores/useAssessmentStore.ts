@@ -1,0 +1,124 @@
+/**
+ * @file stores/useAssessmentStore.ts
+ * @purpose Zustand store for managing assessment responses state
+ * @functionality
+ * - Manages assessment response state with persistence
+ * - Provides actions for updating individual responses
+ * - Supports hydration from imported data
+ * - Computes completion status and percentage
+ * - Persists to localStorage for session recovery
+ * @dependencies
+ * - zustand (create, persist, createJSONStorage)
+ * - @/types/assessment.types (AssessmentResponses)
+ */
+
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import type { AssessmentResponses } from '@/types/assessment.types';
+
+const REQUIRED_FIELDS: (keyof AssessmentResponses)[] = [
+  'peak_energy_times',
+  'low_energy_times',
+  'energy_consistency',
+  'energy_drains',
+  'energy_restores',
+  'mood_triggers_negative',
+  'motivation_reliability',
+  'willpower_pattern',
+  'identity_statements',
+  'others_describe',
+  'automatic_behaviors',
+  'keystone_behaviors',
+  'core_values',
+  'natural_strengths',
+  'resistance_patterns',
+  'identity_clarity',
+];
+
+interface AssessmentState {
+  // State
+  responses: Partial<AssessmentResponses>;
+  lastUpdated: string | null;
+
+  // Actions
+  updateResponse: <K extends keyof AssessmentResponses>(
+    key: K,
+    value: AssessmentResponses[K]
+  ) => void;
+  setResponses: (responses: Partial<AssessmentResponses>) => void;
+  clearResponses: () => void;
+
+  // Computed
+  isComplete: () => boolean;
+  getCompletionPercentage: () => number;
+  getResponses: () => Partial<AssessmentResponses>;
+}
+
+export const useAssessmentStore = create<AssessmentState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      responses: {},
+      lastUpdated: null,
+
+      // Actions
+      updateResponse: (key, value) => {
+        set((state) => ({
+          responses: {
+            ...state.responses,
+            [key]: value,
+          },
+          lastUpdated: new Date().toISOString(),
+        }));
+      },
+
+      setResponses: (responses) => {
+        set({
+          responses,
+          lastUpdated: new Date().toISOString(),
+        });
+      },
+
+      clearResponses: () => {
+        set({
+          responses: {},
+          lastUpdated: null,
+        });
+      },
+
+      // Computed
+      isComplete: () => {
+        const { responses } = get();
+        return REQUIRED_FIELDS.every((field) => {
+          const value = responses[field];
+          if (value === undefined || value === null) return false;
+          if (Array.isArray(value)) return value.length > 0;
+          if (typeof value === 'string') return value.trim().length > 0;
+          return true;
+        });
+      },
+
+      getCompletionPercentage: () => {
+        const { responses } = get();
+        const completedFields = REQUIRED_FIELDS.filter((field) => {
+          const value = responses[field];
+          if (value === undefined || value === null) return false;
+          if (Array.isArray(value)) return value.length > 0;
+          if (typeof value === 'string') return value.trim().length > 0;
+          return true;
+        });
+        return Math.round((completedFields.length / REQUIRED_FIELDS.length) * 100);
+      },
+
+      getResponses: () => get().responses,
+    }),
+    {
+      name: 'assessment-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        responses: state.responses,
+        lastUpdated: state.lastUpdated,
+      }),
+    }
+  )
+);

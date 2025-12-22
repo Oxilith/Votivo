@@ -19,9 +19,15 @@ export const ClaudeModel = {
 
 export type ClaudeModel = (typeof ClaudeModel)[keyof typeof ClaudeModel];
 
+export interface ThinkingParams {
+    type: string;
+    budget_tokens: number; // integer
+}
+
 export interface PromptConfig {
   prompt: string;
   temperature: number; // 0 to 1
   model: ClaudeModel;
   max_tokens: number; // integer
+  thinking_params?: ThinkingParams;
 }

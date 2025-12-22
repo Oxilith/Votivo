@@ -1,9 +1,9 @@
 /**
  * @file src/components/insights/IdentityInsightsAI.tsx
- * @purpose AI-powered analysis of assessment responses using Claude API
+ * @purpose AI-powered analysis of assessment responses using Claude API via backend proxy
  * @functionality
  * - Receives assessment responses as props
- * - Sends formatted responses to Claude API for pattern analysis
+ * - Uses Zustand analysis store for state management
  * - Displays analysis results in tabbed interface (patterns, contradictions, blind spots, etc.)
  * - Shows identity synthesis with hidden strengths and next steps
  * - Provides re-analyze functionality for additional insights
@@ -12,29 +12,24 @@
  * - Supports dark mode theme switching
  * - Supports internationalization (English/Polish)
  * @dependencies
- * - React (useState, useEffect, useCallback)
+ * - React (useState, useCallback)
  * - react-i18next (useTranslation)
- * - @/types/assessment.types (AIAnalysisResult, InsightsProps)
- * - @/utils/responseFormatter (formatResponsesForPrompt)
- * - @/config/prompts (IDENTITY_ANALYSIS_CONFIG)
- * - @/services/claudeClient (sendPrompt)
+ * - @/types/assessment.types (InsightsProps, AnalysisPattern, etc.)
+ * - @/stores (useAnalysisStore)
  * - @/styles/theme (cardStyles, textStyles, badgeStyles)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   InsightsProps,
-  AIAnalysisResult,
   AnalysisPattern,
   AnalysisContradiction,
   AnalysisBlindSpot,
   AnalysisLeveragePoint,
   AnalysisRisk,
 } from '@/types/assessment.types';
-import { formatResponsesForPrompt } from '@/utils/responseFormatter';
-import { IDENTITY_ANALYSIS_CONFIG } from '@/config/prompts';
-import { sendPrompt } from '@/services/claudeClient';
+import { useAnalysisStore } from '@/stores';
 import { cardStyles, textStyles, badgeStyles } from '@/styles/theme';
 
 type InsightType = 'pattern' | 'contradiction' | 'blindSpot' | 'leverage' | 'risk';
@@ -156,78 +151,24 @@ interface Tab {
   icon: string;
 }
 
-const IdentityInsightsAI: React.FC<InsightsProps> = ({ responses, onBack, onAnalysisReady }) => {
+const IdentityInsightsAI: React.FC<InsightsProps> = ({ responses, onBack }) => {
   const { t, i18n } = useTranslation();
-  const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [rawResponse, setRawResponse] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('patterns');
 
-  const exportAnalysisToJson = useCallback(() => {
-    if (!analysis) return;
-    const jsonString = JSON.stringify(analysis, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'identity-analysis-results.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }, [analysis]);
+  // Use Zustand analysis store
+  const {
+    analysis,
+    rawResponse,
+    isAnalyzing: loading,
+    analysisError: error,
+    analyze,
+    downloadRawResponse,
+  } = useAnalysisStore();
 
-  // Notify parent when analysis export function is ready
-  useEffect(() => {
-    if (analysis) {
-      onAnalysisReady?.(exportAnalysisToJson);
-    } else {
-      onAnalysisReady?.(null);
-    }
-  }, [analysis, exportAnalysisToJson, onAnalysisReady]);
-
-  const downloadRawResponse = () => {
-    if (!rawResponse) return;
-    const blob = new Blob([rawResponse], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'raw-ai-response.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  const analyzeWithClaude = async () => {
-    setLoading(true);
-    setError(null);
-    setRawResponse(null);
-
-    // Map i18n language code to the format expected by the prompt
+  const analyzeWithClaude = useCallback(async () => {
     const language = i18n.language === 'pl' ? 'polish' : 'english';
-    const formattedData = formatResponsesForPrompt(responses);
-    const dataWithLanguage = `language: ${language}\n\n${formattedData}`;
-
-    try {
-      const { text, rawResponse } = await sendPrompt(IDENTITY_ANALYSIS_CONFIG, dataWithLanguage);
-      setRawResponse(rawResponse);
-
-      try {
-        const parsed = JSON.parse(text) as AIAnalysisResult;
-        setAnalysis(parsed);
-      } catch (parseErr) {
-        const errorMsg = parseErr instanceof Error ? parseErr.message : 'JSON parse error';
-        throw new Error(`JSON parsing failed: ${errorMsg}. Raw response saved for debugging.`);
-      }
-    } catch (err) {
-      console.error('Analysis error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to analyze responses');
-    } finally {
-      setLoading(false);
-    }
-  };
+    await analyze(responses, language);
+  }, [analyze, responses, i18n.language]);
 
   const tabs: Tab[] = analysis
     ? [

@@ -4,138 +4,163 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Identity Foundations Assessment - a behavioral psychology and habit formation application with:
+Identity Foundations Assessment - a full-stack behavioral psychology assessment application with AI-powered analysis.
 
-1. **Motivation.md** (`/docs`) - Comprehensive framework documentation defining the psychological model (5 phases: State Awareness, Identity Mapping, Identity Design, System Implementation, Feedback & Integration)
-2. **React Application** (`/app`) - Vite + React + TypeScript implementation of the assessment flow
+**Architecture**: Monorepo with three packages:
+- `/app` - React frontend
+- `/backend` - Express API proxy
+- `/shared` - Shared TypeScript types (single source of truth)
 
-## Build Commands
+## Build & Development Commands
 
+### Frontend (`/app`)
 ```bash
-cd app
+npm run dev           # Vite dev server (localhost:5174)
+npm run build         # TypeScript + Vite production build
+npm run lint          # ESLint
+npm run type-check    # TypeScript only
+npm run test          # Vitest watch mode
+npm run test:run      # Vitest single run
+npm run test:coverage # Coverage report (80% threshold)
+```
 
-# Install dependencies
-npm install
+### Backend (`/backend`)
+```bash
+npm run dev           # tsx watch (localhost:3001)
+npm run build         # TypeScript compile
+npm run start         # Run compiled dist/
+npm run lint          # ESLint
+npm run type-check    # TypeScript only
+npm run test          # Vitest
+npm run test:coverage # Coverage report
+```
 
-# Development server
-npm run dev
-
-# Build for production (TypeScript + Vite)
-npm run build
-
-# Lint code
-npm run lint
-
-# Type check only
-npx tsc --noEmit
+### Docker
+```bash
+docker-compose up     # Start full stack (frontend:80, backend:3001)
 ```
 
 ## Code Standards
 
 ### TypeScript
-- **No `any` types** - use specific types or `unknown` when type cannot be determined
-- **Path aliases** - always use `@/` imports (e.g., `@/components/shared/Header`), never relative paths
-- **Strict mode** enabled with `noUnusedLocals`, `noUnusedParameters`
+- **No `any` types** - use specific types or `unknown`
+- **Path aliases** - always use `@/` imports, never relative paths
+- **Shared types** - use `@shared/` for types shared between frontend/backend
+- **Strict mode** - `noUnusedLocals`, `noUnusedParameters` enforced
 - Use `React.ComponentRef` (not deprecated `React.ElementRef`)
 
 ### Documentation Headers
-Every component/service must have JSDoc header:
+Every component/service requires JSDoc header:
 ```typescript
 /**
  * @file src/path/to/file.ts
  * @purpose Single sentence describing business value (max 25 words)
  * @functionality
- * - Bullet point describing feature 1
- * - Bullet point describing feature 2
+ * - Feature bullet 1
+ * - Feature bullet 2
  * @dependencies
- * - React hooks used
- * - Custom components with paths
- * - External libraries
+ * - React hooks, custom components, external libraries
  */
 ```
 
-## React Application Architecture (`/app`)
+### Quality Gates
+- All changes must pass `npm run lint` and `npm run type-check` with zero warnings/errors
+- Documentation must be updated when code changes
 
-### Key Files
+## Architecture
 
-| File | Purpose |
-|------|---------|
-| `src/App.tsx` | Root component - manages view state and response data |
-| `src/components/assessment/` | Multi-phase questionnaire wizard |
-| `src/components/insights/` | Claude API integration for pattern analysis |
-| `src/components/shared/Header.tsx` | Navigation, theme toggle, export dropdown |
-| `src/services/claudeClient.ts` | Reusable Claude API client |
-| `src/config/prompts.ts` | AI prompt configurations (PromptConfig objects) |
-| `src/styles/theme.ts` | Shared Tailwind theme utilities (cardStyles, textStyles) |
-| `src/types/assessment.types.ts` | TypeScript interfaces for all data structures |
-| `src/types/prompt.types.ts` | ClaudeModel enum and PromptConfig interface |
+### Shared Package (`/shared/src`)
 
-### Styling System
-- **Tailwind CSS v4** with PostCSS
-- **Theme utilities** in `src/styles/theme.ts` - shared card/text styles for consistency
-- **Dark/light mode** via `ThemeContext` + `ThemeProvider`
+Single source of truth for types and prompts used by both frontend and backend:
+- `assessment.types.ts` - Core domain types (TimeOfDay, MoodTrigger, CoreValue, WillpowerPattern, AssessmentResponses)
+- `analysis.types.ts` - AI analysis result types (AnalysisPattern, AnalysisContradiction, AnalysisBlindSpot, AnalysisLeveragePoint, AnalysisRisk, IdentitySynthesis, AIAnalysisResult)
+- `labels.ts` - Human-readable label mappings for enum values
+- `prompts.ts` - AI prompt templates (IDENTITY_ANALYSIS_PROMPT)
+- `index.ts` - Barrel exports
 
-### Internationalization
-- **i18next** with browser language detection
-- Languages: English (`src/i18n/resources/en/`) and Polish (`src/i18n/resources/pl/`)
-- Translation files: `common.json` for each language
-- See `/docs/InternationalizationGuide.md` for i18n architecture details
+Import via `@shared/index` in both frontend and backend.
 
-### Application Flow
+### Frontend (`/app/src`)
 
-1. **Assessment View** (default) - Multi-phase questionnaire collecting:
-   - Phase 1: Energy patterns, mood triggers, willpower patterns
-   - Phase 2: Identity statements, behaviors, values, strengths
-   - Synthesis: Summary of all responses
+**State Management** - Zustand stores (not Redux):
+- `stores/useAssessmentStore.ts` - Assessment responses with localStorage persistence
+- `stores/useUIStore.ts` - View state, navigation, loading/error
+- `stores/useAnalysisStore.ts` - AI analysis results
 
-2. **Insights View** - AI-powered analysis via Claude API displaying:
-   - Patterns, contradictions, blind spots
-   - Leverage points, risks
-   - Identity synthesis with next steps
+**Service Layer**:
+- `services/api/ApiClient.ts` - HTTP client with retry logic, timeout handling
+- `services/api/ClaudeService.ts` - Backend API calls for analysis
+- `services/interfaces/` - TypeScript interfaces for dependency injection
 
-### Data Management
+**Key Directories**:
+- `components/assessment/` - Multi-phase questionnaire wizard (split into steps/, hooks/, navigation/)
+- `components/insights/` - AI analysis display
+- `components/shared/` - Header, theme toggle
+- `styles/theme.ts` - Shared Tailwind utilities (cardStyles, textStyles)
+- `i18n/resources/` - Translations (en/, pl/)
+- `config/prompts.ts` - AI prompt configurations (imports prompt from @shared)
 
-- **Import**: Load responses from JSON file
-- **Export Responses**: Download assessment responses as JSON
-- **Export Analysis**: Download AI analysis results as JSON
-- **Load Sample**: Quick-fill with test data from `/personas` directory
+### Backend (`/backend/src`)
 
-### Environment Variables
+**API Proxy** - Protects Anthropic API key from browser exposure:
+- `services/claude.service.ts` - Claude API integration with retry logic (uses prompt from @shared)
+- `controllers/claude.controller.ts` - Request handler for analysis endpoint
+- `routes/api/v1/` - API route definitions (`/api/v1/claude/analyze`)
+- `validators/claude.validator.ts` - Zod request validation schemas
+- `types/claude.types.ts` - Re-exports shared types, defines API request/response types
+- `middleware/` - CORS, rate limiting, error handling, helmet
+- `config/index.ts` - Zod-validated environment configuration
+- `utils/logger.ts` - Pino structured logging
 
-Create `.env` file in `/app`:
+### Data Flow
 ```
-VITE_ANTHROPIC_API_KEY=your-api-key-here
+Frontend (Zustand) → ApiClient → Backend (Express) → Claude API
+                    ↓                        ↓
+              localStorage                Pino logs
 ```
 
-## Domain Framework (Motivation.md)
+## Environment Variables
 
-The psychological model is structured in 5 phases:
+### Backend (`/backend/.env`)
+```
+ANTHROPIC_API_KEY=sk-ant-...  # Required
+PORT=3001
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:5174
+```
 
-1. **State Awareness** - Energy patterns, mood triggers, motivation reliability
-2. **Identity Mapping** - Current self-identity revealed through behaviors
+### Frontend (`/app/.env`)
+```
+VITE_API_URL=http://localhost:3001
+```
+
+## Testing
+
+- Frontend: Vitest + React Testing Library + MSW for mocking
+- Backend: Vitest + Supertest
+- Test files: `**/__tests__/*.test.ts` or `**/*.test.tsx`
+- Coverage thresholds: 80% lines/functions/statements, 75% branches
+
+## Domain Framework
+
+5-phase psychological model (see `/docs/Motivation.md`):
+1. **State Awareness** - Energy, mood, motivation patterns
+2. **Identity Mapping** - Current self through behaviors/values
 3. **Identity Design** - Aspirational identity with stepping-stones
 4. **System Implementation** - Habit loops, environment design
-5. **Feedback & Integration** - Progress tracking and reinforcement
+5. **Feedback & Integration** - Progress tracking
 
-Key concepts:
-- **Habit Loop**: Cue → Craving → Response → Reward
-- **Keystone Behaviors**: Actions with cascading positive effects
-- **Identity-Based Goals**: "I am someone who..." (not "I want to...")
-- **Identity Gap/Bridge**: Manageable distance between current and aspirational self
-
-## AI Analysis Output Schema
-
-The Claude API expects to return JSON with:
-- `patterns` - Behavioral patterns with evidence and leverage points
+**AI Analysis Output** (`AIAnalysisResult` type):
+- `patterns` - Behavioral patterns with evidence
 - `contradictions` - Tensions between values and behaviors
-- `blindSpots` - Things revealed by data but not seen by user
+- `blindSpots` - Data-revealed but user-unseen insights
 - `leveragePoints` - High-ROI areas for change
 - `risks` - Why change attempts might fail
-- `identitySynthesis` - Core identity, hidden strengths, key tension, next identity step
+- `identitySynthesis` - Core identity, hidden strengths, next steps
 
 ## Test Data
 
-Sample persona files in `/personas`:
+Sample personas in `/personas/`:
 - `persona-1-burned-out-achiever-{en,pl}.json`
 - `persona-2-scattered-creative-{en,pl}.json`
 - `persona-3-careful-planner-{en,pl}.json`

@@ -1,50 +1,53 @@
 /**
  * @file src/App.tsx
- * @purpose Root application component managing view state, assessment responses, theme, and i18n
+ * @purpose Root application component with Zustand state management
  * @functionality
- * - Manages application view state (assessment vs insights)
- * - Lifts assessment responses state for sharing between components
- * - Handles transitions between questionnaire and insights views
- * - Coordinates import/export functionality
+ * - Uses Zustand stores for state management
+ * - Coordinates view transitions between assessment and insights
  * - Provides persistent header with navigation and data management
- * - Navigates to synthesis page on import/load sample data
  * - Provides theme context to component tree for dark/light mode
  * @dependencies
- * - React (useState, useCallback)
+ * - React (useCallback)
+ * - @/stores (useAssessmentStore, useUIStore, useAnalysisStore)
  * - @/components/assessment/IdentityFoundationsAssessment
  * - @/components/insights/IdentityInsightsAI
  * - @/components/shared/Header
  * - @/types/assessment.types
  * - @/utils/fileUtils
- * - @/data/sampleResponses
- * - @/components/providers/ThemeProvider (ThemeProvider)
+ * - @/components/providers/ThemeProvider
  */
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import IdentityFoundationsAssessment from '@/components/assessment/IdentityFoundationsAssessment';
 import IdentityInsightsAI from '@/components/insights/IdentityInsightsAI';
 import Header from '@/components/shared/Header';
-import type { AssessmentResponses, AppView } from '@/types/assessment.types';
+import type { AssessmentResponses } from '@/types/assessment.types';
 import { exportToJson } from '@/utils/fileUtils';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { useAssessmentStore, useUIStore, useAnalysisStore } from '@/stores';
 
 function App() {
-  const [currentView, setCurrentView] = useState<AppView>('assessment');
-  const [responses, setResponses] = useState<Partial<AssessmentResponses>>({});
-  const [assessmentKey, setAssessmentKey] = useState(0);
-  const [startAtSynthesis, setStartAtSynthesis] = useState(false);
-  const [analysisExportFn, setAnalysisExportFn] = useState<(() => void) | null>(null);
+  // Zustand stores
+  const { responses, setResponses } = useAssessmentStore();
+  const { currentView, setView, assessmentKey, incrementAssessmentKey, startAtSynthesis, setStartAtSynthesis } = useUIStore();
+  const { analysis, exportAnalysisToJson } = useAnalysisStore();
 
-  const handleAssessmentComplete = useCallback((completedResponses: AssessmentResponses) => {
-    setResponses(completedResponses);
-    setCurrentView('insights');
-  }, []);
+  const handleAssessmentComplete = useCallback(
+    (completedResponses: AssessmentResponses) => {
+      setResponses(completedResponses);
+      setView('insights');
+    },
+    [setResponses, setView]
+  );
 
-  const handleImportResponses = useCallback((imported: AssessmentResponses) => {
-    setResponses(imported);
-    setStartAtSynthesis(true);
-    setAssessmentKey((prev) => prev + 1); // Force remount with new initial state
-  }, []);
+  const handleImportResponses = useCallback(
+    (imported: AssessmentResponses) => {
+      setResponses(imported);
+      setStartAtSynthesis(true);
+      incrementAssessmentKey();
+    },
+    [setResponses, setStartAtSynthesis, incrementAssessmentKey]
+  );
 
   const handleExportResponses = useCallback(() => {
     if (Object.keys(responses).length > 0) {
@@ -53,11 +56,11 @@ function App() {
   }, [responses]);
 
   const handleBackToAssessment = useCallback(() => {
-    setCurrentView('assessment');
-    setAnalysisExportFn(null);
-  }, []);
+    setView('assessment');
+  }, [setView]);
 
   const hasResponses = Object.keys(responses).length > 0;
+  const hasAnalysis = !!analysis;
 
   return (
     <ThemeProvider>
@@ -67,14 +70,23 @@ function App() {
           hasResponses={hasResponses}
           onImport={handleImportResponses}
           onExport={handleExportResponses}
-          onExportAnalysis={analysisExportFn ?? undefined}
-          hasAnalysis={!!analysisExportFn}
+          onExportAnalysis={hasAnalysis ? exportAnalysisToJson : undefined}
+          hasAnalysis={hasAnalysis}
         />
 
         {currentView === 'assessment' ? (
-          <IdentityFoundationsAssessment key={assessmentKey} initialResponses={responses} onComplete={handleAssessmentComplete} startAtSynthesis={startAtSynthesis} />
+          <IdentityFoundationsAssessment
+            key={assessmentKey}
+            initialResponses={responses}
+            onComplete={handleAssessmentComplete}
+            startAtSynthesis={startAtSynthesis}
+          />
         ) : (
-          <IdentityInsightsAI responses={responses as AssessmentResponses} onBack={handleBackToAssessment} onExport={handleExportResponses} onAnalysisReady={setAnalysisExportFn} />
+          <IdentityInsightsAI
+            responses={responses as AssessmentResponses}
+            onBack={handleBackToAssessment}
+            onExport={handleExportResponses}
+          />
         )}
       </div>
     </ThemeProvider>

@@ -3,66 +3,23 @@
  * @purpose Formats assessment responses into structured text for AI analysis
  * @functionality
  * - Converts response object to formatted markdown string
- * - Maps internal IDs to human-readable labels
+ * - Re-exports shared label mappings for use in components
  * - Structures data for optimal Claude analysis
  * @dependencies
  * - @/types/assessment.types (AssessmentResponses)
+ * - @shared/index (shared label mappings)
  */
 
-import type { AssessmentResponses, TimeOfDay, MoodTrigger, CoreValue, WillpowerPattern } from '@/types/assessment.types';
+import type { AssessmentResponses } from '@/types/assessment.types';
+import {
+  valueLabels,
+  timeLabels,
+  triggerLabels,
+  willpowerLabels,
+} from '@shared/index';
 
-export const valueLabels: Record<CoreValue, string> = {
-  growth: 'Growth & Learning',
-  autonomy: 'Autonomy & Independence',
-  mastery: 'Mastery & Excellence',
-  impact: 'Impact & Contribution',
-  connection: 'Connection & Relationships',
-  integrity: 'Integrity & Honesty',
-  creativity: 'Creativity & Innovation',
-  security: 'Security & Stability',
-  adventure: 'Adventure & Novelty',
-  balance: 'Balance & Harmony',
-  recognition: 'Recognition & Status',
-  service: 'Service & Helping Others',
-  wisdom: 'Wisdom & Understanding',
-  efficiency: 'Efficiency & Optimization',
-  authenticity: 'Authenticity & Self-expression',
-  leadership: 'Leadership & Influence',
-};
-
-export const timeLabels: Record<TimeOfDay, string> = {
-  early_morning: 'Early morning (5-8am)',
-  mid_morning: 'Mid-morning (8-11am)',
-  midday: 'Midday (11am-2pm)',
-  afternoon: 'Afternoon (2-5pm)',
-  evening: 'Evening (5-8pm)',
-  night: 'Night (8pm-12am)',
-  late_night: 'Late night (after midnight)',
-};
-
-export const triggerLabels: Record<MoodTrigger, string> = {
-  lack_of_progress: 'Feeling stuck or unproductive',
-  conflict: 'Interpersonal conflict or tension',
-  uncertainty: 'Ambiguity or uncertainty',
-  overwhelm: 'Too many demands at once',
-  lack_of_control: 'Feeling out of control',
-  poor_sleep: 'Poor sleep the night before',
-  physical: 'Physical discomfort',
-  isolation: 'Too much time alone',
-  overstimulation: 'Too much social interaction',
-  criticism: 'Criticism or negative feedback',
-  comparison: 'Comparing yourself to others',
-  boredom: 'Lack of challenge or meaning',
-};
-
-export const willpowerLabels: Record<WillpowerPattern, string> = {
-  never_start: 'Never starting - task feels too big or unclear',
-  start_stop: 'Starting but stopping quickly - momentum fades',
-  distraction: 'Getting distracted - something else captures attention',
-  perfectionism: 'Overthinking and stalling - analysis paralysis',
-  energy: 'Running out of energy - willpower depletes',
-  forget: 'Simply forgetting - falls off radar',
-};
+// Re-export labels for components that import from this file
+export { valueLabels, timeLabels, triggerLabels, willpowerLabels };
 
 export const formatResponsesForPrompt = (responses: AssessmentResponses): string => {
   return `
