@@ -50,8 +50,18 @@ Generate locally-trusted certificates using mkcert:
 brew install mkcert
 mkcert -install
 
-# Generate certificates
+# Install mkcert (Windows - run as Administrator)
+choco install mkcert
+mkcert -install
+
+# Generate certificates (macOS/Linux)
 mkdir -p certs
+cd certs
+mkcert localhost 127.0.0.1 ::1
+cd ..
+
+# Generate certificates (Windows PowerShell)
+New-Item -ItemType Directory -Force -Path certs
 cd certs
 mkcert localhost 127.0.0.1 ::1
 cd ..
