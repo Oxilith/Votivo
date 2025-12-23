@@ -2,7 +2,7 @@ name: votive
 
 services:
   backend:
-    image: oxilith/votive
+    image: oxilith/votive-backend:latest
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -33,7 +33,7 @@ services:
       - app-network
 
   frontend:
-    image: oxilith/votive-frontend
+    image: oxilith/votive-frontend:latest
     build:
       context: .
       dockerfile: app/Dockerfile
