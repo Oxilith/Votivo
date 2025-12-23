@@ -46,7 +46,7 @@ app.use(
   pinoHttp({
     logger,
     autoLogging: {
-      ignore: (req: { url?: string }) => req.url === '/health' || req.url === '/api/v1/health',
+      ignore: (req: { url?: string }) => req.url === '/health' || req.url === '/health/ready',
     },
   })
 );

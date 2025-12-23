@@ -12,7 +12,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
-import { config } from '../../config/index.js';
+import { config } from '@/config/index.js';
 import type { HealthCheck, ComponentHealth } from '../types.js';
 
 const HEALTH_CHECK_MODEL = 'claude-sonnet-4-20250514';

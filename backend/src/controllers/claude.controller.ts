@@ -18,7 +18,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { analyzeRequestSchema } from '../validators/claude.validator.js';
 import { analyzeAssessment } from '../services/claude.service.js';
-import { createAppError } from '../middleware/error.middleware.js';
+import { createAppError } from '@/middleware/index.js';
 import { logger } from '../utils/logger.js';
 import type { AnalyzeResponse } from '../types/claude.types.js';
 
@@ -36,11 +36,14 @@ export async function analyze(
         .map((e) => `${e.path.join('.')}: ${e.message}`)
         .join('; ');
 
-      throw createAppError(
-        `Validation failed: ${errorMessages}`,
-        StatusCodes.BAD_REQUEST,
-        'VALIDATION_ERROR'
+      next(
+        createAppError(
+          `Validation failed: ${errorMessages}`,
+          StatusCodes.BAD_REQUEST,
+          'VALIDATION_ERROR'
+        )
       );
+      return;
     }
 
     const { responses, language } = validationResult.data;

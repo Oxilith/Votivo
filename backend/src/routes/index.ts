@@ -3,23 +3,23 @@
  * @purpose Main route aggregator with API versioning
  * @functionality
  * - Mounts versioned API routes
- * - Provides root health endpoint for Docker/load balancer liveness checks
+ * - Provides health endpoints for Docker/K8s liveness and readiness probes
  * @dependencies
  * - express.Router
  * - ./api/v1
- * - @/controllers/health.controller
+ * - ./health.routes
  */
 
 import { Router } from 'express';
 import v1Routes from './api/v1/index.js';
-import { liveness } from '../controllers/health.controller.js';
+import healthRoutes from './health.routes.js';
 
 const router = Router();
 
 // API v1 routes
 router.use('/api/v1', v1Routes);
 
-// Root health check for Docker/load balancer liveness
-router.get('/health', liveness);
+// Health endpoints for container orchestration
+router.use('/health', healthRoutes);
 
 export default router;

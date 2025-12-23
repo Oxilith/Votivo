@@ -16,7 +16,7 @@ import { config } from '../config/index.js';
 
 export const rateLimiter = rateLimit({
   windowMs: config.rateLimitWindowMs,
-  max: config.rateLimitMaxRequests,
+  limit: config.rateLimitMaxRequests,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -33,7 +33,7 @@ export const rateLimiter = rateLimit({
 // Stricter rate limiter for Claude API calls
 export const claudeRateLimiter = rateLimit({
   windowMs: 60000, // 1 minute
-  max: 5, // 5 requests per minute (Claude is expensive)
+  limit: 5, // 5 requests per minute (Claude is expensive)
   standardHeaders: true,
   legacyHeaders: false,
   message: {

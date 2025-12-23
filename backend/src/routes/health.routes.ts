@@ -1,16 +1,16 @@
 /**
- * @file routes/api/v1/health.routes.ts
- * @purpose Health and readiness check endpoints
+ * @file routes/health.routes.ts
+ * @purpose Health and readiness check endpoints for container orchestration
  * @functionality
- * - GET /health - Basic liveness check
- * - GET /health/ready - Readiness with dependency checks
+ * - GET /health - Basic liveness check for Docker/K8s probes
+ * - GET /health/ready - Readiness check with dependency verification
  * @dependencies
  * - express.Router
  * - @/controllers/health.controller
  */
 
 import { Router } from 'express';
-import { liveness, readiness } from '../../../controllers/health.controller.js';
+import { liveness, readiness } from '@/controllers/health.controller.js';
 
 const router = Router();
 
