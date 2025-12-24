@@ -1,21 +1,87 @@
-MIT License
+# Votive Source Available License
 
-Copyright (c) 2025 Konrad Jagusiak
+Version 1.0, December 2025
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## Copyright
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Copyright © 2025-present Konrad Jagusiak - Oxilith. All rights reserved.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## Definitions
+
+- **"Software"** means the Votive source code, documentation, and associated files made available under this License.
+- **"Licensor"** means Konrad Jagusiak - Oxilith, the copyright holder.
+- **"You"** means the individual or entity accessing or using the Software.
+
+## Grant of Rights
+
+Subject to the terms of this License, the Licensor grants You a limited, non-exclusive, non-transferable, revocable license to:
+
+1. **View** the Software source code
+2. **Study** the Software for educational and research purposes
+3. **Fork** the repository for personal, non-commercial experimentation
+4. **Propose contributions** back to the official repository via pull requests
+
+## Restrictions
+
+You may **NOT**, without prior written permission from the Licensor:
+
+1. **Use commercially** — Use the Software, in whole or in part, for any commercial purpose, including but not limited to:
+   2. Incorporating into commercial products or services
+   3. Offering as a hosted service (SaaS)
+   4. Using in internal business operations that generate revenue
+
+2. **Redistribute** — Distribute, sublicense, sell, lease, or otherwise transfer the Software or derivative works to third parties
+
+3. **Create competing products** — Use the Software to develop any product or service that competes with Votive or any product or service offered by the Licensor
+
+4. **Remove notices** — Remove, alter, or obscure any copyright, trademark, or license notices
+
+5. **Claim ownership** — Represent that You own or created the Software
+
+## Contributions
+
+By submitting contributions (pull requests, issues, suggestions) to this repository, You:
+
+1. Grant the Licensor a perpetual, worldwide, royalty-free, irrevocable license to use, modify, and incorporate Your contributions
+2. Confirm You have the right to grant such license
+3. Understand Your contributions will be subject to this License
+
+## Commercial Licensing
+
+For commercial use, enterprise licensing, or any use not permitted above, contact:
+
+- Email: [your-email@example.com]
+- Website: [your-website.com]
+
+## No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Termination
+
+This License is effective until terminated. Your rights under this License will terminate automatically without notice if You fail to comply with any of its terms. Upon termination, You must destroy all copies of the Software in Your possession.
+
+## Governing Law
+
+This License shall be governed by and construed in accordance with the laws of Poland, without regard to its conflict of law provisions.
+
+## Changes to This License
+
+The Licensor reserves the right to modify this License at any time. Changes will apply to versions of the Software released after the modification date.
+
+---
+
+**Summary (not legally binding):**
+
+| Action                  | Permitted              |
+| ----------------------- | ---------------------- |
+| View source code        | ✅ Yes                  |
+| Learn from code         | ✅ Yes                  |
+| Fork for personal study | ✅ Yes                  |
+| Submit contributions    | ✅ Yes                  |
+| Commercial use          | ❌ No (without license) |
+| Redistribute            | ❌ No                   |
+| Build competing product | ❌ No                   |
+| Use in SaaS             | ❌ No (without license) |
