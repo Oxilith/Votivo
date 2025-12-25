@@ -29,10 +29,11 @@ A 5-phase identity-based approach to sustainable change:
 
 - **Frontend**: React 19 + TypeScript + Vite + Zustand
 - **Backend**: Node.js + Express + TypeScript
+- **Prompt Service**: Express + Prisma + SQLite (encrypted with libsql)
 - **Styling**: Tailwind CSS v4
 - **Internationalization**: i18next (English & Polish)
 - **AI Analysis**: Claude API via backend proxy
-- **Testing**: Vitest + React Testing Library
+- **Testing**: Vitest + React Testing Library (all packages)
 
 ## Getting Started
 
@@ -150,6 +151,26 @@ npm run build         # Compile TypeScript
 npm run start         # Run production build
 npm run lint          # Run ESLint
 npm run test          # Run tests
+```
+
+### Prompt Service (`/prompt-service`)
+```bash
+npm run dev           # Start with hot reload
+npm run build         # Compile TypeScript + Admin UI
+npm run lint          # Run ESLint
+npm run type-check    # TypeScript check
+npm run test          # Run tests (watch)
+npm run test:run      # Run tests (once)
+npm run db:generate   # Generate Prisma client
+npm run db:migrate    # Run migrations
+```
+
+### Shared (`/shared`)
+```bash
+npm run lint          # Run ESLint
+npm run type-check    # TypeScript check
+npm run test          # Run tests (watch)
+npm run test:run      # Run tests (once)
 ```
 
 ### Docker

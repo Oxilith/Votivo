@@ -25,6 +25,15 @@ import type { PromptConfig } from 'shared/index.js';
 const REQUEST_TIMEOUT_MS = 5000;
 const MAX_BACKGROUND_RETRY_ATTEMPTS = 5;
 
+/**
+ * Prompts to refresh when circuit breaker closes (service recovers)
+ * Add new prompt keys here as they are added to the system
+ */
+const PROMPTS_TO_CACHE_ON_RECOVERY = [
+  { key: 'IDENTITY_ANALYSIS', thinkingEnabled: true },
+  { key: 'IDENTITY_ANALYSIS', thinkingEnabled: false },
+] as const;
+
 export interface ResolvePromptResponse {
   config: PromptConfig;
   abTestId?: string;
@@ -210,12 +219,7 @@ export class PromptClientService {
   private refreshAllCachedPrompts(): void {
     logger.info('Service recovered - refreshing prompt cache');
 
-    const promptsToRefresh = [
-      { key: 'IDENTITY_ANALYSIS', thinkingEnabled: true },
-      { key: 'IDENTITY_ANALYSIS', thinkingEnabled: false },
-    ];
-
-    for (const { key, thinkingEnabled } of promptsToRefresh) {
+    for (const { key, thinkingEnabled } of PROMPTS_TO_CACHE_ON_RECOVERY) {
       this.scheduleBackgroundRefresh(key, thinkingEnabled);
     }
   }

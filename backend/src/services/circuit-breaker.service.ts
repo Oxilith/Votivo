@@ -14,6 +14,9 @@
 import CircuitBreaker from 'opossum';
 import { logger } from '@/utils/logger.js';
 
+// Registry to track circuit breakers for cleanup during shutdown
+const circuitBreakerRegistry = new Map<string, CircuitBreaker>();
+
 export interface CircuitBreakerConfig {
   /** Request timeout in milliseconds (default: 5000) */
   timeout: number;
@@ -75,6 +78,9 @@ export function createCircuitBreaker<TArgs extends unknown[], TResult>(
     logger.debug({ circuit: name }, 'Circuit breaker rejected request (circuit open)');
   });
 
+  // Register circuit breaker for cleanup
+  circuitBreakerRegistry.set(name, breaker);
+
   return breaker;
 }
 
@@ -85,4 +91,29 @@ export function isCircuitOpen<TArgs extends unknown[], TResult>(
   breaker: CircuitBreaker<TArgs, TResult>
 ): boolean {
   return breaker.opened;
+}
+
+/**
+ * Destroys a specific circuit breaker and removes event listeners
+ * @param name - The name of the circuit breaker to destroy
+ */
+export function destroyCircuitBreaker(name: string): void {
+  const breaker = circuitBreakerRegistry.get(name);
+  if (breaker) {
+    breaker.removeAllListeners();
+    circuitBreakerRegistry.delete(name);
+    logger.debug({ circuit: name }, 'Circuit breaker destroyed');
+  }
+}
+
+/**
+ * Destroys all circuit breakers and removes event listeners
+ * Call during graceful shutdown to prevent memory leaks
+ */
+export function destroyAllCircuitBreakers(): void {
+  for (const [name, breaker] of circuitBreakerRegistry) {
+    breaker.removeAllListeners();
+    logger.debug({ circuit: name }, 'Circuit breaker destroyed');
+  }
+  circuitBreakerRegistry.clear();
 }

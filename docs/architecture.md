@@ -168,6 +168,7 @@ stateDiagram-v2
 - **Fail Fast**: When prompt-service is unavailable, fail immediately (503) rather than waiting
 - **Automatic Recovery**: Circuit transitions to half-open after 30s, allowing recovery
 - **Cache Integration**: Stale cache entries can trigger background refresh when circuit closes
+- **Graceful Shutdown**: `destroyAllCircuitBreakers()` function removes event listeners to prevent memory leaks
 
 **Configuration**:
 | Parameter | Value | Purpose |
@@ -194,6 +195,8 @@ stateDiagram-v2
 | > STALE_TTL_MS | - | Expired - delete entry |
 
 **Resilience**: When prompt-service is unavailable but stale cached data exists, the system returns stale data instead of failing. A background refresh is scheduled to update the cache when the service recovers.
+
+**Cache Key Format**: `${promptKey}|${thinkingEnabled}` (uses `|` delimiter to avoid collision with keys containing `:true` or `:false`).
 
 **Note**: Cache is per-process. In multi-instance deployments, each instance maintains its own cache.
 

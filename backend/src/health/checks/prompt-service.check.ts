@@ -17,15 +17,13 @@ import type { HealthCheck, ComponentHealth } from '../types.js';
 const HEALTH_CHECK_TIMEOUT_MS = 5000;
 
 async function checkPromptServiceHealth(): Promise<ComponentHealth> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, HEALTH_CHECK_TIMEOUT_MS);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => { controller.abort(); }, HEALTH_CHECK_TIMEOUT_MS);
 
+  try {
     const response = await fetch(`${config.promptServiceUrl}/health`, {
       signal: controller.signal,
     });
-
-    clearTimeout(timeoutId);
 
     if (response.ok) {
       return {
@@ -50,6 +48,8 @@ async function checkPromptServiceHealth(): Promise<ComponentHealth> {
       status: 'unhealthy',
       message,
     };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

@@ -58,11 +58,22 @@ npm run build         # TypeScript compile
 npm run start         # Run compiled dist/
 npm run lint          # ESLint
 npm run type-check    # TypeScript only
+npm run test          # Vitest watch mode
+npm run test:run      # Vitest single run
+npm run test:coverage # Coverage report
 npm run db:generate   # Generate Prisma client
 npm run db:migrate    # Run database migrations
 npm run db:seed       # Seed initial prompt data
 npm run admin:dev     # Vite dev server for admin UI
 npm run admin:build   # Build admin UI
+```
+
+### Shared (`/shared`)
+```bash
+npm run lint          # ESLint
+npm run type-check    # TypeScript only
+npm run test          # Vitest watch mode
+npm run test:run      # Vitest single run
 ```
 
 ### Docker (Local Development)
@@ -204,7 +215,8 @@ The backend calls the prompt-service `/api/resolve` endpoint to get prompt confi
 **API Proxy** - Protects Anthropic API key from browser exposure:
 - `services/claude.service.ts` - Claude API integration with retry logic
 - `services/prompt-client.service.ts` - Client for prompt-service with circuit breaker and caching
-- `services/prompt-cache.service.ts` - In-memory cache for prompt configurations
+- `services/prompt-cache.service.ts` - In-memory cache for prompt configurations (uses `|` delimiter for cache keys)
+- `services/circuit-breaker.service.ts` - Generic circuit breaker wrapper with cleanup functions (`destroyAllCircuitBreakers()` for graceful shutdown)
 - `controllers/claude.controller.ts` - Request handler for analysis endpoint
 - `routes/api/v1/` - API route definitions (`/api/v1/claude/analyze`)
 - `validators/claude.validator.ts` - Zod request validation using enum arrays from shared
@@ -265,8 +277,16 @@ The prompt-service resolves the appropriate prompt configuration variant based o
 
 - Frontend: Vitest + React Testing Library + MSW for mocking
 - Backend: Vitest + Supertest
+- Prompt Service: Vitest (unit tests for services and middleware)
+- Shared: Vitest (unit tests for validation and utilities)
 - Test files: `**/__tests__/*.test.ts` or `**/*.test.tsx`
 - Coverage thresholds: 80% lines/functions/statements, 75% branches
+
+### Test Locations
+- `app/src/**/__tests__/` - Frontend component and store tests
+- `backend/src/**/__tests__/` - Backend service and controller tests
+- `prompt-service/src/**/__tests__/` - A/B test service and auth middleware tests
+- `shared/src/__tests__/` - Validation constants and response formatter tests
 
 ## Domain Framework
 

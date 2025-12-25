@@ -11,6 +11,32 @@ env:
   NODE_VERSION: '22'
 
 jobs:
+  lint-shared:
+    name: Lint Shared
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./shared
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: shared/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript check
+        run: npm run type-check
+
   lint-frontend:
     name: Lint Frontend
     runs-on: ubuntu-latest
@@ -53,6 +79,36 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
+
+      - name: Install shared dependencies
+        run: npm ci
+        working-directory: ./shared
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript check
+        run: npm run type-check
+
+  lint-prompt-service:
+    name: Lint Prompt Service
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./prompt-service
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: prompt-service/package-lock.json
 
       - name: Install shared dependencies
         run: npm ci
@@ -143,9 +199,64 @@ jobs:
           flags: backend
           fail_ci_if_error: false
 
+  test-shared:
+    name: Test Shared
+    needs: lint-shared
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./shared
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: shared/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
+  test-prompt-service:
+    name: Test Prompt Service
+    needs: lint-prompt-service
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./prompt-service
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: prompt-service/package-lock.json
+
+      - name: Install shared dependencies
+        run: npm ci
+        working-directory: ./shared
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npm run db:generate
+
+      - name: Run tests
+        run: npm run test
+
   build:
     name: Build
-    needs: [test-frontend, test-backend]
+    needs: [test-frontend, test-backend, test-shared, test-prompt-service]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -172,6 +283,13 @@ jobs:
           npm ci
           npm run build
 
+      - name: Build Prompt Service
+        working-directory: ./prompt-service
+        run: |
+          npm ci
+          npm run db:generate
+          npm run build
+
       - name: Upload frontend build artifact
         uses: actions/upload-artifact@v6
         with:
@@ -184,4 +302,11 @@ jobs:
         with:
           name: backend-build
           path: backend/dist
+          retention-days: 7
+
+      - name: Upload prompt-service build artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: prompt-service-build
+          path: prompt-service/dist
           retention-days: 7
