@@ -1,0 +1,126 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Note: SQLite doesn't support native enums. The following types are used as strings:
+// - VariantType: "withThinking" | "withoutThinking"
+// - ThinkingType: "enabled" | "disabled"
+// TypeScript validation is enforced at the application layer via Zod schemas.
+// If migrating to PostgreSQL, consider converting these to native Prisma enums.
+
+/// Main prompt definition - stores the base prompt configuration
+model Prompt {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  content     String
+  model       String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  variants PromptVariant[]
+  abTests  ABTest[]
+  versions PromptVersion[]
+
+  @@index([key])
+  @@index([isActive])
+}
+
+/// Thinking mode variants for prompts (withThinking/withoutThinking configurations)
+model PromptVariant {
+  id           String   @id @default(uuid())
+  promptId     String
+  variantType  String   // "withThinking" | "withoutThinking"
+  temperature  Float
+  maxTokens    Int
+  thinkingType String   // "enabled" | "disabled"
+  budgetTokens Int?
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@unique([promptId, variantType])
+  @@index([promptId])
+}
+
+/// Version history for prompts - enables rollback and audit trail
+model PromptVersion {
+  id         String   @id @default(uuid())
+  promptId   String
+  version    Int
+  content    String
+  model      String
+  changedBy  String?
+  changeNote String?
+  createdAt  DateTime @default(now())
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@unique([promptId, version])
+  @@index([promptId])
+  @@index([createdAt])
+}
+
+/// A/B Test configuration - manages experiments on prompts
+model ABTest {
+  id          String    @id @default(uuid())
+  promptId    String
+  name        String
+  description String?
+  isActive    Boolean   @default(false)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  prompt   Prompt      @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  variants ABVariant[]
+
+  @@index([promptId])
+  @@index([isActive])
+}
+
+/// A/B Test variant - individual variant within an A/B test
+model ABVariant {
+  id          String   @id @default(uuid())
+  abTestId    String
+  name        String
+  content     String
+  model       String
+  weight      Float    @default(0.5)
+  impressions Int      @default(0)
+  conversions Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  abTest  ABTest            @relation(fields: [abTestId], references: [id], onDelete: Cascade)
+  configs ABVariantConfig[]
+
+  @@index([abTestId])
+}
+
+/// A/B Variant thinking configurations
+model ABVariantConfig {
+  id           String @id @default(uuid())
+  abVariantId  String
+  variantType  String // "withThinking" | "withoutThinking"
+  temperature  Float
+  maxTokens    Int
+  thinkingType String // "enabled" | "disabled"
+  budgetTokens Int?
+
+  abVariant ABVariant @relation(fields: [abVariantId], references: [id], onDelete: Cascade)
+
+  @@unique([abVariantId, variantType])
+  @@index([abVariantId])
+}

@@ -29,10 +29,11 @@ A 5-phase identity-based approach to sustainable change:
 
 - **Frontend**: React 19 + TypeScript + Vite + Zustand
 - **Backend**: Node.js + Express + TypeScript
+- **Prompt Service**: Express + Prisma + SQLite (encrypted with libsql)
 - **Styling**: Tailwind CSS v4
 - **Internationalization**: i18next (English & Polish)
 - **AI Analysis**: Claude API via backend proxy
-- **Testing**: Vitest + React Testing Library
+- **Testing**: Vitest + React Testing Library (all packages)
 
 ## Getting Started
 
@@ -70,16 +71,15 @@ cd ..
 ### Quick Start
 
 ```bash
-# Backend setup
-cd backend
+# Install all dependencies (from project root)
 npm install
-cp .env.example .env  # Add your ANTHROPIC_API_KEY
-npm run dev           # Starts on https://localhost:3001
+
+# Backend setup
+cp backend/.env.example backend/.env  # Add your ANTHROPIC_API_KEY
+npm run dev:backend                    # Starts on https://localhost:3001
 
 # Frontend setup (new terminal)
-cd app
-npm install
-npm run dev           # Starts on https://localhost:3000
+npm run dev:app                        # Starts on https://localhost:3000
 ```
 
 ### Environment Setup
@@ -105,140 +105,107 @@ VITE_API_URL=https://localhost:3001
 ├── app/                    # React frontend
 │   └── src/
 │       ├── components/     # UI components (assessment/, insights/, shared/)
-│       ├── config/         # AI prompt configurations
 │       ├── contexts/       # React contexts (theme)
 │       ├── i18n/           # Internationalization (en/, pl/)
 │       ├── services/       # API client & service layer
 │       ├── stores/         # Zustand state management
-│       ├── styles/         # Theme utilities
-│       └── types/          # TypeScript interfaces
+│       └── styles/         # Theme utilities
 ├── backend/                # Express API proxy
 │   └── src/
 │       ├── config/         # Environment validation (Zod)
+│       ├── health/         # Health checks (prompt-service dependency)
 │       ├── middleware/     # CORS, rate limiting, error handling
 │       ├── routes/         # API endpoints
-│       ├── services/       # Claude API integration
+│       ├── services/       # Claude API, prompt client, circuit breaker, cache
 │       └── utils/          # Logger (Pino)
+├── prompt-service/         # Prompt management microservice
+│   ├── prisma/             # SQLite schema & migrations
+│   └── src/
+│       ├── admin/          # React admin UI
+│       ├── routes/         # REST API endpoints
+│       └── services/       # Prompt CRUD, A/B testing, resolver
+├── shared/                 # Shared TypeScript types
+│   └── src/                # Types, validation, utilities
 ├── docs/                   # Documentation
-│   ├── Motivation.md       # Framework theory
-│   └── ClaudeDocs/         # Claude Code guidance
 └── personas/               # Sample assessment data
 ```
 
 ## Available Commands
 
-### Frontend (`/app`)
+This repository uses **npm workspaces** for unified dependency management. Run commands from the project root.
+
+### Root Commands (Recommended)
 ```bash
-npm run dev           # Start Vite dev server
-npm run build         # Production build
-npm run lint          # Run ESLint
-npm run type-check    # TypeScript check
-npm run test          # Run tests (watch)
-npm run test:run      # Run tests (once)
-npm run test:coverage # Tests with coverage
+npm install              # Install all workspaces
+npm run lint             # Lint all projects
+npm run type-check       # Type-check all projects
+npm run build            # Build all projects
+npm run test:run         # Run all tests (once)
+npm run test:coverage    # Run all tests with coverage
+
+# Development servers
+npm run dev:app                  # Start frontend (https://localhost:3000)
+npm run dev:backend              # Start backend (https://localhost:3001)
+npm run dev:prompt-service       # Start prompt-service API (http://localhost:3002)
+npm run dev:prompt-service:all   # Start prompt-service API + admin UI
+
+# Production
+npm run start:backend            # Run compiled backend
+npm run start:prompt-service     # Run compiled prompt-service
+npm run preview:app              # Preview frontend build
+
+# Database (prompt-service)
+npm run db:migrate       # Run database migrations
+npm run db:generate      # Generate Prisma client
+npm run db:seed          # Seed initial data
+npm run db:studio        # Open Prisma Studio
 ```
 
-### Backend (`/backend`)
+### Workspace-Specific Commands
+
+Commands can also be run per-workspace using `-w <workspace>`:
+
 ```bash
-npm run dev           # Start with hot reload
-npm run build         # Compile TypeScript
-npm run start         # Run production build
-npm run lint          # Run ESLint
-npm run test          # Run tests
+npm run dev -w app              # Same as npm run dev:app
+npm run test -w backend         # Run backend tests only
+npm run lint:fix -w shared      # Fix lint issues in shared
+```
+
+Or by navigating to the workspace directory:
+
+```bash
+cd app && npm run dev           # Start frontend dev server
+cd backend && npm run test      # Run backend tests
 ```
 
 ### Docker
 
-#### Quick Start (OCI from Docker Hub)
-
-Pull and run the pre-built multi-arch images:
+Quick deployment using pre-built multi-arch images:
 
 ```bash
 # macOS/Linux
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
+ANTHROPIC_API_KEY=<YOUR_KEY> DATABASE_KEY=<32+_CHAR_SECRET> \
+  docker compose -f oci://oxilith/votive-oci:latest up
 
 # Windows (PowerShell)
-$env:ANTHROPIC_API_KEY="<YOUR_KEY>"; docker compose -f oci://oxilith/votive-oci:latest up
+$env:ANTHROPIC_API_KEY="<YOUR_KEY>"; $env:DATABASE_KEY="<32+_CHAR_SECRET>"
+docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
-This starts:
-- Frontend: https://localhost (port 443, HTTPS)
-- Backend: http://localhost:3001 (internal, proxied through nginx)
+See [Docker Hub Workflow](docs/docker-hub.md) for complete documentation including:
+- Local build instructions
+- HTTPS configuration
+- Multi-arch image publishing (maintainers)
+- Troubleshooting guide
 
-#### Local Build & Run
+## Documentation
 
-```bash
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose up --build
-```
-
-#### Trusted HTTPS (No Browser Warning)
-
-By default, Docker generates self-signed certificates (browser shows warning). For trusted HTTPS:
-
-```bash
-# Install mkcert and set up local CA (one-time)
-brew install mkcert nss
-mkcert -install
-
-# Generate trusted certificates
-mkdir -p certs && cd certs
-mkcert localhost 127.0.0.1 ::1
-cd ..
-
-# Run Docker (certificates auto-detected)
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
-```
-
-#### Build & Publish (Maintainers)
-
-```bash
-# Clean rebuild for multi-arch (linux/amd64 + linux/arm64)
-docker rmi oxilith/votive-frontend:latest
-docker rmi oxilith/votive-backend:latest
-docker buildx prune -f
-docker buildx bake --push --no-cache
-
-# Publish OCI compose artifact (--resolve-image-digests ensures multi-arch support)
-docker compose publish --resolve-image-digests --with-env oxilith/votive-oci:latest
-```
-
-#### Platform Selection
-
-If Docker selects the wrong platform, set `DOCKER_DEFAULT_PLATFORM`:
-
-```bash
-# macOS/Linux
-DOCKER_DEFAULT_PLATFORM=linux/amd64 ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
-
-# Windows (PowerShell)
-$env:DOCKER_DEFAULT_PLATFORM="linux/amd64"; $env:ANTHROPIC_API_KEY="<YOUR_KEY>"; docker compose -f oci://oxilith/votive-oci:latest up
-```
-
-#### Clear OCI Cache (After Image Updates)
-
-```bash
-# macOS/Linux
-rm -rf "$HOME/Library/Caches/docker-compose/"
-
-# Windows (PowerShell)
-Remove-Item -Recurse -Force "$env:LOCALAPPDATA\docker-compose"
-
-# Then re-run
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
-```
-
-**Docker Hub Repositories:**
-- `oxilith/votive` - Backend API
-- `oxilith/votive-frontend` - Nginx + React
-- `oxilith/votive-oci` - OCI compose artifact
-
-## Framework Documentation
-
-See [docs/Motivation.md](docs/Motivation.md) for the complete theoretical framework including:
-- Core states (Mood, Energy, Motivation)
-- Behavior types (Automatic, Motivation-driven, Keystone)
-- Habit architecture and mechanisms
-- Identity concepts and psychological principles
+| Document | Description |
+|----------|-------------|
+| [Architecture](docs/architecture.md) | System design, diagrams, and technical decisions |
+| [Docker Hub Workflow](docs/docker-hub.md) | Container deployment, publishing, and troubleshooting |
+| [Production Deployment](docs/ClaudeDocs/production-deployment.md) | Security, configuration, and deployment best practices |
+| [Motivation](docs/Motivation.md) | Theoretical framework and psychology principles |
 
 ## API Endpoints
 

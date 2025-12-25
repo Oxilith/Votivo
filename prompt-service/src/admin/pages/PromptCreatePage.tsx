@@ -1,0 +1,395 @@
+/**
+ * @file prompt-service/src/admin/pages/PromptCreatePage.tsx
+ * @purpose Form page for creating new prompts
+ * @functionality
+ * - Form for entering prompt details (key, name, content, model)
+ * - Configures thinking and non-thinking variants
+ * - Validates input before submission
+ * - Redirects to list page on success
+ * @dependencies
+ * - react-router-dom for navigation
+ * - ../api/promptApi for API calls
+ * - ../types for type definitions
+ */
+
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { promptApi } from '../api/promptApi.js';
+import { CLAUDE_MODELS } from '../types.js';
+import type { CreatePromptInput } from '../types.js';
+
+export function PromptCreatePage() {
+  const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState<CreatePromptInput>({
+    key: '',
+    name: '',
+    description: '',
+    content: '',
+    model: 'claude-sonnet-4-5',
+    variants: {
+      withThinking: {
+        temperature: 1,
+        maxTokens: 16000,
+        budgetTokens: 10000,
+      },
+      withoutThinking: {
+        temperature: 0.7,
+        maxTokens: 8000,
+      },
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSaving(true);
+
+    try {
+      await promptApi.create(formData);
+      navigate('/prompts');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create prompt');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <Link to="/prompts" style={styles.backLink}>
+          &larr; Back to Prompts
+        </Link>
+        <h1 style={styles.title}>Create New Prompt</h1>
+      </div>
+
+      {error && (
+        <div style={styles.error}>
+          <p>{error}</p>
+        </div>
+      )}
+
+      <form onSubmit={(e) => void handleSubmit(e)} style={styles.form}>
+        <div style={styles.card}>
+          <h2 style={styles.sectionTitle}>Basic Information</h2>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Key *</label>
+            <input
+              type="text"
+              value={formData.key}
+              onChange={(e) => setFormData({ ...formData, key: e.target.value.toUpperCase() })}
+              style={styles.input}
+              placeholder="e.g., IDENTITY_ANALYSIS"
+              required
+            />
+            <span style={styles.hint}>Unique identifier (uppercase, underscores)</span>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Name *</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              style={styles.input}
+              placeholder="e.g., Identity Analysis Prompt"
+              required
+            />
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Description</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              style={{ ...styles.input, minHeight: '80px' }}
+              placeholder="Brief description of the prompt's purpose"
+            />
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Model *</label>
+            <select
+              value={formData.model}
+              onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+              style={styles.select}
+              required
+            >
+              {CLAUDE_MODELS.map((model: { value: string; label: string }) => (
+                <option key={model.value} value={model.value}>
+                  {model.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div style={styles.card}>
+          <h2 style={styles.sectionTitle}>Prompt Content</h2>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Prompt *</label>
+            <textarea
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              style={{ ...styles.input, minHeight: '300px', fontFamily: 'monospace' }}
+              placeholder="Enter your prompt content here..."
+              required
+            />
+          </div>
+        </div>
+
+        <div style={styles.card}>
+          <h2 style={styles.sectionTitle}>Thinking Variant</h2>
+          <p style={styles.hint}>Settings when extended thinking is enabled</p>
+
+          <div style={styles.row}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Temperature</label>
+              <input
+                type="number"
+                value={formData.variants.withThinking.temperature}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    variants: {
+                      ...formData.variants,
+                      withThinking: {
+                        ...formData.variants.withThinking,
+                        temperature: parseFloat(e.target.value),
+                      },
+                    },
+                  })
+                }
+                style={styles.input}
+                step="0.1"
+                min="0"
+                max="1"
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Max Tokens</label>
+              <input
+                type="number"
+                value={formData.variants.withThinking.maxTokens}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    variants: {
+                      ...formData.variants,
+                      withThinking: {
+                        ...formData.variants.withThinking,
+                        maxTokens: parseInt(e.target.value, 10),
+                      },
+                    },
+                  })
+                }
+                style={styles.input}
+                min="1"
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Budget Tokens</label>
+              <input
+                type="number"
+                value={formData.variants.withThinking.budgetTokens}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    variants: {
+                      ...formData.variants,
+                      withThinking: {
+                        ...formData.variants.withThinking,
+                        budgetTokens: parseInt(e.target.value, 10),
+                      },
+                    },
+                  })
+                }
+                style={styles.input}
+                min="0"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.card}>
+          <h2 style={styles.sectionTitle}>Non-Thinking Variant</h2>
+          <p style={styles.hint}>Settings when extended thinking is disabled</p>
+
+          <div style={styles.row}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Temperature</label>
+              <input
+                type="number"
+                value={formData.variants.withoutThinking.temperature}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    variants: {
+                      ...formData.variants,
+                      withoutThinking: {
+                        ...formData.variants.withoutThinking,
+                        temperature: parseFloat(e.target.value),
+                      },
+                    },
+                  })
+                }
+                style={styles.input}
+                step="0.1"
+                min="0"
+                max="1"
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Max Tokens</label>
+              <input
+                type="number"
+                value={formData.variants.withoutThinking.maxTokens}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    variants: {
+                      ...formData.variants,
+                      withoutThinking: {
+                        ...formData.variants.withoutThinking,
+                        maxTokens: parseInt(e.target.value, 10),
+                      },
+                    },
+                  })
+                }
+                style={styles.input}
+                min="1"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.actions}>
+          <Link to="/prompts" style={styles.cancelButton}>
+            Cancel
+          </Link>
+          <button type="submit" style={styles.saveButton} disabled={saving}>
+            {saving ? 'Creating...' : 'Create Prompt'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  container: {
+    maxWidth: '900px',
+    margin: '0 auto',
+  },
+  header: {
+    marginBottom: '2rem',
+  },
+  backLink: {
+    color: '#6b7280',
+    textDecoration: 'none',
+    fontSize: '0.875rem',
+    display: 'inline-block',
+    marginBottom: '0.5rem',
+  },
+  title: {
+    fontSize: '1.75rem',
+    fontWeight: 700,
+    color: '#111827',
+    margin: 0,
+  },
+  error: {
+    padding: '1rem',
+    backgroundColor: '#fee2e2',
+    border: '1px solid #fecaca',
+    borderRadius: '0.5rem',
+    color: '#dc2626',
+    marginBottom: '1.5rem',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: '0.75rem',
+    padding: '1.5rem',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+  },
+  sectionTitle: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    color: '#111827',
+    margin: '0 0 1rem 0',
+  },
+  formGroup: {
+    marginBottom: '1rem',
+    flex: 1,
+  },
+  label: {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: '#374151',
+    marginBottom: '0.375rem',
+  },
+  input: {
+    width: '100%',
+    padding: '0.625rem 0.875rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    resize: 'vertical',
+  },
+  select: {
+    width: '100%',
+    padding: '0.625rem 0.875rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    backgroundColor: '#fff',
+  },
+  hint: {
+    fontSize: '0.75rem',
+    color: '#6b7280',
+    marginTop: '0.25rem',
+  },
+  row: {
+    display: 'flex',
+    gap: '1rem',
+  },
+  actions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '1rem',
+    paddingTop: '1rem',
+  },
+  cancelButton: {
+    padding: '0.625rem 1.25rem',
+    backgroundColor: '#fff',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.5rem',
+    color: '#374151',
+    textDecoration: 'none',
+    fontWeight: 500,
+    fontSize: '0.875rem',
+  },
+  saveButton: {
+    padding: '0.625rem 1.25rem',
+    backgroundColor: '#3b82f6',
+    border: 'none',
+    borderRadius: '0.5rem',
+    color: '#fff',
+    fontWeight: 500,
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+  },
+};

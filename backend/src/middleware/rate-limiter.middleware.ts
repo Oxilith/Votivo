@@ -30,10 +30,10 @@ export const rateLimiter = rateLimit({
   keyGenerator: (req) => req.ip ?? 'unknown',
 });
 
-// Stricter rate limiter for Claude API calls
+// Stricter rate limiter for Claude API calls (configurable)
 export const claudeRateLimiter = rateLimit({
-  windowMs: 60000, // 1 minute
-  limit: 5, // 5 requests per minute (Claude is expensive)
+  windowMs: config.claudeRateLimitWindowMs,
+  limit: config.claudeRateLimitMaxRequests,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

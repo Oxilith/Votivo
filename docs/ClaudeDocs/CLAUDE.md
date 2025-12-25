@@ -6,10 +6,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Votive - a full-stack behavioral psychology assessment application with AI-powered analysis.
 
-**Architecture**: Monorepo with three packages:
+**Architecture**: Monorepo with four packages:
 - `/app` - React frontend
 - `/backend` - Express API proxy
+- `/prompt-service` - Prompt management microservice with admin UI and A/B testing
 - `/shared` - Shared TypeScript types (single source of truth)
+
+## Monorepo Workspaces
+
+This repository uses **npm workspaces** for unified dependency management. All commands should be run from the project root.
+
+### Root Commands (Preferred)
+```bash
+npm install              # Install all workspaces
+npm run lint             # Lint all projects
+npm run type-check       # Type-check all projects
+npm run build            # Build all projects
+npm run test:run         # Run all tests (once)
+npm run test:coverage    # Run all tests with coverage
+```
+
+### Development Servers
+```bash
+npm run dev:app                  # Frontend (https://localhost:3000)
+npm run dev:backend              # Backend (https://localhost:3001)
+npm run dev:prompt-service       # Prompt service API (http://localhost:3002)
+npm run dev:prompt-service:all   # Prompt service API + admin UI
+```
+
+### Production
+```bash
+npm run start:backend            # Run compiled backend
+npm run start:prompt-service     # Run compiled prompt-service
+npm run preview:app              # Preview frontend build (Vite preview)
+```
+
+### Database Commands
+```bash
+npm run db:migrate       # Run migrations
+npm run db:generate      # Generate Prisma client
+npm run db:seed          # Seed initial data
+npm run db:studio        # Open Prisma Studio
+```
+
+### Per-Workspace Commands
+```bash
+npm run dev -w app           # Run command in specific workspace
+npm run test -w backend      # Run tests in backend only
+```
 
 ## License & Contribution
 
@@ -27,6 +71,8 @@ Votive - a full-stack behavioral psychology assessment application with AI-power
 - Security issues: Email konrad.jagusiak@oxilogic.com (not public issues)
 
 ## Build & Development Commands
+
+**Note:** Use root commands from [Monorepo Workspaces](#monorepo-workspaces) section for most operations. Per-workspace commands below are for reference when targeting a specific workspace.
 
 ### Frontend (`/app`)
 ```bash
@@ -50,46 +96,74 @@ npm run test          # Vitest
 npm run test:coverage # Coverage report
 ```
 
+### Prompt Service (`/prompt-service`)
+```bash
+npm run dev           # tsx watch (http://localhost:3002)
+npm run build         # TypeScript compile
+npm run start         # Run compiled dist/
+npm run lint          # ESLint
+npm run type-check    # TypeScript only
+npm run test          # Vitest watch mode
+npm run test:run      # Vitest single run
+npm run test:coverage # Coverage report
+npm run db:generate   # Generate Prisma client
+npm run db:migrate    # Run database migrations
+npm run db:seed       # Seed initial prompt data
+npm run admin:dev     # Vite dev server for admin UI
+npm run admin:build   # Build admin UI
+```
+
+### Shared (`/shared`)
+```bash
+npm run lint          # ESLint
+npm run type-check    # TypeScript only
+npm run test          # Vitest watch mode
+npm run test:run      # Vitest single run
+```
+
 ### Docker (Local Development)
 ```bash
-docker compose up --build   # Build and run full stack (frontend:443 HTTPS, backend:3001)
+docker compose up --build   # Build and run full stack
 docker compose up           # Run existing images
 docker compose down         # Stop containers
 ```
-Requires `ANTHROPIC_API_KEY` environment variable (export or .env file).
+Requires `ANTHROPIC_API_KEY` and `DATABASE_KEY` environment variables.
 
 ### Docker (OCI Deployment)
 
 **Run from Docker Hub OCI:**
 ```bash
-ANTHROPIC_API_KEY=<key> docker compose -f oci://oxilith/votive-oci:latest up
+ANTHROPIC_API_KEY=<key> DATABASE_KEY=<32+chars> docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
 **Build and publish multi-arch images:**
 ```bash
-# Remove old images and clear cache (clean rebuild)
+# Clean rebuild for multi-arch (linux/amd64 + linux/arm64)
 docker rmi oxilith/votive-frontend:latest
-docker rmi oxilith/votive:latest
+docker rmi oxilith/votive-backend:latest
+docker rmi oxilith/votive-prompt-service:latest
 docker buildx prune -f
 
-# Build for linux/amd64 + linux/arm64 and push to Docker Hub
+# Build and push using docker-bake.hcl
 docker buildx bake --push --no-cache
 
-# Publish OCI compose artifact
-docker compose publish --with-env oxilith/votive-oci:latest
+# Publish OCI compose artifact (--resolve-image-digests for multi-arch)
+docker compose publish --resolve-image-digests --with-env oxilith/votive-oci:latest
 ```
 
 **Clear OCI cache (when images updated):**
 ```bash
 # macOS
 rm -rf "$HOME/Library/Caches/docker-compose/"
-# Then re-run the OCI compose command
 ```
 
 **Docker Hub repositories:**
-- `oxilith/votive` - Backend (multi-arch)
-- `oxilith/votive-frontend` - Frontend (multi-arch)
+- `oxilith/votive-backend` - Backend API (multi-arch)
+- `oxilith/votive-frontend` - Nginx + React (multi-arch)
+- `oxilith/votive-prompt-service` - Prompt microservice (multi-arch)
 - `oxilith/votive-oci` - OCI compose artifact
+
+See [docs/docker-hub.md](../docker-hub.md) for complete workflow documentation.
 
 ### HTTPS Setup (Local Development)
 ```bash
@@ -136,19 +210,33 @@ Every component/service requires JSDoc header:
 
 ### Shared Package (`/shared/src`)
 
-Single source of truth for types, validation, and utilities used by both frontend and backend:
+Single source of truth for types, validation, and utilities used by frontend, backend, and prompt-service:
 - `assessment.types.ts` - Core domain types (TimeOfDay, MoodTrigger, CoreValue, WillpowerPattern, AssessmentResponses)
 - `analysis.types.ts` - AI analysis result types (AnalysisPattern, AnalysisContradiction, AnalysisBlindSpot, AnalysisLeveragePoint, AnalysisRisk, IdentitySynthesis, AIAnalysisResult)
 - `api.types.ts` - API types (AnalysisLanguage, SUPPORTED_LANGUAGES)
 - `labels.ts` - Human-readable label mappings for enum values
 - `validation.ts` - Enum value arrays for Zod schemas, REQUIRED_FIELDS, field categorization (ARRAY_FIELDS, NUMBER_FIELDS, STRING_FIELDS)
 - `responseFormatter.ts` - Shared `formatResponsesForPrompt()` function for AI analysis
-- `prompts.ts` - AI prompt templates (IDENTITY_ANALYSIS_PROMPT)
 - `prompt.types.ts` - Prompt config types (ClaudeModel, PromptConfig, ThinkingVariant, PromptConfigDefinition)
-- `promptConfigResolver.ts` - Strategy-based prompt config resolver with thinking mode variants
 - `index.ts` - Barrel exports
 
-Import via `shared/index` in both frontend and backend (e.g., `import { ... } from 'shared/index'`).
+Import via `shared/index` in packages (e.g., `import { ... } from 'shared/index'`).
+
+### Prompt Service (`/prompt-service`)
+
+Microservice for prompt management with database storage and admin UI:
+- `src/services/prompt.service.ts` - CRUD operations for prompts with input validation
+- `src/services/ab-test.service.ts` - A/B test management with atomic weight normalization
+- `src/services/prompt-resolver.service.ts` - Resolves prompt config based on key and thinking mode
+- `src/errors/index.ts` - Type-safe error hierarchy (AppError, NotFoundError, ValidationError, ConflictError)
+- `src/utils/sanitize.ts` - Input validation for XSS prevention (script tags, event handlers, javascript: URLs)
+- `src/constants/auth.ts` - Authentication constants (cookie name, session values, header names)
+- `src/routes/auth.routes.ts` - Authentication endpoints (login, logout, verify) with HttpOnly cookies
+- `src/routes/` - REST API endpoints for prompts, A/B tests, and resolve
+- `src/admin/` - React admin UI for prompt and A/B test management
+- `prisma/schema.prisma` - SQLite database schema (encrypted with libsql)
+
+The backend calls the prompt-service `/api/resolve` endpoint to get prompt configurations.
 
 ### Frontend (`/app/src`)
 
@@ -173,20 +261,26 @@ Import via `shared/index` in both frontend and backend (e.g., `import { ... } fr
 ### Backend (`/backend/src`)
 
 **API Proxy** - Protects Anthropic API key from browser exposure:
-- `services/claude.service.ts` - Claude API integration with retry logic, uses `PromptConfigResolver` from shared
+- `services/claude.service.ts` - Claude API integration with retry logic
+- `services/prompt-client.service.ts` - Client for prompt-service with circuit breaker, caching, and concurrent refresh limiting (max 3)
+- `services/prompt-cache.service.ts` - In-memory cache for prompt configurations (uses JSON serialization for cache keys)
+- `services/circuit-breaker.service.ts` - Generic circuit breaker wrapper with cleanup functions (`destroyAllCircuitBreakers()` for graceful shutdown)
 - `controllers/claude.controller.ts` - Request handler for analysis endpoint
 - `routes/api/v1/` - API route definitions (`/api/v1/claude/analyze`)
 - `validators/claude.validator.ts` - Zod request validation using enum arrays from shared
 - `types/claude.types.ts` - Re-exports shared types, defines API request/response types
 - `middleware/` - CORS, rate limiting, error handling, helmet
 - `config/index.ts` - Zod-validated environment configuration
+- `health/checks/prompt-service.check.ts` - Health check for prompt-service dependency
 - `utils/logger.ts` - Pino structured logging
 
 ### Data Flow
 ```
 Frontend (Zustand) → ApiClient → Backend (Express) → Claude API
-                    ↓                        ↓
-              localStorage                Pino logs
+                    ↓               ↓          ↓
+              localStorage     Prompt-Service  Pino logs
+                                    ↓
+                              SQLite (encrypted)
 ```
 
 ## Environment Variables
@@ -208,20 +302,41 @@ THINKING_ENABLED=true         # Feature flag for Claude extended thinking mode
 VITE_API_URL=https://localhost:3001
 ```
 
+### Prompt Service (`/prompt-service/.env`)
+```
+DATABASE_URL=file:./data/prompts.db          # Required in production (no fallback)
+DATABASE_KEY=<32+ character encryption key>  # Required
+ADMIN_API_KEY=<admin authentication key>     # Required in production
+SESSION_SECRET=<32+ char cookie signing>     # Required in production (separate from ADMIN_API_KEY for security)
+PORT=3002
+NODE_ENV=development
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+```
+
+**Production Requirements**: In production, `DATABASE_URL`, `ADMIN_API_KEY`, and `SESSION_SECRET` are all required. `SESSION_SECRET` must be separate from `ADMIN_API_KEY` to prevent session forgery if the API key is compromised.
+
 ### Feature Flags
 
 **`THINKING_ENABLED`** (backend) - Controls Claude's extended thinking mode:
 - `true` (default): Uses extended thinking with 8000 token budget, temperature=1, max_tokens=16000
 - `false`: Standard mode with temperature=0.6, max_tokens=8000
 
-The `PromptConfigResolver` in shared package selects the appropriate prompt configuration variant based on this flag.
+The prompt-service resolves the appropriate prompt configuration variant based on this flag.
 
 ## Testing
 
 - Frontend: Vitest + React Testing Library + MSW for mocking
 - Backend: Vitest + Supertest
+- Prompt Service: Vitest (unit tests for services and middleware)
+- Shared: Vitest (unit tests for validation and utilities)
 - Test files: `**/__tests__/*.test.ts` or `**/*.test.tsx`
 - Coverage thresholds: 80% lines/functions/statements, 75% branches
+
+### Test Locations
+- `app/src/**/__tests__/` - Frontend component and store tests
+- `backend/src/**/__tests__/` - Backend service and controller tests
+- `prompt-service/src/**/__tests__/` - A/B test service, auth middleware, error types, and validation tests
+- `shared/src/__tests__/` - Validation constants and response formatter tests
 
 ## Domain Framework
 

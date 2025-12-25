@@ -9,6 +9,8 @@
  * - @/health/types
  * - @/health/health-service
  * - @/health/checks/anthropic.check
+ * - @/health/checks/prompt-service.check
+ * - @/health/checks/prompt-cache.check
  */
 
 export type {
@@ -20,3 +22,5 @@ export type {
 
 export { HealthService, healthService } from './health-service.js';
 export { createAnthropicCheck } from './checks/anthropic.check.js';
+export { createPromptServiceCheck } from './checks/prompt-service.check.js';
+export { createPromptCacheCheck } from './checks/prompt-cache.check.js';

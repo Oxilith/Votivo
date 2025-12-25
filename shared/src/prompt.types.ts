@@ -5,6 +5,7 @@
  * - Defines ClaudeModel const object for available model options
  * - Uses ThinkingConfigParam from official Anthropic SDK
  * - Defines PromptConfig interface for prompt settings
+ * - Defines PromptConfigKey type for prompt identifiers
  * - Provides type safety for AI API calls across frontend and backend
  * @dependencies
  * - @anthropic-ai/sdk for ThinkingConfigParam type
@@ -23,6 +24,11 @@ export const ClaudeModel = {
 export type ClaudeModel = (typeof ClaudeModel)[keyof typeof ClaudeModel];
 
 export type { ThinkingConfigParam };
+
+/**
+ * Key identifiers for prompt configurations stored in the prompt-service database
+ */
+export type PromptConfigKey = 'IDENTITY_ANALYSIS';
 
 export interface PromptConfig {
   prompt: string;
