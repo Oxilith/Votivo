@@ -23,6 +23,11 @@ const configSchema = z.object({
 
   // Database
   databaseUrl: z.string().default('file:./dev.db'),
+  // libsql requires 32+ character encryption key
+  databaseKey: z
+    .string()
+    .min(32, 'DATABASE_KEY must be at least 32 characters for libsql encryption')
+    .optional(),
 
   // CORS
   corsOrigins: z
@@ -44,6 +49,7 @@ function loadConfig(): Config {
     port: process.env['PORT'],
     nodeEnv: process.env['NODE_ENV'],
     databaseUrl: process.env['DATABASE_URL'],
+    databaseKey: process.env['DATABASE_KEY'],
     corsOrigins: process.env['CORS_ORIGINS'],
     logLevel: process.env['LOG_LEVEL'],
     adminApiKey: process.env['ADMIN_API_KEY'],

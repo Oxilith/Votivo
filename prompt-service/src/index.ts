@@ -84,13 +84,27 @@ app.use(
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Health check endpoint
+// Health check endpoint with database connectivity verification
 app.get('/health', (_req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    service: 'prompt-service',
-  });
+  prisma.$queryRaw`SELECT 1`
+    .then(() => {
+      res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        service: 'prompt-service',
+        database: 'connected',
+      });
+    })
+    .catch((error: unknown) => {
+      logger.error({ error }, 'Database health check failed');
+      res.status(503).json({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        service: 'prompt-service',
+        database: 'disconnected',
+        error: config.nodeEnv === 'production' ? 'Database unavailable' : String(error),
+      });
+    });
 });
 
 // API routes
@@ -164,4 +178,4 @@ const shutdown = async () => {
 process.on('SIGTERM', () => void shutdown());
 process.on('SIGINT', () => void shutdown());
 
-export { app };
+export { app, logger };

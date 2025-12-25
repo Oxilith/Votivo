@@ -34,8 +34,17 @@ const adminRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Public routes (used by backend service)
-router.use('/resolve', resolveRoutes);
+// Rate limiter for resolve endpoint (more lenient - service-to-service)
+const resolveRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 1000, // 1000 requests per minute
+  message: { error: 'Rate limit exceeded for resolve endpoint' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Public routes (used by backend service) - rate limited to prevent abuse
+router.use('/resolve', resolveRateLimiter, resolveRoutes);
 
 // Protected admin routes (require X-Admin-Key header + rate limiting)
 router.use('/prompts', adminRateLimiter, adminAuthMiddleware, promptRoutes);

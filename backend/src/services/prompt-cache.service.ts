@@ -8,12 +8,14 @@
  * - Provides cache freshness checking
  * @dependencies
  * - shared/index for PromptConfig type
+ * - @/config for TTL configuration
  * @note Cache is per-process. In multi-instance deployments, each instance
  *       maintains its own cache. Updates/deletes may take up to STALE_TTL_MS
- *       (1 hour) to propagate across all instances.
+ *       (default 1 hour) to propagate across all instances.
  */
 
 import type { PromptConfig } from 'shared/index.js';
+import { config } from '@/config/index.js';
 
 interface CacheEntry {
   config: PromptConfig;
@@ -21,11 +23,11 @@ interface CacheEntry {
   timestamp: number;
 }
 
-/** Cache TTL - entries older than this are considered stale (5 minutes) */
-const CACHE_TTL_MS = 5 * 60 * 1000;
+/** Cache TTL - entries older than this are considered stale (configurable, default 5 minutes) */
+const CACHE_TTL_MS = config.promptCacheTtlMs;
 
-/** Maximum age before entry is deleted entirely (1 hour) */
-const STALE_TTL_MS = 60 * 60 * 1000;
+/** Maximum age before entry is deleted entirely (configurable, default 1 hour) */
+const STALE_TTL_MS = config.promptStaleTtlMs;
 
 export class PromptCacheService {
   private cache = new Map<string, CacheEntry>();

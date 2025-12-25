@@ -168,6 +168,7 @@ export class ABTestService {
 
   /**
    * Activate an A/B test (deactivates other tests for the same prompt)
+   * Uses transaction to prevent race conditions with concurrent activations
    */
   async activate(id: string): Promise<ABTestWithVariants> {
     const test = await this.getById(id);
@@ -175,24 +176,27 @@ export class ABTestService {
       throw new Error(`A/B test with id ${id} not found`);
     }
 
-    // Deactivate other tests for the same prompt
-    await prisma.aBTest.updateMany({
-      where: {
-        promptId: test.promptId,
-        id: { not: id },
-      },
-      data: { isActive: false },
-    });
-
-    // Activate this test
-    return prisma.aBTest.update({
-      where: { id },
-      data: { isActive: true },
-      include: {
-        variants: {
-          include: { configs: true },
+    // Use transaction to ensure atomicity - prevents multiple active tests
+    return prisma.$transaction(async (tx) => {
+      // Deactivate other tests for the same prompt
+      await tx.aBTest.updateMany({
+        where: {
+          promptId: test.promptId,
+          id: { not: id },
         },
-      },
+        data: { isActive: false },
+      });
+
+      // Activate this test
+      return tx.aBTest.update({
+        where: { id },
+        data: { isActive: true },
+        include: {
+          variants: {
+            include: { configs: true },
+          },
+        },
+      });
     });
   }
 

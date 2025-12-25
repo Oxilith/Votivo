@@ -141,6 +141,7 @@ export class PromptService {
 
   /**
    * Update an existing prompt and create a version record
+   * Uses transaction to prevent race conditions with version numbering
    */
   async update(id: string, input: UpdatePromptInput): Promise<PromptWithVariants> {
     const existingPrompt = await this.getById(id);
@@ -148,83 +149,89 @@ export class PromptService {
       throw new Error(`Prompt with id ${id} not found`);
     }
 
-    // Get the latest version number
-    const latestVersion = await prisma.promptVersion.findFirst({
-      where: { promptId: id },
-      orderBy: { version: 'desc' },
-    });
-    const nextVersion = (latestVersion?.version ?? 0) + 1;
-
     // Determine if content or model changed (requiring a new version)
     const contentChanged = input.content !== undefined && input.content !== existingPrompt.content;
     const modelChanged = input.model !== undefined && input.model !== existingPrompt.model;
 
-    // Update the prompt
-    await prisma.prompt.update({
-      where: { id },
-      data: {
-        ...(input.name !== undefined && { name: input.name }),
-        ...(input.description !== undefined && { description: input.description }),
-        ...(input.content !== undefined && { content: input.content }),
-        ...(input.model !== undefined && { model: input.model }),
-        ...(input.isActive !== undefined && { isActive: input.isActive }),
-        // Create a new version if content or model changed
-        ...(contentChanged || modelChanged
-          ? {
-              versions: {
-                create: {
-                  version: nextVersion,
-                  content: input.content ?? existingPrompt.content,
-                  model: input.model ?? existingPrompt.model,
-                  ...(input.changedBy !== undefined && { changedBy: input.changedBy }),
-                  ...(input.changeNote !== undefined && { changeNote: input.changeNote }),
+    // Use transaction to ensure atomic version increment
+    await prisma.$transaction(async (tx) => {
+      // Get the latest version number within transaction
+      const latestVersion = await tx.promptVersion.findFirst({
+        where: { promptId: id },
+        orderBy: { version: 'desc' },
+      });
+      const nextVersion = (latestVersion?.version ?? 0) + 1;
+
+      // Update the prompt
+      await tx.prompt.update({
+        where: { id },
+        data: {
+          ...(input.name !== undefined && { name: input.name }),
+          ...(input.description !== undefined && { description: input.description }),
+          ...(input.content !== undefined && { content: input.content }),
+          ...(input.model !== undefined && { model: input.model }),
+          ...(input.isActive !== undefined && { isActive: input.isActive }),
+          // Create a new version if content or model changed
+          ...(contentChanged || modelChanged
+            ? {
+                versions: {
+                  create: {
+                    version: nextVersion,
+                    content: input.content ?? existingPrompt.content,
+                    model: input.model ?? existingPrompt.model,
+                    ...(input.changedBy !== undefined && { changedBy: input.changedBy }),
+                    ...(input.changeNote !== undefined && { changeNote: input.changeNote }),
+                  },
                 },
-              },
-            }
-          : {}),
-      },
-      include: { variants: true },
+              }
+            : {}),
+        },
+      });
+
+      // Update variants if provided
+      if (input.variants) {
+        if (input.variants.withThinking) {
+          const thinkingData: Record<string, number> = {};
+          if (input.variants.withThinking.temperature !== undefined) {
+            thinkingData['temperature'] = input.variants.withThinking.temperature;
+          }
+          if (input.variants.withThinking.maxTokens !== undefined) {
+            thinkingData['maxTokens'] = input.variants.withThinking.maxTokens;
+          }
+          if (input.variants.withThinking.budgetTokens !== undefined) {
+            thinkingData['budgetTokens'] = input.variants.withThinking.budgetTokens;
+          }
+          if (Object.keys(thinkingData).length > 0) {
+            await tx.promptVariant.updateMany({
+              where: { promptId: id, variantType: 'withThinking' },
+              data: thinkingData,
+            });
+          }
+        }
+        if (input.variants.withoutThinking) {
+          const nonThinkingData: Record<string, number> = {};
+          if (input.variants.withoutThinking.temperature !== undefined) {
+            nonThinkingData['temperature'] = input.variants.withoutThinking.temperature;
+          }
+          if (input.variants.withoutThinking.maxTokens !== undefined) {
+            nonThinkingData['maxTokens'] = input.variants.withoutThinking.maxTokens;
+          }
+          if (Object.keys(nonThinkingData).length > 0) {
+            await tx.promptVariant.updateMany({
+              where: { promptId: id, variantType: 'withoutThinking' },
+              data: nonThinkingData,
+            });
+          }
+        }
+      }
     });
 
-    // Update variants if provided
-    if (input.variants) {
-      if (input.variants.withThinking) {
-        const thinkingData: Record<string, number> = {};
-        if (input.variants.withThinking.temperature !== undefined) {
-          thinkingData['temperature'] = input.variants.withThinking.temperature;
-        }
-        if (input.variants.withThinking.maxTokens !== undefined) {
-          thinkingData['maxTokens'] = input.variants.withThinking.maxTokens;
-        }
-        if (input.variants.withThinking.budgetTokens !== undefined) {
-          thinkingData['budgetTokens'] = input.variants.withThinking.budgetTokens;
-        }
-        if (Object.keys(thinkingData).length > 0) {
-          await prisma.promptVariant.updateMany({
-            where: { promptId: id, variantType: 'withThinking' },
-            data: thinkingData,
-          });
-        }
-      }
-      if (input.variants.withoutThinking) {
-        const nonThinkingData: Record<string, number> = {};
-        if (input.variants.withoutThinking.temperature !== undefined) {
-          nonThinkingData['temperature'] = input.variants.withoutThinking.temperature;
-        }
-        if (input.variants.withoutThinking.maxTokens !== undefined) {
-          nonThinkingData['maxTokens'] = input.variants.withoutThinking.maxTokens;
-        }
-        if (Object.keys(nonThinkingData).length > 0) {
-          await prisma.promptVariant.updateMany({
-            where: { promptId: id, variantType: 'withoutThinking' },
-            data: nonThinkingData,
-          });
-        }
-      }
-    }
-
     // Return updated prompt with variants
-    return this.getById(id) as Promise<PromptWithVariants>;
+    const updated = await this.getById(id);
+    if (!updated) {
+      throw new Error(`Failed to retrieve updated prompt ${id}`);
+    }
+    return updated;
   }
 
   /**

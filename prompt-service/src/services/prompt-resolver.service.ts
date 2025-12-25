@@ -15,8 +15,26 @@
 
 import { promptService } from '@/services/prompt.service.js';
 import { abTestService, type ABTestWithVariants } from '@/services/ab-test.service.js';
-import type { PromptConfig, ClaudeModel } from 'shared/prompt.types.js';
+import { ClaudeModel, type PromptConfig, type ClaudeModel as ClaudeModelType } from 'shared/prompt.types.js';
 import type { ABVariantConfig } from '@prisma/client';
+
+/**
+ * Valid ClaudeModel values for runtime validation
+ */
+const VALID_CLAUDE_MODELS: readonly string[] = Object.values(ClaudeModel);
+
+/**
+ * Validates that a model string is a valid ClaudeModel
+ * @throws Error if model is not valid
+ */
+function validateClaudeModel(model: string): ClaudeModelType {
+  if (!VALID_CLAUDE_MODELS.includes(model)) {
+    throw new Error(
+      `Invalid Claude model: "${model}". Valid models are: ${VALID_CLAUDE_MODELS.join(', ')}`
+    );
+  }
+  return model as ClaudeModelType;
+}
 
 export interface ResolveResult {
   config: PromptConfig;
@@ -68,7 +86,7 @@ export class PromptResolverService {
 
     const config: PromptConfig = {
       prompt: selectedVariant.content,
-      model: selectedVariant.model as ClaudeModel,
+      model: validateClaudeModel(selectedVariant.model),
       temperature: variantConfig?.temperature ?? (thinkingEnabled ? 1 : 0.6),
       max_tokens: variantConfig?.maxTokens ?? (thinkingEnabled ? 16000 : 8000),
       ...(thinkingEnabled && variantConfig?.thinkingType === 'enabled'
@@ -111,7 +129,7 @@ export class PromptResolverService {
 
     const config: PromptConfig = {
       prompt: prompt.content,
-      model: prompt.model as ClaudeModel,
+      model: validateClaudeModel(prompt.model),
       temperature: variant.temperature,
       max_tokens: variant.maxTokens,
       ...(thinkingEnabled && variant.thinkingType === 'enabled'

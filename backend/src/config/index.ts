@@ -53,9 +53,14 @@ const configSchema = z.object({
   promptServiceUrl: z.string().url().default('http://localhost:3002'),
 
   // Circuit Breaker
-  circuitBreakerTimeout: z.coerce.number().default(5000),
+  // Note: timeout should be higher than request timeout to distinguish network failures
+  circuitBreakerTimeout: z.coerce.number().default(6000),
   circuitBreakerResetTimeout: z.coerce.number().default(30000),
   circuitBreakerErrorThreshold: z.coerce.number().default(50),
+
+  // Prompt Cache TTL
+  promptCacheTtlMs: z.coerce.number().default(5 * 60 * 1000), // 5 minutes
+  promptStaleTtlMs: z.coerce.number().default(60 * 60 * 1000), // 1 hour
 });
 
 type Config = z.infer<typeof configSchema>;
@@ -77,6 +82,8 @@ function loadConfig(): Config {
     circuitBreakerTimeout: process.env['CIRCUIT_BREAKER_TIMEOUT'],
     circuitBreakerResetTimeout: process.env['CIRCUIT_BREAKER_RESET_TIMEOUT'],
     circuitBreakerErrorThreshold: process.env['CIRCUIT_BREAKER_ERROR_THRESHOLD'],
+    promptCacheTtlMs: process.env['PROMPT_CACHE_TTL_MS'],
+    promptStaleTtlMs: process.env['PROMPT_STALE_TTL_MS'],
   });
 
   if (!result.success) {
