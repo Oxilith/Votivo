@@ -51,46 +51,63 @@ npm run test          # Vitest
 npm run test:coverage # Coverage report
 ```
 
+### Prompt Service (`/prompt-service`)
+```bash
+npm run dev           # tsx watch (http://localhost:3002)
+npm run build         # TypeScript compile
+npm run start         # Run compiled dist/
+npm run lint          # ESLint
+npm run type-check    # TypeScript only
+npm run db:generate   # Generate Prisma client
+npm run db:migrate    # Run database migrations
+npm run db:seed       # Seed initial prompt data
+npm run admin:dev     # Vite dev server for admin UI
+npm run admin:build   # Build admin UI
+```
+
 ### Docker (Local Development)
 ```bash
-docker compose up --build   # Build and run full stack (frontend:443 HTTPS, backend:3001)
+docker compose up --build   # Build and run full stack
 docker compose up           # Run existing images
 docker compose down         # Stop containers
 ```
-Requires `ANTHROPIC_API_KEY` environment variable (export or .env file).
+Requires `ANTHROPIC_API_KEY` and `DATABASE_KEY` environment variables.
 
 ### Docker (OCI Deployment)
 
 **Run from Docker Hub OCI:**
 ```bash
-ANTHROPIC_API_KEY=<key> docker compose -f oci://oxilith/votive-oci:latest up
+ANTHROPIC_API_KEY=<key> DATABASE_KEY=<32+chars> docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
 **Build and publish multi-arch images:**
 ```bash
-# Remove old images and clear cache (clean rebuild)
+# Clean rebuild for multi-arch (linux/amd64 + linux/arm64)
 docker rmi oxilith/votive-frontend:latest
-docker rmi oxilith/votive:latest
+docker rmi oxilith/votive-backend:latest
+docker rmi oxilith/votive-prompt-service:latest
 docker buildx prune -f
 
-# Build for linux/amd64 + linux/arm64 and push to Docker Hub
+# Build and push using docker-bake.hcl
 docker buildx bake --push --no-cache
 
-# Publish OCI compose artifact
-docker compose publish --with-env oxilith/votive-oci:latest
+# Publish OCI compose artifact (--resolve-image-digests for multi-arch)
+docker compose publish --resolve-image-digests --with-env oxilith/votive-oci:latest
 ```
 
 **Clear OCI cache (when images updated):**
 ```bash
 # macOS
 rm -rf "$HOME/Library/Caches/docker-compose/"
-# Then re-run the OCI compose command
 ```
 
 **Docker Hub repositories:**
-- `oxilith/votive` - Backend (multi-arch)
-- `oxilith/votive-frontend` - Frontend (multi-arch)
+- `oxilith/votive-backend` - Backend API (multi-arch)
+- `oxilith/votive-frontend` - Nginx + React (multi-arch)
+- `oxilith/votive-prompt-service` - Prompt microservice (multi-arch)
 - `oxilith/votive-oci` - OCI compose artifact
+
+See [docs/docker-hub.md](../docker-hub.md) for complete workflow documentation.
 
 ### HTTPS Setup (Local Development)
 ```bash
@@ -222,6 +239,16 @@ THINKING_ENABLED=true         # Feature flag for Claude extended thinking mode
 ### Frontend (`/app/.env`)
 ```
 VITE_API_URL=https://localhost:3001
+```
+
+### Prompt Service (`/prompt-service/.env`)
+```
+DATABASE_URL=file:./data/prompts.db
+DATABASE_KEY=<32+ character encryption key>  # Required
+ADMIN_API_KEY=<admin authentication key>     # Required in production
+PORT=3002
+NODE_ENV=development
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001
 ```
 
 ### Feature Flags

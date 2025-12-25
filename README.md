@@ -105,23 +105,28 @@ VITE_API_URL=https://localhost:3001
 ├── app/                    # React frontend
 │   └── src/
 │       ├── components/     # UI components (assessment/, insights/, shared/)
-│       ├── config/         # AI prompt configurations
 │       ├── contexts/       # React contexts (theme)
 │       ├── i18n/           # Internationalization (en/, pl/)
 │       ├── services/       # API client & service layer
 │       ├── stores/         # Zustand state management
-│       ├── styles/         # Theme utilities
-│       └── types/          # TypeScript interfaces
+│       └── styles/         # Theme utilities
 ├── backend/                # Express API proxy
 │   └── src/
 │       ├── config/         # Environment validation (Zod)
+│       ├── health/         # Health checks (prompt-service dependency)
 │       ├── middleware/     # CORS, rate limiting, error handling
 │       ├── routes/         # API endpoints
-│       ├── services/       # Claude API integration
+│       ├── services/       # Claude API, prompt client, circuit breaker, cache
 │       └── utils/          # Logger (Pino)
+├── prompt-service/         # Prompt management microservice
+│   ├── prisma/             # SQLite schema & migrations
+│   └── src/
+│       ├── admin/          # React admin UI
+│       ├── routes/         # REST API endpoints
+│       └── services/       # Prompt CRUD, A/B testing, resolver
+├── shared/                 # Shared TypeScript types
+│   └── src/                # Types, validation, utilities
 ├── docs/                   # Documentation
-│   ├── Motivation.md       # Framework theory
-│   └── ClaudeDocs/         # Claude Code guidance
 └── personas/               # Sample assessment data
 ```
 
