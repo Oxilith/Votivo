@@ -3,14 +3,17 @@
  * @purpose Secure server-side Claude API integration
  * @functionality
  * - Sends prompts to Claude API using official SDK
- * - Uses prompt configuration from shared package
+ * - Resolves prompt configuration from prompt-service (no local fallback - IP protection)
  * - Implements retry logic with exponential backoff
  * - Supports extended thinking when configured
+ * - Records A/B test conversions on successful analysis
+ * - Throws PromptServiceUnavailableError when prompt-service is unavailable
  * @dependencies
  * - @anthropic-ai/sdk for Claude API
- * - @/config for API key
+ * - @/config for API key and feature flags
  * - @/utils/logger for logging
  * - @/services/claude/response-parser for response handling
+ * - @/services/prompt-client.service for prompt-service communication (with circuit breaker)
  * - shared/index for prompt config and response formatter
  */
 
@@ -19,9 +22,10 @@ import type { MessageCreateParamsNonStreaming } from '@anthropic-ai/sdk/resource
 import { config } from '@/config/index.js';
 import { logger } from '@/utils/logger.js';
 import type { AssessmentResponses, AIAnalysisResult } from '@/types/claude.types.js';
-import type { AnalysisLanguage, PromptConfig } from 'shared/index.js';
-import { formatResponsesForPrompt, PromptConfigResolver } from 'shared/index.js';
+import type { AnalysisLanguage, PromptConfig, PromptConfigKey } from 'shared/index.js';
+import { formatResponsesForPrompt } from 'shared/index.js';
 import { extractTextFromMessage, parseAnalysisResponse } from '@/services/claude/response-parser.js';
+import { promptClientService } from '@/services/prompt-client.service.js';
 
 const anthropic = new Anthropic({
   apiKey: config.anthropicApiKey,
@@ -55,11 +59,35 @@ function buildRequestParams(
   return params;
 }
 
+interface ResolvedPromptConfig {
+  promptConfig: PromptConfig;
+  variantId: string | undefined;
+}
+
+/**
+ * Resolves prompt configuration from prompt-service
+ * No local fallback - circuit breaker handles failures with fail-fast behavior
+ * @throws PromptServiceUnavailableError when prompt service is unavailable
+ */
+async function resolvePromptConfig(
+  key: PromptConfigKey,
+  thinkingEnabled: boolean
+): Promise<ResolvedPromptConfig> {
+  const resolved = await promptClientService.resolve(key, thinkingEnabled);
+  return {
+    promptConfig: resolved.config,
+    variantId: resolved.variantId,
+  };
+}
+
 export async function analyzeAssessment(
   responses: AssessmentResponses,
   language: AnalysisLanguage
 ): Promise<{ analysis: AIAnalysisResult; rawResponse: string }> {
-  const promptConfig = PromptConfigResolver.fromFlag(config.thinkingEnabled).resolve('IDENTITY_ANALYSIS');
+  const { promptConfig, variantId } = await resolvePromptConfig(
+    'IDENTITY_ANALYSIS',
+    config.thinkingEnabled
+  );
   const fullPrompt = promptConfig.prompt + formatResponsesForPrompt(responses, language);
   const requestParams = buildRequestParams(fullPrompt, promptConfig);
 
@@ -91,6 +119,14 @@ export async function analyzeAssessment(
       }
 
       logger.info('Claude API call successful');
+
+      // Record A/B test conversion on success
+      if (variantId) {
+        promptClientService.recordConversion(variantId).catch(() => {
+          // Error already logged in recordConversion
+        });
+      }
+
       return { analysis: parseResult.data, rawResponse };
 
     } catch (error) {

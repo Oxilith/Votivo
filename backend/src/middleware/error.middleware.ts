@@ -6,16 +6,19 @@
  * - Formats error responses consistently
  * - Logs errors with appropriate severity
  * - Hides internal error details in production
+ * - Returns 503 for PromptServiceUnavailableError with retry hint
  * @dependencies
  * - express (Request, Response, NextFunction)
  * - http-status-codes for status constants
  * - @/utils/logger for error logging
+ * - @/services/prompt-client.service for PromptServiceUnavailableError
  */
 
 import type { Request, Response, NextFunction } from 'express';
 import { StatusCodes, getReasonPhrase } from 'http-status-codes';
 import { logger } from '../utils/logger.js';
 import { config } from '../config/index.js';
+import { PromptServiceUnavailableError } from '@/services/prompt-client.service.js';
 
 export interface AppError extends Error {
   statusCode?: number;
@@ -29,6 +32,24 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
+  // Handle PromptServiceUnavailableError with 503 and retry hint
+  if (err instanceof PromptServiceUnavailableError) {
+    logger.warn({
+      err: { message: err.message },
+      req: { method: req.method, url: req.url, ip: req.ip },
+    }, 'Prompt service unavailable');
+
+    res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+      success: false,
+      error: {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Service temporarily unavailable. Please try again later.',
+      },
+      retryAfter: 30,
+    });
+    return;
+  }
+
   const statusCode = err.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR;
   const isOperational = err.isOperational ?? false;
 

@@ -1,21 +1,21 @@
 /**
  * @file shared/src/index.ts
- * @purpose Barrel export for shared types, labels, prompts, and utilities
+ * @purpose Barrel export for shared types, labels, and utilities
  * @functionality
  * - Re-exports all types from assessment.types
  * - Re-exports all AI analysis types from analysis.types
  * - Re-exports all label mappings from labels
- * - Re-exports AI analysis prompt from prompts
  * - Re-exports validation constants from validation
  * - Re-exports API types from api.types
+ * - Re-exports prompt types from prompt.types
  * - Re-exports response formatter from responseFormatter
  * @dependencies
  * - ./assessment.types for assessment type definitions
  * - ./analysis.types for AI analysis type definitions
  * - ./labels for label mappings
- * - ./prompts for AI prompts
  * - ./validation for validation constants
  * - ./api.types for API type definitions
+ * - ./prompt.types for prompt configuration types
  * - ./responseFormatter for response formatting
  */
 
@@ -65,11 +65,14 @@ export {
 
 // Prompt Types
 export { ClaudeModel } from './prompt.types.js';
-export type { ClaudeModel as ClaudeModelType, ThinkingConfigParam, PromptConfig } from './prompt.types.js';
-
-// Prompts
-export type { PromptConfigKey } from './promptConfigResolver.js';
-export { PromptConfigResolver } from './promptConfigResolver.js';
+export type {
+  ClaudeModel as ClaudeModelType,
+  ThinkingConfigParam,
+  PromptConfig,
+  PromptConfigKey,
+  ThinkingVariant,
+  PromptConfigDefinition,
+} from './prompt.types.js';
 
 // Response Formatter
 export { formatResponsesForPrompt } from './responseFormatter.js';

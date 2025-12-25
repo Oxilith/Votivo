@@ -110,3 +110,39 @@ coverage/
 
 # SSL Certificates (local dev)
 /certs/
+
+# Database files (prompts stored here - NEVER commit)
+*.db
+*.sqlite
+*.sqlite3
+data/prompts/
+prompts.json
+prompt-templates/
+
+# Prompt service seed file (contains proprietary prompt content)
+prompt-service/prisma/seed.ts
+
+# Additional environment patterns
+.env.local
+.env.*.local
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Test results
+TestResults/
+*.trx
+
+# Azure
+.azure/
+azure-pipelines*.yml.user
+
+# Private configuration
+private/
+.private/
+secrets/
+
+# Additional cache/temp
+*.cache
+out/
+build/

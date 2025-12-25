@@ -4,13 +4,14 @@
  * @functionality
  * - Runs startup health checks before starting server
  * - Starts HTTP or HTTPS server on configured port
- * - Handles graceful shutdown
+ * - Handles graceful shutdown with circuit breaker cleanup
  * - Logs server startup information
  * @dependencies
  * - @/app for Express application
  * - @/config for server configuration
  * - @/utils/logger for logging
  * - @/health for health service
+ * - @/services/circuit-breaker.service for destroyAllCircuitBreakers
  * - https for HTTPS server
  * - fs for reading certificates
  * - path for resolving certificate paths
@@ -23,6 +24,7 @@ import app from './app.js';
 import { config } from './config/index.js';
 import { logger } from './utils/logger.js';
 import { healthService } from './health/index.js';
+import { destroyAllCircuitBreakers } from './services/circuit-breaker.service.js';
 
 async function startServer(): Promise<void> {
   // Run startup health checks
@@ -110,6 +112,11 @@ async function startServer(): Promise<void> {
   // Graceful shutdown
   const shutdown = (signal: string) => {
     logger.info({ signal }, 'Received shutdown signal, closing server');
+
+    // Clean up circuit breakers to prevent event listener memory leaks
+    destroyAllCircuitBreakers();
+    logger.info('Circuit breakers destroyed');
+
     server.close(() => {
       logger.info('Server closed');
       process.exit(0);
