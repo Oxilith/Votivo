@@ -6,9 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Votive - a full-stack behavioral psychology assessment application with AI-powered analysis.
 
-**Architecture**: Monorepo with three packages:
+**Architecture**: Monorepo with four packages:
 - `/app` - React frontend
 - `/backend` - Express API proxy
+- `/prompt-service` - Prompt management microservice with admin UI and A/B testing
 - `/shared` - Shared TypeScript types (single source of truth)
 
 ## License & Contribution
@@ -136,19 +137,29 @@ Every component/service requires JSDoc header:
 
 ### Shared Package (`/shared/src`)
 
-Single source of truth for types, validation, and utilities used by both frontend and backend:
+Single source of truth for types, validation, and utilities used by frontend, backend, and prompt-service:
 - `assessment.types.ts` - Core domain types (TimeOfDay, MoodTrigger, CoreValue, WillpowerPattern, AssessmentResponses)
 - `analysis.types.ts` - AI analysis result types (AnalysisPattern, AnalysisContradiction, AnalysisBlindSpot, AnalysisLeveragePoint, AnalysisRisk, IdentitySynthesis, AIAnalysisResult)
 - `api.types.ts` - API types (AnalysisLanguage, SUPPORTED_LANGUAGES)
 - `labels.ts` - Human-readable label mappings for enum values
 - `validation.ts` - Enum value arrays for Zod schemas, REQUIRED_FIELDS, field categorization (ARRAY_FIELDS, NUMBER_FIELDS, STRING_FIELDS)
 - `responseFormatter.ts` - Shared `formatResponsesForPrompt()` function for AI analysis
-- `prompts.ts` - AI prompt templates (IDENTITY_ANALYSIS_PROMPT)
 - `prompt.types.ts` - Prompt config types (ClaudeModel, PromptConfig, ThinkingVariant, PromptConfigDefinition)
-- `promptConfigResolver.ts` - Strategy-based prompt config resolver with thinking mode variants
 - `index.ts` - Barrel exports
 
-Import via `shared/index` in both frontend and backend (e.g., `import { ... } from 'shared/index'`).
+Import via `shared/index` in packages (e.g., `import { ... } from 'shared/index'`).
+
+### Prompt Service (`/prompt-service`)
+
+Microservice for prompt management with database storage and admin UI:
+- `src/services/prompt.service.ts` - CRUD operations for prompts
+- `src/services/ab-test.service.ts` - A/B test management
+- `src/services/prompt-resolver.service.ts` - Resolves prompt config based on key and thinking mode
+- `src/routes/` - REST API endpoints for prompts, A/B tests, and resolve
+- `src/admin/` - React admin UI for prompt and A/B test management
+- `prisma/schema.prisma` - SQLite database schema (encrypted with libsql)
+
+The backend calls the prompt-service `/api/resolve` endpoint to get prompt configurations.
 
 ### Frontend (`/app/src`)
 
@@ -173,20 +184,25 @@ Import via `shared/index` in both frontend and backend (e.g., `import { ... } fr
 ### Backend (`/backend/src`)
 
 **API Proxy** - Protects Anthropic API key from browser exposure:
-- `services/claude.service.ts` - Claude API integration with retry logic, uses `PromptConfigResolver` from shared
+- `services/claude.service.ts` - Claude API integration with retry logic
+- `services/prompt-client.service.ts` - Client for prompt-service with circuit breaker and caching
+- `services/prompt-cache.service.ts` - In-memory cache for prompt configurations
 - `controllers/claude.controller.ts` - Request handler for analysis endpoint
 - `routes/api/v1/` - API route definitions (`/api/v1/claude/analyze`)
 - `validators/claude.validator.ts` - Zod request validation using enum arrays from shared
 - `types/claude.types.ts` - Re-exports shared types, defines API request/response types
 - `middleware/` - CORS, rate limiting, error handling, helmet
 - `config/index.ts` - Zod-validated environment configuration
+- `health/checks/prompt-service.check.ts` - Health check for prompt-service dependency
 - `utils/logger.ts` - Pino structured logging
 
 ### Data Flow
 ```
 Frontend (Zustand) → ApiClient → Backend (Express) → Claude API
-                    ↓                        ↓
-              localStorage                Pino logs
+                    ↓               ↓          ↓
+              localStorage     Prompt-Service  Pino logs
+                                    ↓
+                              SQLite (encrypted)
 ```
 
 ## Environment Variables
@@ -214,7 +230,7 @@ VITE_API_URL=https://localhost:3001
 - `true` (default): Uses extended thinking with 8000 token budget, temperature=1, max_tokens=16000
 - `false`: Standard mode with temperature=0.6, max_tokens=8000
 
-The `PromptConfigResolver` in shared package selects the appropriate prompt configuration variant based on this flag.
+The prompt-service resolves the appropriate prompt configuration variant based on this flag.
 
 ## Testing
 

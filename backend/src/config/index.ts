@@ -6,6 +6,7 @@
  * - Validates required configuration values
  * - Provides typed configuration object for application use
  * - Throws descriptive errors for missing required values
+ * - Configures circuit breaker settings for prompt service resilience
  * @dependencies
  * - dotenv for environment variable loading
  * - zod for schema validation
@@ -47,6 +48,14 @@ const configSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('true'),
+
+  // Prompt Service
+  promptServiceUrl: z.string().url().default('http://localhost:3002'),
+
+  // Circuit Breaker
+  circuitBreakerTimeout: z.coerce.number().default(5000),
+  circuitBreakerResetTimeout: z.coerce.number().default(30000),
+  circuitBreakerErrorThreshold: z.coerce.number().default(50),
 });
 
 type Config = z.infer<typeof configSchema>;
@@ -64,6 +73,10 @@ function loadConfig(): Config {
     rateLimitMaxRequests: process.env['RATE_LIMIT_MAX_REQUESTS'],
     logLevel: process.env['LOG_LEVEL'],
     thinkingEnabled: process.env['THINKING_ENABLED'],
+    promptServiceUrl: process.env['PROMPT_SERVICE_URL'],
+    circuitBreakerTimeout: process.env['CIRCUIT_BREAKER_TIMEOUT'],
+    circuitBreakerResetTimeout: process.env['CIRCUIT_BREAKER_RESET_TIMEOUT'],
+    circuitBreakerErrorThreshold: process.env['CIRCUIT_BREAKER_ERROR_THRESHOLD'],
   });
 
   if (!result.success) {

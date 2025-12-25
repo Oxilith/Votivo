@@ -149,96 +149,31 @@ npm run test          # Run tests
 
 ### Docker
 
-#### Quick Start (OCI from Docker Hub)
-
-Pull and run the pre-built multi-arch images:
+Quick deployment using pre-built multi-arch images:
 
 ```bash
 # macOS/Linux
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
+ANTHROPIC_API_KEY=<YOUR_KEY> DATABASE_KEY=<32+_CHAR_SECRET> \
+  docker compose -f oci://oxilith/votive-oci:latest up
 
 # Windows (PowerShell)
-$env:ANTHROPIC_API_KEY="<YOUR_KEY>"; docker compose -f oci://oxilith/votive-oci:latest up
+$env:ANTHROPIC_API_KEY="<YOUR_KEY>"; $env:DATABASE_KEY="<32+_CHAR_SECRET>"
+docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
-This starts:
-- Frontend: https://localhost (port 443, HTTPS)
-- Backend: http://localhost:3001 (internal, proxied through nginx)
+See [Docker Hub Workflow](docs/docker-hub.md) for complete documentation including:
+- Local build instructions
+- HTTPS configuration
+- Multi-arch image publishing (maintainers)
+- Troubleshooting guide
 
-#### Local Build & Run
+## Documentation
 
-```bash
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose up --build
-```
-
-#### Trusted HTTPS (No Browser Warning)
-
-By default, Docker generates self-signed certificates (browser shows warning). For trusted HTTPS:
-
-```bash
-# Install mkcert and set up local CA (one-time)
-brew install mkcert nss
-mkcert -install
-
-# Generate trusted certificates
-mkdir -p certs && cd certs
-mkcert localhost 127.0.0.1 ::1
-cd ..
-
-# Run Docker (certificates auto-detected)
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
-```
-
-#### Build & Publish (Maintainers)
-
-```bash
-# Clean rebuild for multi-arch (linux/amd64 + linux/arm64)
-docker rmi oxilith/votive-frontend:latest
-docker rmi oxilith/votive-backend:latest
-docker buildx prune -f
-docker buildx bake --push --no-cache
-
-# Publish OCI compose artifact (--resolve-image-digests ensures multi-arch support)
-docker compose publish --resolve-image-digests --with-env oxilith/votive-oci:latest
-```
-
-#### Platform Selection
-
-If Docker selects the wrong platform, set `DOCKER_DEFAULT_PLATFORM`:
-
-```bash
-# macOS/Linux
-DOCKER_DEFAULT_PLATFORM=linux/amd64 ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
-
-# Windows (PowerShell)
-$env:DOCKER_DEFAULT_PLATFORM="linux/amd64"; $env:ANTHROPIC_API_KEY="<YOUR_KEY>"; docker compose -f oci://oxilith/votive-oci:latest up
-```
-
-#### Clear OCI Cache (After Image Updates)
-
-```bash
-# macOS/Linux
-rm -rf "$HOME/Library/Caches/docker-compose/"
-
-# Windows (PowerShell)
-Remove-Item -Recurse -Force "$env:LOCALAPPDATA\docker-compose"
-
-# Then re-run
-ANTHROPIC_API_KEY=<YOUR_KEY> docker compose -f oci://oxilith/votive-oci:latest up
-```
-
-**Docker Hub Repositories:**
-- `oxilith/votive` - Backend API
-- `oxilith/votive-frontend` - Nginx + React
-- `oxilith/votive-oci` - OCI compose artifact
-
-## Framework Documentation
-
-See [docs/Motivation.md](docs/Motivation.md) for the complete theoretical framework including:
-- Core states (Mood, Energy, Motivation)
-- Behavior types (Automatic, Motivation-driven, Keystone)
-- Habit architecture and mechanisms
-- Identity concepts and psychological principles
+| Document | Description |
+|----------|-------------|
+| [Architecture](docs/architecture.md) | System design, diagrams, and technical decisions |
+| [Docker Hub Workflow](docs/docker-hub.md) | Container deployment, publishing, and troubleshooting |
+| [Motivation](docs/Motivation.md) | Theoretical framework and psychology principles |
 
 ## API Endpoints
 
