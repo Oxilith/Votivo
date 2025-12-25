@@ -11,6 +11,21 @@ Votive - a full-stack behavioral psychology assessment application with AI-power
 - `/backend` - Express API proxy
 - `/shared` - Shared TypeScript types (single source of truth)
 
+## License & Contribution
+
+**License**: Votive Source Available License (proprietary, non-commercial)
+- View and study code: ✅
+- Submit contributions: ✅
+- Commercial use: ❌ (requires license)
+- Redistribution: ❌
+
+**Contribution Workflow**:
+- Target `develop` branch (not `main`)
+- Branch naming: `feature/short-desc`, `bugfix/issue-123-desc`, `docs/what-changed`
+- Commit format: `type(scope): brief description`
+  - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- Security issues: Email konrad.jagusiak@oxilogic.com (not public issues)
+
 ## Build & Development Commands
 
 ### Frontend (`/app`)
