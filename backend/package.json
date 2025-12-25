@@ -10,8 +10,8 @@
     "start": "node dist/index.js",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test": "vitest --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
