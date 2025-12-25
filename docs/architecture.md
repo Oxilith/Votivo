@@ -45,7 +45,7 @@ flowchart TB
     Nginx --> ReactApp
     Nginx -->|"/api/*"| Express
 
-    AdminUI -->|"X-Admin-Key"| PromptAPI
+    AdminUI -->|"HttpOnly Cookie"| PromptAPI
 
     Express --> CircuitBreaker
     CircuitBreaker --> PromptCache
@@ -193,15 +193,25 @@ stateDiagram-v2
 | STALE_TTL_MS | 1 hour | Stale - serve while refreshing |
 | > STALE_TTL_MS | - | Expired - delete entry |
 
+**Resilience**: When prompt-service is unavailable but stale cached data exists, the system returns stale data instead of failing. A background refresh is scheduled to update the cache when the service recovers.
+
 **Note**: Cache is per-process. In multi-instance deployments, each instance maintains its own cache.
 
-### 4. Timing-Safe Authentication
+### 4. Timing-Safe Authentication with HttpOnly Cookies
 
-**Decision**: Use `crypto.timingSafeEqual` for API key comparison.
+**Decision**: Use HttpOnly session cookies as primary authentication with `crypto.timingSafeEqual` for API key validation.
 
 **Rationale**:
-- **Security**: Prevents timing attacks that could leak API key information
-- **Best Practice**: Standard approach for secret comparison in security-critical code
+- **XSS Protection**: HttpOnly cookies cannot be accessed by JavaScript, mitigating XSS attacks
+- **Timing Attack Prevention**: Uses `crypto.timingSafeEqual` for secret comparison
+- **Best Practice**: Standard approach for secure session management
+
+**Authentication Flow**:
+1. Admin UI calls `/api/auth/login` with API key
+2. Server validates key with timing-safe comparison
+3. Server sets signed HttpOnly cookie (Secure, SameSite=Strict)
+4. Subsequent requests authenticated via cookie
+5. X-Admin-Key header supported for backward compatibility
 
 ### 5. Rate Limiting
 
@@ -314,9 +324,9 @@ flowchart TB
 |-------|---------|----------------|
 | Transport | HTTPS | Nginx SSL termination |
 | API | Rate Limiting | express-rate-limit on admin endpoints |
-| Authentication | API Key | X-Admin-Key header with timing-safe comparison |
+| Authentication | HttpOnly Cookie + API Key | Signed HttpOnly session cookie (primary) or X-Admin-Key header (fallback) |
 | Data at Rest | Encryption | libsql AES encryption |
-| Headers | Security Headers | Helmet middleware |
+| Headers | Security Headers | Helmet with CSP directives (script-src, style-src, img-src, connect-src) |
 | CORS | Origin Restriction | Whitelist of allowed origins |
 
 ## Environment Configuration
@@ -340,6 +350,7 @@ flowchart TB
 | DATABASE_URL | Yes | - | SQLite database path |
 | DATABASE_KEY | Yes | - | Encryption key (32+ chars) |
 | ADMIN_API_KEY | Prod | - | Admin authentication key |
+| SESSION_SECRET | No | ADMIN_API_KEY | Cookie signing secret (32+ chars) |
 | PORT | No | 3002 | Server port |
 | NODE_ENV | No | development | Environment mode |
 | CORS_ORIGINS | No | localhost | Allowed CORS origins |

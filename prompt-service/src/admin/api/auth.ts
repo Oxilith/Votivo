@@ -1,78 +1,105 @@
 /**
  * @file prompt-service/src/admin/api/auth.ts
- * @purpose Authentication utilities for admin API requests
+ * @purpose Authentication utilities for admin API requests using HttpOnly cookies
  * @functionality
- * - Stores and retrieves admin API key from localStorage
- * - Provides function to get auth headers for API requests
+ * - Provides login function that authenticates via API and sets HttpOnly cookie
+ * - Provides logout function that clears the session cookie
+ * - Provides checkAuth function to verify authentication status
  * - Handles 401 responses by redirecting to login
  * @dependencies
- * - localStorage for API key storage
+ * - fetch API for HTTP requests
+ * - HttpOnly cookies for secure session storage (set by server)
  */
 
-const ADMIN_API_KEY_STORAGE_KEY = 'adminApiKey';
+const API_BASE = '/api/auth';
 
-/**
- * Get the stored admin API key from localStorage
- */
-export function getAdminApiKey(): string | null {
-  return localStorage.getItem(ADMIN_API_KEY_STORAGE_KEY);
+interface AuthResponse {
+  success?: boolean;
+  authenticated?: boolean;
+  error?: string;
 }
 
 /**
- * Store the admin API key in localStorage
+ * Login with admin API key
+ * Server will set HttpOnly session cookie on success
  */
-export function setAdminApiKey(apiKey: string): void {
-  localStorage.setItem(ADMIN_API_KEY_STORAGE_KEY, apiKey);
+export async function login(apiKey: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey }),
+      credentials: 'include', // Important for cookies
+    });
+
+    const data = (await response.json()) as AuthResponse;
+
+    if (!response.ok) {
+      return { success: false, error: data.error ?? 'Login failed' };
+    }
+
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Network error - please try again' };
+  }
 }
 
 /**
- * Clear the stored admin API key
+ * Logout and clear session cookie
  */
-export function clearAdminApiKey(): void {
-  localStorage.removeItem(ADMIN_API_KEY_STORAGE_KEY);
+export async function logout(): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch {
+    // Ignore errors on logout
+  }
+  // Redirect to login page
+  window.location.href = '/admin/login';
 }
 
 /**
- * Check if user is authenticated (has stored API key)
+ * Check if user is authenticated by verifying session with server
  */
-export function isAuthenticated(): boolean {
-  return getAdminApiKey() !== null;
+export async function checkAuth(): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE}/verify`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const data = (await response.json()) as AuthResponse;
+    return data.authenticated === true;
+  } catch {
+    return false;
+  }
 }
 
 /**
- * Get headers with authentication for API requests
+ * Get headers for authenticated API requests
+ * Cookie is sent automatically via credentials: 'include'
  */
 export function getAuthHeaders(): HeadersInit {
-  const headers: HeadersInit = {
+  return {
     'Content-Type': 'application/json',
   };
-
-  const apiKey = getAdminApiKey();
-  if (apiKey) {
-    headers['X-Admin-Key'] = apiKey;
-  }
-
-  return headers;
 }
 
 /**
  * Get headers without Content-Type (for requests without body)
  */
 export function getAuthHeadersNoContent(): HeadersInit {
-  const headers: HeadersInit = {};
-
-  const apiKey = getAdminApiKey();
-  if (apiKey) {
-    headers['X-Admin-Key'] = apiKey;
-  }
-
-  return headers;
+  return {};
 }
 
 /**
- * Handle 401 response by clearing stored key and redirecting to login
+ * Handle 401 response by redirecting to login
  */
 export function handleUnauthorized(): void {
-  clearAdminApiKey();
   window.location.href = '/admin/login';
 }

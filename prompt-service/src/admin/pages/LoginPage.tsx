@@ -3,25 +3,26 @@
  * @purpose Login page for admin authentication
  * @functionality
  * - Displays login form for entering admin API key
- * - Stores API key in localStorage on submission
+ * - Authenticates via API and receives HttpOnly session cookie
  * - Redirects to prompts page after successful login
- * - Shows validation feedback for empty input
+ * - Shows validation feedback for empty input or invalid credentials
  * @dependencies
  * - react for useState
  * - react-router-dom for navigation
- * - ../api/auth for API key storage
+ * - ../api/auth for login API call
  */
 
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { setAdminApiKey } from '../api/auth.js';
+import { login } from '../api/auth.js';
 
 export function LoginPage() {
   const [apiKey, setApiKey] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!apiKey.trim()) {
@@ -29,8 +30,17 @@ export function LoginPage() {
       return;
     }
 
-    setAdminApiKey(apiKey.trim());
-    navigate('/prompts');
+    setIsLoading(true);
+    setError('');
+
+    const result = await login(apiKey.trim());
+
+    if (result.success) {
+      navigate('/prompts');
+    } else {
+      setError(result.error ?? 'Login failed');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -39,7 +49,7 @@ export function LoginPage() {
         <h1 style={styles.title}>Prompt Service Admin</h1>
         <p style={styles.subtitle}>Enter your admin API key to continue</p>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={(e) => void handleSubmit(e)} style={styles.form}>
           <div style={styles.inputGroup}>
             <label htmlFor="apiKey" style={styles.label}>
               Admin API Key
@@ -55,12 +65,21 @@ export function LoginPage() {
               placeholder="Enter your API key"
               style={styles.input}
               autoFocus
+              disabled={isLoading}
             />
             {error && <p style={styles.error}>{error}</p>}
           </div>
 
-          <button type="submit" style={styles.button}>
-            Login
+          <button
+            type="submit"
+            style={{
+              ...styles.button,
+              opacity: isLoading ? 0.7 : 1,
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+            }}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

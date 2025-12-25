@@ -365,37 +365,36 @@ export class ABTestService {
 
   /**
    * Normalize weights to sum to 1.0
+   * Uses transaction to prevent race conditions with concurrent requests
    */
   private async normalizeWeights(testId: string): Promise<void> {
-    const variants = await prisma.aBVariant.findMany({
-      where: { abTestId: testId },
-    });
+    await prisma.$transaction(async (tx) => {
+      const variants = await tx.aBVariant.findMany({
+        where: { abTestId: testId },
+      });
 
-    if (variants.length === 0) return;
+      if (variants.length === 0) return;
 
-    const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
-    if (totalWeight === 0) {
-      // Distribute equally if all weights are 0
-      const equalWeight = 1 / variants.length;
-      await Promise.all(
-        variants.map((v) =>
-          prisma.aBVariant.update({
+      const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
+      if (totalWeight === 0) {
+        // Distribute equally if all weights are 0
+        const equalWeight = 1 / variants.length;
+        for (const v of variants) {
+          await tx.aBVariant.update({
             where: { id: v.id },
             data: { weight: equalWeight },
-          })
-        )
-      );
-    } else if (Math.abs(totalWeight - 1) > 0.001) {
-      // Normalize if total doesn't equal 1
-      await Promise.all(
-        variants.map((v) =>
-          prisma.aBVariant.update({
+          });
+        }
+      } else if (Math.abs(totalWeight - 1) > 0.001) {
+        // Normalize if total doesn't equal 1
+        for (const v of variants) {
+          await tx.aBVariant.update({
             where: { id: v.id },
             data: { weight: v.weight / totalWeight },
-          })
-        )
-      );
-    }
+          });
+        }
+      }
+    });
   }
 }
 

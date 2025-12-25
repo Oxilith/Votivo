@@ -172,6 +172,7 @@ Microservice for prompt management with database storage and admin UI:
 - `src/services/prompt.service.ts` - CRUD operations for prompts
 - `src/services/ab-test.service.ts` - A/B test management
 - `src/services/prompt-resolver.service.ts` - Resolves prompt config based on key and thinking mode
+- `src/routes/auth.routes.ts` - Authentication endpoints (login, logout, verify) with HttpOnly cookies
 - `src/routes/` - REST API endpoints for prompts, A/B tests, and resolve
 - `src/admin/` - React admin UI for prompt and A/B test management
 - `prisma/schema.prisma` - SQLite database schema (encrypted with libsql)
@@ -246,6 +247,7 @@ VITE_API_URL=https://localhost:3001
 DATABASE_URL=file:./data/prompts.db
 DATABASE_KEY=<32+ character encryption key>  # Required
 ADMIN_API_KEY=<admin authentication key>     # Required in production
+SESSION_SECRET=<cookie signing secret>       # Optional, defaults to ADMIN_API_KEY
 PORT=3002
 NODE_ENV=development
 CORS_ORIGINS=http://localhost:3000,http://localhost:3001

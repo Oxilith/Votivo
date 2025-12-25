@@ -9,10 +9,10 @@
  * - Deletes A/B tests
  * - Activates and deactivates A/B tests
  * - Manages A/B test variants
- * - Includes authentication headers for admin access
+ * - Uses HttpOnly cookie authentication via credentials: 'include'
  * @dependencies
  * - ../types for type definitions
- * - ./auth for authentication utilities
+ * - ./auth for authentication utilities and headers
  */
 
 import type {
@@ -64,6 +64,7 @@ export const abTestApi = {
   async getAll(): Promise<ABTestDTO[]> {
     const response = await fetch(API_BASE, {
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<ABTestDTO[]>(response);
   },
@@ -74,6 +75,7 @@ export const abTestApi = {
   async getById(id: string): Promise<ABTestDTO> {
     const response = await fetch(`${API_BASE}/${id}`, {
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<ABTestDTO>(response);
   },
@@ -86,6 +88,7 @@ export const abTestApi = {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(input),
+      credentials: 'include',
     });
     return handleResponse<ABTestDTO>(response);
   },
@@ -98,6 +101,7 @@ export const abTestApi = {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(input),
+      credentials: 'include',
     });
     return handleResponse<ABTestDTO>(response);
   },
@@ -109,6 +113,7 @@ export const abTestApi = {
     const response = await fetch(`${API_BASE}/${id}`, {
       method: 'DELETE',
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleVoidResponse(response);
   },
@@ -120,6 +125,7 @@ export const abTestApi = {
     const response = await fetch(`${API_BASE}/${id}/activate`, {
       method: 'POST',
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<ABTestDTO>(response);
   },
@@ -131,6 +137,7 @@ export const abTestApi = {
     const response = await fetch(`${API_BASE}/${id}/deactivate`, {
       method: 'POST',
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<ABTestDTO>(response);
   },
@@ -143,6 +150,7 @@ export const abTestApi = {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(input),
+      credentials: 'include',
     });
     return handleResponse<ABVariantDTO>(response);
   },
@@ -159,6 +167,7 @@ export const abTestApi = {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(input),
+      credentials: 'include',
     });
     return handleResponse<ABVariantDTO>(response);
   },
@@ -170,6 +179,7 @@ export const abTestApi = {
     const response = await fetch(`${API_BASE}/${testId}/variants/${variantId}`, {
       method: 'DELETE',
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleVoidResponse(response);
   },

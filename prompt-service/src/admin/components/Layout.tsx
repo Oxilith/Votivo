@@ -5,14 +5,17 @@
  * - Provides consistent page layout with header and sidebar
  * - Navigation links to Prompts and A/B Tests sections
  * - Highlights current active section
+ * - Includes logout button in footer
  * - Responsive design for different screen sizes
  * @dependencies
  * - react-router-dom for navigation
  * - react for ReactNode type
+ * - ../api/auth for logout functionality
  */
 
 import { NavLink } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { logout } from '../api/auth.js';
 
 interface LayoutProps {
   children: ReactNode;
@@ -74,6 +77,25 @@ export function Layout({ children }: LayoutProps) {
           </NavLink>
         </nav>
         <div style={styles.footer}>
+          <button
+            onClick={() => void logout()}
+            style={styles.logoutButton}
+            type="button"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
           <span style={styles.footerText}>Votive Prompt Service</span>
         </div>
       </aside>
@@ -120,10 +142,29 @@ const styles: Record<string, React.CSSProperties> = {
   footer: {
     padding: '1rem',
     borderTop: '1px solid #e5e7eb',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+  },
+  logoutButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    padding: '0.5rem 0.75rem',
+    backgroundColor: 'transparent',
+    border: '1px solid #e5e7eb',
+    borderRadius: '0.375rem',
+    color: '#6b7280',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+    width: '100%',
+    justifyContent: 'center',
   },
   footerText: {
     fontSize: '0.75rem',
     color: '#9ca3af',
+    textAlign: 'center',
   },
   main: {
     flex: 1,

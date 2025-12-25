@@ -99,14 +99,20 @@ export class PromptClientService {
 
       return result;
     } catch (error) {
-      // Schedule background refresh if we have stale cached data
-      if (cached) {
-        this.scheduleBackgroundRefresh(key, thinkingEnabled);
-      }
-
       const errorMessage = error instanceof Error ? error.message : 'Failed to resolve prompt';
       logger.error({ key, thinkingEnabled, error: errorMessage }, 'Prompt resolution failed');
 
+      // Return stale cached data if available instead of throwing
+      if (cached) {
+        this.scheduleBackgroundRefresh(key, thinkingEnabled);
+        logger.warn({ key, thinkingEnabled }, 'Returning stale cached prompt');
+        return {
+          config: cached.config,
+          ...(cached.variantId !== undefined && { variantId: cached.variantId }),
+        };
+      }
+
+      // Only throw if no cached data available
       throw new PromptServiceUnavailableError(errorMessage);
     }
   }

@@ -2,14 +2,15 @@
  * @file prompt-service/src/routes/index.ts
  * @purpose Aggregates all API routes for the prompt service
  * @functionality
- * - Combines prompt, A/B test, and resolve routes
+ * - Combines auth, prompt, A/B test, and resolve routes
  * - Applies admin auth middleware to protected routes (prompts, ab-tests)
  * - Applies rate limiting to admin routes
- * - Keeps resolve routes open for backend service communication
+ * - Keeps resolve and auth routes open for public access
  * - Provides a single router for mounting in Express app
  * @dependencies
  * - express Router
  * - express-rate-limit for rate limiting
+ * - @/routes/auth.routes
  * - @/routes/prompt.routes
  * - @/routes/ab-test.routes
  * - @/routes/resolve.routes
@@ -18,6 +19,7 @@
 
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import { authRoutes } from '@/routes/auth.routes.js';
 import { promptRoutes } from '@/routes/prompt.routes.js';
 import { abTestRoutes } from '@/routes/ab-test.routes.js';
 import { resolveRoutes } from '@/routes/resolve.routes.js';
@@ -45,6 +47,9 @@ const resolveRateLimiter = rateLimit({
 
 // Public routes (used by backend service) - rate limited to prevent abuse
 router.use('/resolve', resolveRateLimiter, resolveRoutes);
+
+// Auth routes (public - for login/logout)
+router.use('/auth', authRoutes);
 
 // Protected admin routes (require X-Admin-Key header + rate limiting)
 router.use('/prompts', adminRateLimiter, adminAuthMiddleware, promptRoutes);

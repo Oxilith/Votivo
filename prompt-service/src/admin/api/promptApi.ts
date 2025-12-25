@@ -9,10 +9,10 @@
  * - Deletes prompts (soft delete)
  * - Retrieves version history
  * - Restores prompts to previous versions
- * - Includes authentication headers for admin access
+ * - Uses HttpOnly cookie authentication via credentials: 'include'
  * @dependencies
  * - ../types for type definitions
- * - ./auth for authentication utilities
+ * - ./auth for authentication utilities and headers
  */
 
 import type {
@@ -62,6 +62,7 @@ export const promptApi = {
   async getAll(): Promise<PromptDTO[]> {
     const response = await fetch(API_BASE, {
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<PromptDTO[]>(response);
   },
@@ -72,6 +73,7 @@ export const promptApi = {
   async getById(id: string): Promise<PromptDTO> {
     const response = await fetch(`${API_BASE}/${id}`, {
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<PromptDTO>(response);
   },
@@ -82,6 +84,7 @@ export const promptApi = {
   async getByKey(key: string): Promise<PromptDTO> {
     const response = await fetch(`${API_BASE}/key/${key}`, {
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<PromptDTO>(response);
   },
@@ -94,6 +97,7 @@ export const promptApi = {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(input),
+      credentials: 'include',
     });
     return handleResponse<PromptDTO>(response);
   },
@@ -106,6 +110,7 @@ export const promptApi = {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(input),
+      credentials: 'include',
     });
     return handleResponse<PromptDTO>(response);
   },
@@ -117,6 +122,7 @@ export const promptApi = {
     const response = await fetch(`${API_BASE}/${id}`, {
       method: 'DELETE',
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleVoidResponse(response);
   },
@@ -127,6 +133,7 @@ export const promptApi = {
   async getVersions(promptId: string): Promise<PromptVersionDTO[]> {
     const response = await fetch(`${API_BASE}/${promptId}/versions`, {
       headers: getAuthHeadersNoContent(),
+      credentials: 'include',
     });
     return handleResponse<PromptVersionDTO[]>(response);
   },
@@ -145,6 +152,7 @@ export const promptApi = {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ changedBy }),
+        credentials: 'include',
       }
     );
     return handleResponse<PromptDTO>(response);

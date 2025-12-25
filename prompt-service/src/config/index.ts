@@ -40,6 +40,9 @@ const configSchema = z.object({
 
   // Admin Authentication
   adminApiKey: z.string().optional(),
+
+  // Session secret for signing cookies (defaults to adminApiKey if not set)
+  sessionSecret: z.string().min(32).optional(),
 });
 
 type Config = z.infer<typeof configSchema>;
@@ -53,6 +56,7 @@ function loadConfig(): Config {
     corsOrigins: process.env['CORS_ORIGINS'],
     logLevel: process.env['LOG_LEVEL'],
     adminApiKey: process.env['ADMIN_API_KEY'],
+    sessionSecret: process.env['SESSION_SECRET'] ?? process.env['ADMIN_API_KEY'],
   });
 
   if (!result.success) {

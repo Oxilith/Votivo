@@ -2,8 +2,10 @@
  * @file prompt-service/src/middleware/admin-auth.middleware.ts
  * @purpose API key authentication middleware for admin routes
  * @functionality
- * - Validates X-Admin-Key header against configured key using timing-safe comparison
- * - Returns 401 Unauthorized if key is missing or invalid
+ * - Validates authentication via HttpOnly session cookie (primary method)
+ * - Falls back to X-Admin-Key header validation for backward compatibility
+ * - Uses timing-safe comparison to prevent timing attacks
+ * - Returns 401 Unauthorized if authentication fails
  * - Allows access in development mode without key if not configured
  * - Blocks access in production if admin key is not configured
  * @dependencies
@@ -16,41 +18,44 @@ import crypto from 'crypto';
 import type { Request, Response, NextFunction } from 'express';
 import { config } from '@/config/index.js';
 
+const COOKIE_NAME = 'admin_session';
+
 export function adminAuthMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
 ): void {
-  const apiKey = req.headers['x-admin-key'];
-
+  // Development mode without key configured - allow all
   if (!config.adminApiKey) {
-    // If no key configured, block all admin access in production
     if (config.nodeEnv === 'production') {
       res.status(503).json({ error: 'Admin access not configured' });
       return;
     }
-    // Allow in development without key
     next();
     return;
   }
 
-  // Validate API key exists and is a string
-  if (!apiKey || typeof apiKey !== 'string') {
-    res.status(401).json({ error: 'Unauthorized' });
+  // Check for authenticated session cookie first (primary auth method)
+  const sessionCookie = req.signedCookies[COOKIE_NAME] as string | undefined;
+  if (sessionCookie === 'authenticated') {
+    next();
     return;
   }
 
-  // Use timing-safe comparison to prevent timing attacks
-  const apiKeyBuffer = Buffer.from(apiKey);
-  const configKeyBuffer = Buffer.from(config.adminApiKey);
+  // Fall back to X-Admin-Key header for backward compatibility
+  const apiKey = req.headers['x-admin-key'];
+  if (apiKey && typeof apiKey === 'string') {
+    const apiKeyBuffer = Buffer.from(apiKey);
+    const configKeyBuffer = Buffer.from(config.adminApiKey);
 
-  if (
-    apiKeyBuffer.length !== configKeyBuffer.length ||
-    !crypto.timingSafeEqual(apiKeyBuffer, configKeyBuffer)
-  ) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
+    if (
+      apiKeyBuffer.length === configKeyBuffer.length &&
+      crypto.timingSafeEqual(apiKeyBuffer, configKeyBuffer)
+    ) {
+      next();
+      return;
+    }
   }
 
-  next();
+  res.status(401).json({ error: 'Unauthorized' });
 }

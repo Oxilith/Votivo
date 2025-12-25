@@ -3,15 +3,16 @@
  * @purpose Express server entry point for the prompt management microservice
  * @functionality
  * - Initializes Express application with middleware
- * - Configures CORS, security headers, and logging
+ * - Configures CORS, CSP security headers, and logging
  * - Mounts API routes and admin UI static files
- * - Protects admin UI with API key authentication in production
- * - Provides health check endpoint
+ * - Protects admin UI with HttpOnly cookie authentication in production
+ * - Provides health check endpoint with database verification
  * - Handles graceful shutdown
  * @dependencies
  * - express for HTTP server
- * - helmet for security headers
+ * - helmet for security headers with CSP
  * - cors for cross-origin requests
+ * - cookie-parser for signed HttpOnly session cookies
  * - pino-http for request logging
  * - @/config for configuration
  * - @/routes for API routes
@@ -22,6 +23,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
 import path from 'path';
@@ -51,10 +53,22 @@ const logger = pino({
 // Initialize Express app
 const app = express();
 
-// Security middleware
+// Security middleware with CSP headers
 app.use(
   helmet({
-    contentSecurityPolicy: config.nodeEnv === 'production',
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"], // Required for inline styles
+        imgSrc: ["'self'", 'data:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
   })
 );
 
@@ -83,6 +97,10 @@ app.use(
 // Body parsing
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Cookie parsing with signing secret for secure session cookies
+const cookieSecret = config.sessionSecret ?? config.adminApiKey ?? 'dev-secret-key';
+app.use(cookieParser(cookieSecret));
 
 // Health check endpoint with database connectivity verification
 app.get('/health', (_req, res) => {
