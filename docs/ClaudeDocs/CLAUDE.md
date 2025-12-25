@@ -180,9 +180,12 @@ Import via `shared/index` in packages (e.g., `import { ... } from 'shared/index'
 ### Prompt Service (`/prompt-service`)
 
 Microservice for prompt management with database storage and admin UI:
-- `src/services/prompt.service.ts` - CRUD operations for prompts
-- `src/services/ab-test.service.ts` - A/B test management
+- `src/services/prompt.service.ts` - CRUD operations for prompts with input validation
+- `src/services/ab-test.service.ts` - A/B test management with atomic weight normalization
 - `src/services/prompt-resolver.service.ts` - Resolves prompt config based on key and thinking mode
+- `src/errors/index.ts` - Type-safe error hierarchy (AppError, NotFoundError, ValidationError, ConflictError)
+- `src/utils/sanitize.ts` - Input validation for XSS prevention (script tags, event handlers, javascript: URLs)
+- `src/constants/auth.ts` - Authentication constants (cookie name, session values, header names)
 - `src/routes/auth.routes.ts` - Authentication endpoints (login, logout, verify) with HttpOnly cookies
 - `src/routes/` - REST API endpoints for prompts, A/B tests, and resolve
 - `src/admin/` - React admin UI for prompt and A/B test management
@@ -214,8 +217,8 @@ The backend calls the prompt-service `/api/resolve` endpoint to get prompt confi
 
 **API Proxy** - Protects Anthropic API key from browser exposure:
 - `services/claude.service.ts` - Claude API integration with retry logic
-- `services/prompt-client.service.ts` - Client for prompt-service with circuit breaker and caching
-- `services/prompt-cache.service.ts` - In-memory cache for prompt configurations (uses `|` delimiter for cache keys)
+- `services/prompt-client.service.ts` - Client for prompt-service with circuit breaker, caching, and concurrent refresh limiting (max 3)
+- `services/prompt-cache.service.ts` - In-memory cache for prompt configurations (uses JSON serialization for cache keys)
 - `services/circuit-breaker.service.ts` - Generic circuit breaker wrapper with cleanup functions (`destroyAllCircuitBreakers()` for graceful shutdown)
 - `controllers/claude.controller.ts` - Request handler for analysis endpoint
 - `routes/api/v1/` - API route definitions (`/api/v1/claude/analyze`)
@@ -256,14 +259,16 @@ VITE_API_URL=https://localhost:3001
 
 ### Prompt Service (`/prompt-service/.env`)
 ```
-DATABASE_URL=file:./data/prompts.db
+DATABASE_URL=file:./data/prompts.db          # Required in production (no fallback)
 DATABASE_KEY=<32+ character encryption key>  # Required
 ADMIN_API_KEY=<admin authentication key>     # Required in production
-SESSION_SECRET=<cookie signing secret>       # Optional, defaults to ADMIN_API_KEY
+SESSION_SECRET=<32+ char cookie signing>     # Required in production (separate from ADMIN_API_KEY for security)
 PORT=3002
 NODE_ENV=development
 CORS_ORIGINS=http://localhost:3000,http://localhost:3001
 ```
+
+**Production Requirements**: In production, `DATABASE_URL`, `ADMIN_API_KEY`, and `SESSION_SECRET` are all required. `SESSION_SECRET` must be separate from `ADMIN_API_KEY` to prevent session forgery if the API key is compromised.
 
 ### Feature Flags
 
@@ -285,7 +290,7 @@ The prompt-service resolves the appropriate prompt configuration variant based o
 ### Test Locations
 - `app/src/**/__tests__/` - Frontend component and store tests
 - `backend/src/**/__tests__/` - Backend service and controller tests
-- `prompt-service/src/**/__tests__/` - A/B test service and auth middleware tests
+- `prompt-service/src/**/__tests__/` - A/B test service, auth middleware, error types, and validation tests
 - `shared/src/__tests__/` - Validation constants and response formatter tests
 
 ## Domain Framework

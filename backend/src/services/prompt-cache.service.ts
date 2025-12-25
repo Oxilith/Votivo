@@ -35,10 +35,10 @@ export class PromptCacheService {
 
   /**
    * Generates a cache key from prompt key and thinking mode
-   * Uses `|` delimiter to avoid collision if key contains `:true` or `:false`
+   * Uses JSON serialization to prevent collisions if key contains special characters
    */
   private getCacheKey(key: string, thinkingEnabled: boolean): string {
-    return `${key}|${thinkingEnabled}`;
+    return JSON.stringify({ key, thinkingEnabled });
   }
 
   /**

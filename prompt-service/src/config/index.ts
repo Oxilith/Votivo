@@ -22,7 +22,7 @@ const configSchema = z.object({
   nodeEnv: z.enum(['development', 'production', 'test']).default('development'),
 
   // Database
-  databaseUrl: z.string().default('file:./dev.db'),
+  databaseUrl: z.string().optional(),
   // libsql requires 32+ character encryption key
   databaseKey: z
     .string()
@@ -41,13 +41,41 @@ const configSchema = z.object({
   // Admin Authentication
   adminApiKey: z.string().optional(),
 
-  // Session secret for signing cookies (defaults to adminApiKey if not set)
+  // Session secret for signing cookies - must be separate from adminApiKey in production
   sessionSecret: z.string().min(32).optional(),
 });
 
-type Config = z.infer<typeof configSchema>;
+type Config = z.infer<typeof configSchema> & {
+  databaseUrl: string;
+};
 
 function loadConfig(): Config {
+  const nodeEnv = process.env['NODE_ENV'] ?? 'development';
+  const isProduction = nodeEnv === 'production';
+
+  // Validate required production environment variables
+  if (isProduction) {
+    if (!process.env['DATABASE_URL']) {
+      throw new Error(
+        'DATABASE_URL is required in production. Cannot use default dev.db in production environment.'
+      );
+    }
+    if (!process.env['SESSION_SECRET']) {
+      throw new Error(
+        'SESSION_SECRET is required in production. Using ADMIN_API_KEY as fallback is a security risk - if the API key leaks, session cookies can be forged.'
+      );
+    }
+  }
+
+  // Warn in development if using ADMIN_API_KEY as SESSION_SECRET fallback
+  const sessionSecretRaw = process.env['SESSION_SECRET'];
+  const adminApiKeyRaw = process.env['ADMIN_API_KEY'];
+  if (!isProduction && !sessionSecretRaw && adminApiKeyRaw) {
+    console.warn(
+      '[CONFIG WARNING] SESSION_SECRET not set, falling back to ADMIN_API_KEY. Set a separate SESSION_SECRET for better security.'
+    );
+  }
+
   const result = configSchema.safeParse({
     port: process.env['PORT'],
     nodeEnv: process.env['NODE_ENV'],
@@ -66,7 +94,13 @@ function loadConfig(): Config {
     throw new Error(`Configuration validation failed:\n${errors}`);
   }
 
-  return result.data;
+  // Apply default database URL for non-production environments
+  const databaseUrl = result.data.databaseUrl ?? 'file:./dev.db';
+
+  return {
+    ...result.data,
+    databaseUrl,
+  };
 }
 
 export const config = loadConfig();

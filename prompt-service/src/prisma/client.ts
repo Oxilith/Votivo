@@ -52,11 +52,17 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
+/**
+ * Singleton Prisma instance
+ * Uses global caching in all environments to ensure a single connection pool:
+ * - Development: Prevents connection leaks during hot module reloading
+ * - Production: Ensures consistent single instance across module imports
+ * The caching is safe because PrismaClient manages its own connection pool.
+ */
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+// Cache instance globally to prevent connection leaks
+globalForPrisma.prisma = prisma;
 
 // Graceful shutdown
 process.on('beforeExit', () => {

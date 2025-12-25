@@ -19,6 +19,7 @@ import { promptResolverService } from '@/services/prompt-resolver.service.js';
 import { abTestService } from '@/services/ab-test.service.js';
 import { resolvePromptSchema, variantIdParamSchema } from '@/validators/resolve.validator.js';
 import { logger } from '@/index.js';
+import { isAppError } from '@/errors/index.js';
 
 export class ResolveController {
   /**
@@ -39,10 +40,10 @@ export class ResolveController {
       const result = await promptResolverService.resolve(body.data.key, body.data.thinkingEnabled);
       res.json({ success: true, data: result });
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({
+      if (isAppError(error)) {
+        res.status(error.statusCode).json({
           success: false,
-          error: { code: 'NOT_FOUND', message: error.message },
+          error: { code: error.code, message: error.message },
         });
         return;
       }

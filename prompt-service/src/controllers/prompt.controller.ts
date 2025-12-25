@@ -22,6 +22,7 @@ import {
   promptKeyParamSchema,
   versionIdParamSchema,
 } from '@/validators/prompt.validator.js';
+import { isAppError } from '@/errors/index.js';
 
 export class PromptController {
   /**
@@ -84,6 +85,10 @@ export class PromptController {
       const prompt = await promptService.create(body.data);
       res.status(StatusCodes.CREATED).json(prompt);
     } catch (error) {
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
+        return;
+      }
       if (error instanceof Error && error.message.includes('Unique constraint')) {
         res.status(StatusCodes.CONFLICT).json({ error: 'Prompt with this key already exists' });
         return;
@@ -112,8 +117,8 @@ export class PromptController {
       const prompt = await promptService.update(params.data.id, body.data);
       res.json(prompt);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;
@@ -134,8 +139,8 @@ export class PromptController {
       await promptService.delete(params.data.id);
       res.status(StatusCodes.NO_CONTENT).send();
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;
@@ -175,8 +180,8 @@ export class PromptController {
       );
       res.json(prompt);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;

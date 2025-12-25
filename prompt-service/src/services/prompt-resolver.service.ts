@@ -17,6 +17,7 @@ import { promptService } from '@/services/prompt.service.js';
 import { abTestService, type ABTestWithVariants } from '@/services/ab-test.service.js';
 import { ClaudeModel, type PromptConfig, type ClaudeModel as ClaudeModelType } from 'shared/prompt.types.js';
 import type { ABVariantConfig } from '@prisma/client';
+import { NotFoundError, ValidationError } from '@/errors/index.js';
 
 /**
  * Valid ClaudeModel values for runtime validation
@@ -29,7 +30,7 @@ const VALID_CLAUDE_MODELS: readonly string[] = Object.values(ClaudeModel);
  */
 function validateClaudeModel(model: string): ClaudeModelType {
   if (!VALID_CLAUDE_MODELS.includes(model)) {
-    throw new Error(
+    throw new ValidationError(
       `Invalid Claude model: "${model}". Valid models are: ${VALID_CLAUDE_MODELS.join(', ')}`
     );
   }
@@ -50,7 +51,7 @@ export class PromptResolverService {
     // Get the base prompt
     const prompt = await promptService.getByKey(key);
     if (!prompt) {
-      throw new Error(`Prompt with key "${key}" not found`);
+      throw new NotFoundError('Prompt', key);
     }
 
     // Check for active A/B test
@@ -124,7 +125,7 @@ export class PromptResolverService {
     const variant = prompt.variants.find((v) => v.variantType === variantType);
 
     if (!variant) {
-      throw new Error(`Variant "${variantType}" not found for prompt "${prompt.key}"`);
+      throw new NotFoundError('Variant', `${variantType} for prompt ${prompt.key}`);
     }
 
     const config: PromptConfig = {

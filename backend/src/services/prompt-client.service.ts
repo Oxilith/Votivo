@@ -24,6 +24,7 @@ import type { PromptConfig } from 'shared/index.js';
 
 const REQUEST_TIMEOUT_MS = 5000;
 const MAX_BACKGROUND_RETRY_ATTEMPTS = 5;
+const MAX_CONCURRENT_REFRESHES = 3;
 
 /**
  * Prompts to refresh when circuit breaker closes (service recovers)
@@ -51,9 +52,16 @@ export class PromptServiceUnavailableError extends Error {
   }
 }
 
+interface RefreshTask {
+  key: string;
+  thinkingEnabled: boolean;
+}
+
 export class PromptClientService {
   private readonly baseUrl: string;
   private readonly circuitBreaker: CircuitBreaker<[string, boolean], ResolvePromptResponse>;
+  private activeRefreshCount = 0;
+  private readonly pendingRefreshQueue: RefreshTask[] = [];
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl ?? config.promptServiceUrl;
@@ -170,7 +178,7 @@ export class PromptClientService {
 
   /**
    * Schedules a background refresh for a cached prompt
-   * Uses exponential backoff for retries
+   * Limits concurrent refreshes to prevent memory leaks from spawning too many retries
    */
   private scheduleBackgroundRefresh(key: string, thinkingEnabled: boolean): void {
     // Prevent duplicate refresh operations
@@ -178,38 +186,93 @@ export class PromptClientService {
       return;
     }
 
-    const retry = async (attempt: number): Promise<void> => {
-      // Exponential backoff: 1s, 2s, 4s, 8s, 16s (capped at 30s)
-      const delay = Math.min(1000 * Math.pow(2, attempt), 30000);
-      await new Promise((r) => setTimeout(r, delay));
+    // Check if we can start immediately or need to queue
+    if (this.activeRefreshCount < MAX_CONCURRENT_REFRESHES) {
+      void this.executeRefresh(key, thinkingEnabled);
+    } else {
+      // Queue for later processing
+      this.pendingRefreshQueue.push({ key, thinkingEnabled });
+      logger.debug(
+        { key, thinkingEnabled, queueLength: this.pendingRefreshQueue.length },
+        'Background refresh queued - max concurrent refreshes reached'
+      );
+    }
+  }
 
-      // If circuit is still open, stop retrying
-      if (this.circuitBreaker.opened) {
-        promptCacheService.clearRefreshInProgress(key, thinkingEnabled);
-        logger.debug({ key, thinkingEnabled }, 'Background refresh cancelled - circuit still open');
-        return;
+  /**
+   * Executes a background refresh with retry logic
+   */
+  private async executeRefresh(key: string, thinkingEnabled: boolean): Promise<void> {
+    this.activeRefreshCount++;
+
+    try {
+      await this.retryRefresh(key, thinkingEnabled, 0);
+    } finally {
+      this.completeRefresh(key, thinkingEnabled);
+    }
+  }
+
+  /**
+   * Recursive retry logic with exponential backoff
+   */
+  private async retryRefresh(key: string, thinkingEnabled: boolean, attempt: number): Promise<void> {
+    // Exponential backoff: 1s, 2s, 4s, 8s, 16s (capped at 30s)
+    const delay = Math.min(1000 * Math.pow(2, attempt), 30000);
+    await new Promise((r) => setTimeout(r, delay));
+
+    // If circuit is still open, stop retrying
+    if (this.circuitBreaker.opened) {
+      logger.debug({ key, thinkingEnabled }, 'Background refresh cancelled - circuit still open');
+      return;
+    }
+
+    try {
+      const result = await this.resolveInternal(key, thinkingEnabled);
+      promptCacheService.set(key, thinkingEnabled, result.config, result.variantId);
+      logger.info({ key, thinkingEnabled }, 'Background cache refresh successful');
+    } catch {
+      if (attempt < MAX_BACKGROUND_RETRY_ATTEMPTS) {
+        await this.retryRefresh(key, thinkingEnabled, attempt + 1);
+      } else {
+        logger.warn(
+          { key, thinkingEnabled, attempts: attempt + 1 },
+          'Background refresh failed after max attempts'
+        );
       }
+    }
+  }
 
-      try {
-        const result = await this.resolveInternal(key, thinkingEnabled);
-        promptCacheService.set(key, thinkingEnabled, result.config, result.variantId);
-        promptCacheService.clearRefreshInProgress(key, thinkingEnabled);
-        logger.info({ key, thinkingEnabled }, 'Background cache refresh successful');
-      } catch {
-        if (attempt < MAX_BACKGROUND_RETRY_ATTEMPTS) {
-          void retry(attempt + 1);
+  /**
+   * Completes a refresh operation and processes the next queued task
+   */
+  private completeRefresh(key: string, thinkingEnabled: boolean): void {
+    this.activeRefreshCount--;
+    promptCacheService.clearRefreshInProgress(key, thinkingEnabled);
+
+    // Process next queued task if any
+    this.processQueue();
+  }
+
+  /**
+   * Processes the next task in the refresh queue
+   */
+  private processQueue(): void {
+    if (this.pendingRefreshQueue.length === 0) {
+      return;
+    }
+
+    if (this.activeRefreshCount < MAX_CONCURRENT_REFRESHES) {
+      const nextTask = this.pendingRefreshQueue.shift();
+      if (nextTask) {
+        // Re-check if refresh is still needed (might have been completed by another path)
+        if (promptCacheService.markRefreshInProgress(nextTask.key, nextTask.thinkingEnabled)) {
+          void this.executeRefresh(nextTask.key, nextTask.thinkingEnabled);
         } else {
-          promptCacheService.clearRefreshInProgress(key, thinkingEnabled);
-          logger.warn(
-            { key, thinkingEnabled, attempts: attempt + 1 },
-            'Background refresh failed after max attempts'
-          );
+          // Task no longer needed, process next
+          this.processQueue();
         }
       }
-    };
-
-    // Start retry loop
-    void retry(0);
+    }
   }
 
   /**

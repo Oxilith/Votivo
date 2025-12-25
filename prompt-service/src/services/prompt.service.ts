@@ -16,6 +16,8 @@
 
 import { prisma } from '@/prisma/client.js';
 import type { Prompt, PromptVariant, PromptVersion } from '@prisma/client';
+import { NotFoundError } from '@/errors/index.js';
+import { validatePromptContent, validatePromptKey } from '@/utils/sanitize.js';
 
 export interface PromptWithVariants extends Prompt {
   variants: PromptVariant[];
@@ -97,6 +99,10 @@ export class PromptService {
    * Create a new prompt with thinking variants
    */
   async create(input: CreatePromptInput): Promise<PromptWithVariants> {
+    // Validate input for security
+    validatePromptKey(input.key);
+    validatePromptContent(input.content);
+
     const prompt = await prisma.prompt.create({
       data: {
         key: input.key,
@@ -144,9 +150,14 @@ export class PromptService {
    * Uses transaction to prevent race conditions with version numbering
    */
   async update(id: string, input: UpdatePromptInput): Promise<PromptWithVariants> {
+    // Validate content if being updated
+    if (input.content !== undefined) {
+      validatePromptContent(input.content);
+    }
+
     const existingPrompt = await this.getById(id);
     if (!existingPrompt) {
-      throw new Error(`Prompt with id ${id} not found`);
+      throw new NotFoundError('Prompt', id);
     }
 
     // Determine if content or model changed (requiring a new version)
@@ -267,7 +278,7 @@ export class PromptService {
     });
 
     if (!version || version.promptId !== promptId) {
-      throw new Error(`Version ${versionId} not found for prompt ${promptId}`);
+      throw new NotFoundError('Version', versionId);
     }
 
     const updateInput: UpdatePromptInput = {

@@ -196,7 +196,9 @@ stateDiagram-v2
 
 **Resilience**: When prompt-service is unavailable but stale cached data exists, the system returns stale data instead of failing. A background refresh is scheduled to update the cache when the service recovers.
 
-**Cache Key Format**: `${promptKey}|${thinkingEnabled}` (uses `|` delimiter to avoid collision with keys containing `:true` or `:false`).
+**Cache Key Format**: `JSON.stringify({ key, thinkingEnabled })` (uses JSON serialization to prevent collisions if keys contain special characters).
+
+**Concurrent Refresh Limiting**: Background refresh operations are limited to `MAX_CONCURRENT_REFRESHES = 3` to prevent memory leaks. Excess refresh requests are queued and processed sequentially as active refreshes complete.
 
 **Note**: Cache is per-process. In multi-instance deployments, each instance maintains its own cache.
 
@@ -331,6 +333,8 @@ flowchart TB
 | Data at Rest | Encryption | libsql AES encryption |
 | Headers | Security Headers | Helmet with CSP directives (script-src, style-src, img-src, connect-src) |
 | CORS | Origin Restriction | Whitelist of allowed origins |
+| Input Validation | XSS Prevention | Prompt content sanitized for script tags, event handlers, and javascript: URLs |
+| Error Handling | Type-Safe Errors | AppError hierarchy (NotFoundError, ValidationError, ConflictError) with status codes |
 
 ## Environment Configuration
 
@@ -350,13 +354,15 @@ flowchart TB
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| DATABASE_URL | Yes | - | SQLite database path |
+| DATABASE_URL | Prod | file:./dev.db | SQLite database path (required in production) |
 | DATABASE_KEY | Yes | - | Encryption key (32+ chars) |
 | ADMIN_API_KEY | Prod | - | Admin authentication key |
-| SESSION_SECRET | No | ADMIN_API_KEY | Cookie signing secret (32+ chars) |
+| SESSION_SECRET | Prod | ADMIN_API_KEY* | Cookie signing secret (32+ chars, required in production) |
 | PORT | No | 3002 | Server port |
 | NODE_ENV | No | development | Environment mode |
 | CORS_ORIGINS | No | localhost | Allowed CORS origins |
+
+*In development, `SESSION_SECRET` falls back to `ADMIN_API_KEY` with a warning. In production, a separate `SESSION_SECRET` is required for security (prevents session forgery if API key is compromised).
 
 ## Monitoring & Observability
 

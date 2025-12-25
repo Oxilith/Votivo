@@ -17,8 +17,7 @@
 import crypto from 'crypto';
 import type { Request, Response, NextFunction } from 'express';
 import { config } from '@/config/index.js';
-
-const COOKIE_NAME = 'admin_session';
+import { AUTH_CONSTANTS } from '@/constants/auth.js';
 
 export function adminAuthMiddleware(
   req: Request,
@@ -36,14 +35,14 @@ export function adminAuthMiddleware(
   }
 
   // Check for authenticated session cookie first (primary auth method)
-  const sessionCookie = req.signedCookies[COOKIE_NAME] as string | undefined;
-  if (sessionCookie === 'authenticated') {
+  const sessionCookie = req.signedCookies[AUTH_CONSTANTS.COOKIE_NAME] as string | undefined;
+  if (sessionCookie === AUTH_CONSTANTS.SESSION_VALUES.AUTHENTICATED) {
     next();
     return;
   }
 
   // Fall back to X-Admin-Key header for backward compatibility
-  const apiKey = req.headers['x-admin-key'];
+  const apiKey = req.headers[AUTH_CONSTANTS.API_KEY_HEADER];
   if (apiKey && typeof apiKey === 'string') {
     const apiKeyBuffer = Buffer.from(apiKey);
     const configKeyBuffer = Buffer.from(config.adminApiKey);

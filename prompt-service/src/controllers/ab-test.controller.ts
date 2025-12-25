@@ -23,6 +23,7 @@ import {
   abTestIdParamSchema,
   variantIdParamSchema,
 } from '@/validators/ab-test.validator.js';
+import { isAppError } from '@/errors/index.js';
 
 export class ABTestController {
   /**
@@ -86,8 +87,8 @@ export class ABTestController {
       const test = await abTestService.update(params.data.id, body.data);
       res.json(test);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;
@@ -108,8 +109,8 @@ export class ABTestController {
       await abTestService.delete(params.data.id);
       res.status(StatusCodes.NO_CONTENT).send();
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;
@@ -130,8 +131,8 @@ export class ABTestController {
       const test = await abTestService.activate(params.data.id);
       res.json(test);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;
@@ -152,8 +153,8 @@ export class ABTestController {
       const test = await abTestService.deactivate(params.data.id);
       res.json(test);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;
@@ -200,8 +201,8 @@ export class ABTestController {
       const variant = await abTestService.updateVariant(params.data.variantId, body.data);
       res.json(variant);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;
@@ -222,8 +223,8 @@ export class ABTestController {
       await abTestService.removeVariant(params.data.variantId);
       res.status(StatusCodes.NO_CONTENT).send();
     } catch (error) {
-      if (error instanceof Error && error.message.includes('not found')) {
-        res.status(StatusCodes.NOT_FOUND).json({ error: error.message });
+      if (isAppError(error)) {
+        res.status(error.statusCode).json(error.toJSON());
         return;
       }
       throw error;

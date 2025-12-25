@@ -13,6 +13,7 @@
 
 import { prisma } from '@/prisma/client.js';
 import type { ABTest, ABVariant, ABVariantConfig } from '@prisma/client';
+import { NotFoundError, ValidationError } from '@/errors/index.js';
 
 export interface ABTestWithVariants extends ABTest {
   variants: (ABVariant & { configs: ABVariantConfig[] })[];
@@ -173,7 +174,7 @@ export class ABTestService {
   async activate(id: string): Promise<ABTestWithVariants> {
     const test = await this.getById(id);
     if (!test) {
-      throw new Error(`A/B test with id ${id} not found`);
+      throw new NotFoundError('A/B test', id);
     }
 
     // Use transaction to ensure atomicity - prevents multiple active tests
@@ -295,7 +296,7 @@ export class ABTestService {
     });
 
     if (!variant) {
-      throw new Error(`Variant with id ${variantId} not found`);
+      throw new NotFoundError('Variant', variantId);
     }
 
     await prisma.aBVariant.delete({
@@ -337,12 +338,12 @@ export class ABTestService {
     variants: (ABVariant & { configs: ABVariantConfig[] })[]
   ): ABVariant & { configs: ABVariantConfig[] } {
     if (variants.length === 0) {
-      throw new Error('No variants available for selection');
+      throw new ValidationError('No variants available for selection');
     }
 
     if (variants.length === 1) {
       const firstVariant = variants[0];
-      if (!firstVariant) throw new Error('Variant array is empty');
+      if (!firstVariant) throw new ValidationError('Variant array is empty');
       return firstVariant;
     }
 
@@ -359,42 +360,44 @@ export class ABTestService {
 
     // Fallback to last variant (shouldn't happen with proper weights)
     const lastVariant = variants[variants.length - 1];
-    if (!lastVariant) throw new Error('Variant array is empty');
+    if (!lastVariant) throw new ValidationError('Variant array is empty');
     return lastVariant;
   }
 
   /**
    * Normalize weights to sum to 1.0
-   * Uses transaction to prevent race conditions with concurrent requests
+   * Uses atomic SQL operations to prevent race conditions with concurrent modifications
    */
   private async normalizeWeights(testId: string): Promise<void> {
-    await prisma.$transaction(async (tx) => {
-      const variants = await tx.aBVariant.findMany({
-        where: { abTestId: testId },
-      });
-
-      if (variants.length === 0) return;
-
-      const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
-      if (totalWeight === 0) {
-        // Distribute equally if all weights are 0
-        const equalWeight = 1 / variants.length;
-        for (const v of variants) {
-          await tx.aBVariant.update({
-            where: { id: v.id },
-            data: { weight: equalWeight },
-          });
-        }
-      } else if (Math.abs(totalWeight - 1) > 0.001) {
-        // Normalize if total doesn't equal 1
-        for (const v of variants) {
-          await tx.aBVariant.update({
-            where: { id: v.id },
-            data: { weight: v.weight / totalWeight },
-          });
-        }
-      }
+    // First, check current state
+    const variants = await prisma.aBVariant.findMany({
+      where: { abTestId: testId },
+      select: { weight: true },
     });
+
+    if (variants.length === 0) return;
+
+    const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
+
+    if (totalWeight === 0) {
+      // Distribute equally if all weights are 0
+      // Use atomic update with computed equal weight
+      const equalWeight = 1 / variants.length;
+      await prisma.aBVariant.updateMany({
+        where: { abTestId: testId },
+        data: { weight: equalWeight },
+      });
+    } else if (Math.abs(totalWeight - 1) > 0.001) {
+      // Normalize using atomic raw SQL to prevent race conditions
+      // This single statement reads and updates atomically
+      await prisma.$executeRaw`
+        UPDATE "ABVariant"
+        SET "weight" = "weight" / (
+          SELECT COALESCE(SUM("weight"), 1) FROM "ABVariant" WHERE "abTestId" = ${testId}
+        )
+        WHERE "abTestId" = ${testId}
+      `;
+    }
   }
 }
 

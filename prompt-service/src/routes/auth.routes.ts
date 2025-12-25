@@ -14,11 +14,9 @@
 import crypto from 'crypto';
 import { Router, type Request, type Response } from 'express';
 import { config } from '@/config/index.js';
+import { AUTH_CONSTANTS } from '@/constants/auth.js';
 
 const router = Router();
-
-const COOKIE_NAME = 'admin_session';
-const COOKIE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * POST /api/auth/login
@@ -66,7 +64,7 @@ router.post('/login', (req: Request, res: Response): void => {
  * Clears the session cookie
  */
 router.post('/logout', (_req: Request, res: Response): void => {
-  res.clearCookie(COOKIE_NAME, {
+  res.clearCookie(AUTH_CONSTANTS.COOKIE_NAME, {
     httpOnly: true,
     secure: config.nodeEnv === 'production',
     sameSite: 'strict',
@@ -80,15 +78,15 @@ router.post('/logout', (_req: Request, res: Response): void => {
  * Checks if the current session is authenticated
  */
 router.get('/verify', (req: Request, res: Response): void => {
-  const sessionCookie = req.signedCookies[COOKIE_NAME] as string | undefined;
+  const sessionCookie = req.signedCookies[AUTH_CONSTANTS.COOKIE_NAME] as string | undefined;
 
-  if (sessionCookie === 'authenticated') {
+  if (sessionCookie === AUTH_CONSTANTS.SESSION_VALUES.AUTHENTICATED) {
     res.json({ authenticated: true });
     return;
   }
 
   // Also check X-Admin-Key header for backward compatibility
-  const apiKey = req.headers['x-admin-key'];
+  const apiKey = req.headers[AUTH_CONSTANTS.API_KEY_HEADER];
   if (apiKey && config.adminApiKey) {
     const apiKeyBuffer = Buffer.from(String(apiKey));
     const configKeyBuffer = Buffer.from(config.adminApiKey);
@@ -115,12 +113,12 @@ router.get('/verify', (req: Request, res: Response): void => {
  * Helper function to set the session cookie
  */
 function setSessionCookie(res: Response): void {
-  res.cookie(COOKIE_NAME, 'authenticated', {
+  res.cookie(AUTH_CONSTANTS.COOKIE_NAME, AUTH_CONSTANTS.SESSION_VALUES.AUTHENTICATED, {
     httpOnly: true,
     secure: config.nodeEnv === 'production',
     sameSite: 'strict',
     signed: true,
-    maxAge: COOKIE_MAX_AGE,
+    maxAge: AUTH_CONSTANTS.COOKIE_MAX_AGE_MS,
     path: '/',
   });
 }
