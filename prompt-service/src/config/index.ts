@@ -43,6 +43,12 @@ const configSchema = z.object({
 
   // Session secret for signing cookies - must be separate from adminApiKey in production
   sessionSecret: z.string().min(32).optional(),
+
+  // Development auth bypass - requires explicit opt-in for security
+  devAuthBypass: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
 });
 
 type Config = z.infer<typeof configSchema> & {
@@ -92,6 +98,7 @@ function loadConfig(): Config {
     logLevel: process.env['LOG_LEVEL'],
     adminApiKey: process.env['ADMIN_API_KEY'],
     sessionSecret: process.env['SESSION_SECRET'] ?? process.env['ADMIN_API_KEY'],
+    devAuthBypass: process.env['DEV_AUTH_BYPASS'],
   });
 
   if (!result.success) {

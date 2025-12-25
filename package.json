@@ -1,0 +1,37 @@
+{
+  "name": "votive",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "backend",
+    "app",
+    "prompt-service"
+  ],
+  "scripts": {
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:run": "npm run test:run --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+
+    "dev:backend": "npm run dev -w backend",
+    "dev:app": "npm run dev -w app",
+    "dev:prompt-service": "npm run dev -w prompt-service",
+    "dev:prompt-service:all": "npm run dev:all -w prompt-service",
+
+    "start:backend": "npm run start -w backend",
+    "start:prompt-service": "npm run start -w prompt-service",
+    "preview:app": "npm run preview -w app",
+
+    "db:migrate": "npm run db:migrate -w prompt-service",
+    "db:generate": "npm run db:generate -w prompt-service",
+    "db:seed": "npm run db:seed -w prompt-service",
+    "db:studio": "npm run db:studio -w prompt-service"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

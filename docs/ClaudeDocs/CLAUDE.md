@@ -12,6 +12,49 @@ Votive - a full-stack behavioral psychology assessment application with AI-power
 - `/prompt-service` - Prompt management microservice with admin UI and A/B testing
 - `/shared` - Shared TypeScript types (single source of truth)
 
+## Monorepo Workspaces
+
+This repository uses **npm workspaces** for unified dependency management. All commands should be run from the project root.
+
+### Root Commands (Preferred)
+```bash
+npm install              # Install all workspaces
+npm run lint             # Lint all projects
+npm run type-check       # Type-check all projects
+npm run build            # Build all projects
+npm run test:run         # Run all tests (once)
+npm run test:coverage    # Run all tests with coverage
+```
+
+### Development Servers
+```bash
+npm run dev:app                  # Frontend (https://localhost:3000)
+npm run dev:backend              # Backend (https://localhost:3001)
+npm run dev:prompt-service       # Prompt service API (http://localhost:3002)
+npm run dev:prompt-service:all   # Prompt service API + admin UI
+```
+
+### Production
+```bash
+npm run start:backend            # Run compiled backend
+npm run start:prompt-service     # Run compiled prompt-service
+npm run preview:app              # Preview frontend build (Vite preview)
+```
+
+### Database Commands
+```bash
+npm run db:migrate       # Run migrations
+npm run db:generate      # Generate Prisma client
+npm run db:seed          # Seed initial data
+npm run db:studio        # Open Prisma Studio
+```
+
+### Per-Workspace Commands
+```bash
+npm run dev -w app           # Run command in specific workspace
+npm run test -w backend      # Run tests in backend only
+```
+
 ## License & Contribution
 
 **License**: Votive Source Available License (proprietary, non-commercial)
@@ -28,6 +71,8 @@ Votive - a full-stack behavioral psychology assessment application with AI-power
 - Security issues: Email konrad.jagusiak@oxilogic.com (not public issues)
 
 ## Build & Development Commands
+
+**Note:** Use root commands from [Monorepo Workspaces](#monorepo-workspaces) section for most operations. Per-workspace commands below are for reference when targeting a specific workspace.
 
 ### Frontend (`/app`)
 ```bash

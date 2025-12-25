@@ -6,7 +6,7 @@
  * - Falls back to X-Admin-Key header validation for backward compatibility
  * - Uses timing-safe comparison to prevent timing attacks
  * - Returns 401 Unauthorized if authentication fails
- * - Allows access in development mode without key if not configured
+ * - Requires explicit DEV_AUTH_BYPASS=true in development for auth bypass
  * - Blocks access in production if admin key is not configured
  * @dependencies
  * - @/utils/crypto for timing-safe comparison
@@ -24,13 +24,20 @@ export function adminAuthMiddleware(
   res: Response,
   next: NextFunction
 ): void {
-  // Development mode without key configured - allow all
+  // Development mode without key configured - require explicit bypass
   if (!config.adminApiKey) {
     if (config.nodeEnv === 'production') {
       res.status(503).json({ error: 'Admin access not configured' });
       return;
     }
-    next();
+    // Only allow bypass in development if explicitly enabled
+    if (config.devAuthBypass) {
+      next();
+      return;
+    }
+    res.status(503).json({
+      error: 'Admin access not configured. Set ADMIN_API_KEY or DEV_AUTH_BYPASS=true',
+    });
     return;
   }
 

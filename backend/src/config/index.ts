@@ -53,8 +53,8 @@ const configSchema = z.object({
   promptServiceUrl: z.string().url().default('http://localhost:3002'),
 
   // Circuit Breaker
-  // Note: timeout should be higher than request timeout to distinguish network failures
-  circuitBreakerTimeout: z.coerce.number().default(6000),
+  // Note: timeout should be 2x request timeout (5000ms) to account for network jitter
+  circuitBreakerTimeout: z.coerce.number().default(10000),
   circuitBreakerResetTimeout: z.coerce.number().default(30000),
   circuitBreakerErrorThreshold: z.coerce.number().default(50),
 

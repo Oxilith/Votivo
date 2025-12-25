@@ -3,10 +3,11 @@
  * @purpose HTTP client for communicating with the prompt-service microservice
  * @functionality
  * - Resolves prompt configurations with circuit breaker protection
- * - Caches successful resolutions with TTL
+ * - Caches successful resolutions with TTL and stale-while-revalidate
  * - Fails fast when circuit is open (no fallback to hardcoded prompts)
- * - Schedules background cache refresh when service recovers
- * - Records A/B test conversions for analytics
+ * - Schedules background cache refresh with overall timeout (60s)
+ * - Records A/B test conversions with circuit breaker protection
+ * - Health checks with circuit breaker protection
  * @dependencies
  * - @/config for prompt service URL configuration
  * - @/utils/logger for logging
@@ -25,6 +26,7 @@ import type { PromptConfig } from 'shared/index.js';
 const REQUEST_TIMEOUT_MS = 5000;
 const MAX_BACKGROUND_RETRY_ATTEMPTS = 5;
 const MAX_CONCURRENT_REFRESHES = 3;
+const MAX_REFRESH_DURATION_MS = 60000;
 
 /**
  * Prompts to refresh when circuit breaker closes (service recovers)
@@ -60,6 +62,8 @@ interface RefreshTask {
 export class PromptClientService {
   private readonly baseUrl: string;
   private readonly circuitBreaker: CircuitBreaker<[string, boolean], ResolvePromptResponse>;
+  private readonly conversionCircuitBreaker: CircuitBreaker<[string], undefined>;
+  private readonly healthCircuitBreaker: CircuitBreaker<[], boolean>;
   private activeRefreshCount = 0;
   private readonly pendingRefreshQueue: RefreshTask[] = [];
 
@@ -68,8 +72,30 @@ export class PromptClientService {
 
     // Create circuit breaker for resolve calls
     this.circuitBreaker = createCircuitBreaker<[string, boolean], ResolvePromptResponse>(
-      'prompt-service',
+      'prompt-service-resolve',
       this.resolveInternal.bind(this),
+      {
+        timeout: config.circuitBreakerTimeout,
+        errorThresholdPercentage: config.circuitBreakerErrorThreshold,
+        resetTimeout: config.circuitBreakerResetTimeout,
+      }
+    );
+
+    // Create circuit breaker for conversion calls (more lenient for non-critical path)
+    this.conversionCircuitBreaker = createCircuitBreaker<[string], undefined>(
+      'prompt-service-conversion',
+      this.recordConversionInternal.bind(this),
+      {
+        timeout: config.circuitBreakerTimeout,
+        errorThresholdPercentage: 75,
+        resetTimeout: config.circuitBreakerResetTimeout,
+      }
+    );
+
+    // Create circuit breaker for health checks
+    this.healthCircuitBreaker = createCircuitBreaker<[], boolean>(
+      'prompt-service-health',
+      this.healthCheckInternal.bind(this),
       {
         timeout: config.circuitBreakerTimeout,
         errorThresholdPercentage: config.circuitBreakerErrorThreshold,
@@ -150,8 +176,6 @@ export class PromptClientService {
         signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
-
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
         // Truncate and sanitize error message to prevent information disclosure
@@ -168,13 +192,13 @@ export class PromptClientService {
 
       return data;
     } catch (error) {
-      clearTimeout(timeoutId);
-
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('Prompt service request timed out');
       }
 
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -202,7 +226,7 @@ export class PromptClientService {
   }
 
   /**
-   * Executes a background refresh with retry logic
+   * Executes a background refresh with retry logic and overall timeout
    */
   private async executeRefresh(key: string, thinkingEnabled: boolean): Promise<void> {
     // Defensive check: ensure we're within limits even if called unexpectedly
@@ -217,18 +241,33 @@ export class PromptClientService {
     }
 
     this.activeRefreshCount++;
+    const startTime = Date.now();
 
     try {
-      await this.retryRefresh(key, thinkingEnabled, 0);
+      await this.retryRefresh(key, thinkingEnabled, 0, startTime);
     } finally {
       this.completeRefresh(key, thinkingEnabled);
     }
   }
 
   /**
-   * Recursive retry logic with exponential backoff
+   * Recursive retry logic with exponential backoff and overall timeout
    */
-  private async retryRefresh(key: string, thinkingEnabled: boolean, attempt: number): Promise<void> {
+  private async retryRefresh(
+    key: string,
+    thinkingEnabled: boolean,
+    attempt: number,
+    startTime: number
+  ): Promise<void> {
+    // Check overall timeout first
+    if (Date.now() - startTime > MAX_REFRESH_DURATION_MS) {
+      logger.warn(
+        { key, thinkingEnabled, durationMs: Date.now() - startTime },
+        'Background refresh cancelled - overall timeout exceeded'
+      );
+      return;
+    }
+
     // Exponential backoff: 1s, 2s, 4s, 8s, 16s (capped at 30s)
     const delay = Math.min(1000 * Math.pow(2, attempt), 30000);
     await new Promise((r) => setTimeout(r, delay));
@@ -245,7 +284,7 @@ export class PromptClientService {
       logger.info({ key, thinkingEnabled }, 'Background cache refresh successful');
     } catch {
       if (attempt < MAX_BACKGROUND_RETRY_ATTEMPTS) {
-        await this.retryRefresh(key, thinkingEnabled, attempt + 1);
+        await this.retryRefresh(key, thinkingEnabled, attempt + 1, startTime);
       } else {
         logger.warn(
           { key, thinkingEnabled, attempts: attempt + 1 },
@@ -268,6 +307,7 @@ export class PromptClientService {
 
   /**
    * Processes the next task in the refresh queue
+   * Uses setImmediate for recursive calls to prevent stack overflow under high load
    */
   private processQueue(): void {
     if (this.pendingRefreshQueue.length === 0) {
@@ -281,8 +321,8 @@ export class PromptClientService {
         if (promptCacheService.markRefreshInProgress(nextTask.key, nextTask.thinkingEnabled)) {
           void this.executeRefresh(nextTask.key, nextTask.thinkingEnabled);
         } else {
-          // Task no longer needed, process next
-          this.processQueue();
+          // Task no longer needed, process next using setImmediate to prevent stack overflow
+          setImmediate(() => { this.processQueue(); });
         }
       }
     }
@@ -301,29 +341,37 @@ export class PromptClientService {
   }
 
   /**
-   * Records a conversion for A/B testing analytics
-   * @param variantId - The variant ID to record the conversion for
+   * Internal method that makes the actual HTTP call for conversion recording
+   * This is wrapped by the circuit breaker
    */
-  async recordConversion(variantId: string): Promise<void> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
+  private async recordConversionInternal(variantId: string): Promise<undefined> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
 
+    try {
       const response = await fetch(`${this.baseUrl}/api/resolve/${variantId}/conversion`, {
         method: 'POST',
         signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
-
       if (!response.ok) {
-        logger.warn(
-          { variantId, status: response.status },
-          'Failed to record A/B test conversion'
-        );
-      } else {
-        logger.debug({ variantId }, 'A/B test conversion recorded');
+        throw new Error(`HTTP ${response.status}`);
       }
+      logger.debug({ variantId }, 'A/B test conversion recorded');
+      return undefined;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  /**
+   * Records a conversion for A/B testing analytics
+   * Uses circuit breaker protection to prevent cascading failures
+   * @param variantId - The variant ID to record the conversion for
+   */
+  async recordConversion(variantId: string): Promise<void> {
+    try {
+      await this.conversionCircuitBreaker.fire(variantId);
     } catch (error) {
       // Don't fail the main operation if conversion recording fails
       logger.warn(
@@ -334,20 +382,32 @@ export class PromptClientService {
   }
 
   /**
-   * Checks if the prompt service is healthy
-   * @returns true if the service is reachable and healthy
+   * Internal method that makes the actual HTTP call for health check
+   * This is wrapped by the circuit breaker
    */
-  async healthCheck(): Promise<boolean> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
+  private async healthCheckInternal(): Promise<boolean> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
 
+    try {
       const response = await fetch(`${this.baseUrl}/health`, {
         signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
       return response.ok;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  /**
+   * Checks if the prompt service is healthy
+   * Uses circuit breaker protection to prevent cascading failures
+   * @returns true if the service is reachable and healthy
+   */
+  async healthCheck(): Promise<boolean> {
+    try {
+      return await this.healthCircuitBreaker.fire();
     } catch {
       return false;
     }

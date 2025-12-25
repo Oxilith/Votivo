@@ -5,16 +5,19 @@
  * - Provides login endpoint that validates API key and sets session cookie
  * - Provides logout endpoint that clears session cookie
  * - Provides verify endpoint to check authentication status
+ * - Requires explicit DEV_AUTH_BYPASS=true in development for auth bypass
  * @dependencies
  * - express Router
  * - @/utils/crypto for timing-safe comparison
  * - @/config for configuration
+ * - @/index for logger
  */
 
 import { Router, type Request, type Response } from 'express';
 import { config } from '@/config/index.js';
 import { AUTH_CONSTANTS } from '@/constants/auth.js';
 import { timingSafeCompare } from '@/utils/crypto.js';
+import { logger } from '@/index.js';
 
 const router = Router();
 
@@ -36,9 +39,17 @@ router.post('/login', (req: Request, res: Response): void => {
       res.status(503).json({ error: 'Admin access not configured' });
       return;
     }
-    // Allow any key in development if not configured
-    setSessionCookie(res);
-    res.json({ success: true });
+    // Only allow bypass in development if explicitly enabled
+    if (config.devAuthBypass) {
+      logger.warn('DEV_AUTH_BYPASS is enabled - allowing any API key');
+      setSessionCookie(res);
+      res.json({ success: true });
+      return;
+    }
+    // Development without bypass enabled
+    res.status(503).json({
+      error: 'Admin access not configured. Set ADMIN_API_KEY or DEV_AUTH_BYPASS=true',
+    });
     return;
   }
 
@@ -86,8 +97,8 @@ router.get('/verify', (req: Request, res: Response): void => {
     return;
   }
 
-  // Development mode without key configured
-  if (!config.adminApiKey && config.nodeEnv !== 'production') {
+  // Development mode with explicit bypass enabled
+  if (!config.adminApiKey && config.nodeEnv !== 'production' && config.devAuthBypass) {
     res.json({ authenticated: true });
     return;
   }

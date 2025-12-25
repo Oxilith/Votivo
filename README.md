@@ -71,16 +71,15 @@ cd ..
 ### Quick Start
 
 ```bash
-# Backend setup
-cd backend
+# Install all dependencies (from project root)
 npm install
-cp .env.example .env  # Add your ANTHROPIC_API_KEY
-npm run dev           # Starts on https://localhost:3001
+
+# Backend setup
+cp backend/.env.example backend/.env  # Add your ANTHROPIC_API_KEY
+npm run dev:backend                    # Starts on https://localhost:3001
 
 # Frontend setup (new terminal)
-cd app
-npm install
-npm run dev           # Starts on https://localhost:3000
+npm run dev:app                        # Starts on https://localhost:3000
 ```
 
 ### Environment Setup
@@ -133,44 +132,50 @@ VITE_API_URL=https://localhost:3001
 
 ## Available Commands
 
-### Frontend (`/app`)
+This repository uses **npm workspaces** for unified dependency management. Run commands from the project root.
+
+### Root Commands (Recommended)
 ```bash
-npm run dev           # Start Vite dev server
-npm run build         # Production build
-npm run lint          # Run ESLint
-npm run type-check    # TypeScript check
-npm run test          # Run tests (watch)
-npm run test:run      # Run tests (once)
-npm run test:coverage # Tests with coverage
+npm install              # Install all workspaces
+npm run lint             # Lint all projects
+npm run type-check       # Type-check all projects
+npm run build            # Build all projects
+npm run test:run         # Run all tests (once)
+npm run test:coverage    # Run all tests with coverage
+
+# Development servers
+npm run dev:app                  # Start frontend (https://localhost:3000)
+npm run dev:backend              # Start backend (https://localhost:3001)
+npm run dev:prompt-service       # Start prompt-service API (http://localhost:3002)
+npm run dev:prompt-service:all   # Start prompt-service API + admin UI
+
+# Production
+npm run start:backend            # Run compiled backend
+npm run start:prompt-service     # Run compiled prompt-service
+npm run preview:app              # Preview frontend build
+
+# Database (prompt-service)
+npm run db:migrate       # Run database migrations
+npm run db:generate      # Generate Prisma client
+npm run db:seed          # Seed initial data
+npm run db:studio        # Open Prisma Studio
 ```
 
-### Backend (`/backend`)
+### Workspace-Specific Commands
+
+Commands can also be run per-workspace using `-w <workspace>`:
+
 ```bash
-npm run dev           # Start with hot reload
-npm run build         # Compile TypeScript
-npm run start         # Run production build
-npm run lint          # Run ESLint
-npm run test          # Run tests
+npm run dev -w app              # Same as npm run dev:app
+npm run test -w backend         # Run backend tests only
+npm run lint:fix -w shared      # Fix lint issues in shared
 ```
 
-### Prompt Service (`/prompt-service`)
-```bash
-npm run dev           # Start with hot reload
-npm run build         # Compile TypeScript + Admin UI
-npm run lint          # Run ESLint
-npm run type-check    # TypeScript check
-npm run test          # Run tests (watch)
-npm run test:run      # Run tests (once)
-npm run db:generate   # Generate Prisma client
-npm run db:migrate    # Run migrations
-```
+Or by navigating to the workspace directory:
 
-### Shared (`/shared`)
 ```bash
-npm run lint          # Run ESLint
-npm run type-check    # TypeScript check
-npm run test          # Run tests (watch)
-npm run test:run      # Run tests (once)
+cd app && npm run dev           # Start frontend dev server
+cd backend && npm run test      # Run backend tests
 ```
 
 ### Docker

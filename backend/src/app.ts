@@ -4,7 +4,7 @@
  * @functionality
  * - Configures Express application with security middleware
  * - Sets up request logging with Pino
- * - Registers health checks for dependency monitoring (Anthropic, Prompt Service)
+ * - Registers health checks for dependency monitoring (Anthropic, Prompt Service, Cache)
  * - Mounts API routes
  * - Configures error handling
  * @dependencies
@@ -14,7 +14,7 @@
  * - pino-http for request logging
  * - @/middleware for custom middleware
  * - @/routes for API routes
- * - @/health for health check registration (anthropic, prompt-service)
+ * - @/health for health check registration (anthropic, prompt-service, prompt-cache)
  */
 
 import express from 'express';
@@ -24,11 +24,17 @@ import pinoHttp from 'pino-http';
 import { corsMiddleware, rateLimiter, errorHandler, notFoundHandler } from './middleware/index.js';
 import routes from './routes/index.js';
 import { logger } from './utils/logger.js';
-import { healthService, createAnthropicCheck, createPromptServiceCheck } from './health/index.js';
+import {
+  healthService,
+  createAnthropicCheck,
+  createPromptServiceCheck,
+  createPromptCacheCheck,
+} from './health/index.js';
 
 // Register health checks
 healthService.register(createAnthropicCheck());
 healthService.register(createPromptServiceCheck());
+healthService.register(createPromptCacheCheck());
 
 const app = express();
 

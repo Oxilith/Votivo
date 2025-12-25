@@ -4,7 +4,7 @@
  * @functionality
  * - Tests HttpOnly cookie authentication (primary method)
  * - Tests X-Admin-Key header authentication (backward compatibility)
- * - Tests development mode bypass
+ * - Tests development mode bypass with explicit DEV_AUTH_BYPASS requirement
  * - Tests production mode without API key configured
  * - Verifies timing-safe comparison is used
  * @dependencies
@@ -20,6 +20,7 @@ vi.mock('@/config/index.js', () => ({
   config: {
     adminApiKey: '',
     nodeEnv: 'development',
+    devAuthBypass: false,
   },
 }));
 
@@ -58,8 +59,9 @@ describe('adminAuthMiddleware', () => {
   beforeEach(() => {
     mockNext = vi.fn();
     // Reset config to defaults
-    (config as { adminApiKey: string; nodeEnv: string }).adminApiKey = '';
-    (config as { adminApiKey: string; nodeEnv: string }).nodeEnv = 'development';
+    (config as { adminApiKey: string; nodeEnv: string; devAuthBypass: boolean }).adminApiKey = '';
+    (config as { adminApiKey: string; nodeEnv: string; devAuthBypass: boolean }).nodeEnv = 'development';
+    (config as { adminApiKey: string; nodeEnv: string; devAuthBypass: boolean }).devAuthBypass = false;
   });
 
   afterEach(() => {
@@ -67,7 +69,22 @@ describe('adminAuthMiddleware', () => {
   });
 
   describe('development mode without API key', () => {
-    it('should allow access when no API key is configured', () => {
+    it('should return 503 when devAuthBypass is not enabled', () => {
+      const req = createMockRequest();
+      const res = createMockResponse();
+
+      adminAuthMiddleware(req, res, mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(res.statusCode).toBe(503);
+      expect(res.jsonData).toEqual({
+        error: 'Admin access not configured. Set ADMIN_API_KEY or DEV_AUTH_BYPASS=true',
+      });
+    });
+
+    it('should allow access when devAuthBypass is enabled', () => {
+      (config as { adminApiKey: string; nodeEnv: string; devAuthBypass: boolean }).devAuthBypass = true;
+
       const req = createMockRequest();
       const res = createMockResponse();
 

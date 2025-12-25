@@ -1,9 +1,10 @@
 /**
  * @file services/prompt-cache.service.ts
- * @purpose In-memory cache for prompt configurations with TTL management
+ * @purpose In-memory cache for prompt configurations with TTL and LRU eviction
  * @functionality
  * - Caches prompt configs with configurable TTL
  * - Supports stale-while-revalidate pattern
+ * - Implements LRU eviction when cache exceeds max entries (100)
  * - Tracks refresh operations to prevent duplicate requests
  * - Provides cache freshness checking
  * @dependencies
@@ -29,20 +30,27 @@ const CACHE_TTL_MS = config.promptCacheTtlMs;
 /** Maximum age before entry is deleted entirely (configurable, default 1 hour) */
 const STALE_TTL_MS = config.promptStaleTtlMs;
 
+/** Maximum number of cache entries before LRU eviction */
+const MAX_CACHE_ENTRIES = 100;
+
 export class PromptCacheService {
   private cache = new Map<string, CacheEntry>();
   private refreshInProgress = new Set<string>();
+  private accessOrder: string[] = [];
+  private hits = 0;
+  private misses = 0;
 
   /**
    * Generates a cache key from prompt key and thinking mode
-   * Uses JSON serialization to prevent collisions if key contains special characters
+   * Uses simple string concatenation for performance
    */
   private getCacheKey(key: string, thinkingEnabled: boolean): string {
-    return JSON.stringify({ key, thinkingEnabled });
+    return `${key}:${thinkingEnabled ? '1' : '0'}`;
   }
 
   /**
    * Gets a cached entry if it exists and hasn't expired
+   * Updates LRU access order and hit/miss metrics on cache access
    * @returns The cache entry or null if not found/expired
    */
   get(key: string, thinkingEnabled: boolean): CacheEntry | null {
@@ -50,6 +58,7 @@ export class PromptCacheService {
     const entry = this.cache.get(cacheKey);
 
     if (!entry) {
+      this.misses++;
       return null;
     }
 
@@ -58,10 +67,27 @@ export class PromptCacheService {
     // If beyond stale TTL, delete and return null
     if (age > STALE_TTL_MS) {
       this.cache.delete(cacheKey);
+      this.removeFromAccessOrder(cacheKey);
+      this.misses++;
       return null;
     }
 
+    // Update LRU access order - move to end (most recently used)
+    this.removeFromAccessOrder(cacheKey);
+    this.accessOrder.push(cacheKey);
+    this.hits++;
+
     return entry;
+  }
+
+  /**
+   * Removes a cache key from the access order tracking
+   */
+  private removeFromAccessOrder(cacheKey: string): void {
+    const index = this.accessOrder.indexOf(cacheKey);
+    if (index !== -1) {
+      this.accessOrder.splice(index, 1);
+    }
   }
 
   /**
@@ -84,16 +110,31 @@ export class PromptCacheService {
 
   /**
    * Sets a cache entry with current timestamp
+   * Evicts least recently used entries if cache exceeds max size
    */
   set(
     key: string,
     thinkingEnabled: boolean,
-    config: PromptConfig,
+    promptConfig: PromptConfig,
     variantId: string | undefined
   ): void {
     const cacheKey = this.getCacheKey(key, thinkingEnabled);
+
+    // Update access order - remove if exists, then add to end
+    this.removeFromAccessOrder(cacheKey);
+    this.accessOrder.push(cacheKey);
+
+    // Evict LRU entries if cache is at or over limit
+    while (this.cache.size >= MAX_CACHE_ENTRIES && this.accessOrder.length > 0) {
+      const lruKey = this.accessOrder.shift();
+      if (lruKey) {
+        this.cache.delete(lruKey);
+        this.refreshInProgress.delete(lruKey);
+      }
+    }
+
     this.cache.set(cacheKey, {
-      config,
+      config: promptConfig,
       variantId,
       timestamp: Date.now(),
     });
@@ -126,15 +167,26 @@ export class PromptCacheService {
   clear(): void {
     this.cache.clear();
     this.refreshInProgress.clear();
+    this.accessOrder = [];
   }
 
   /**
-   * Gets cache statistics
+   * Gets cache statistics including hit/miss metrics
    */
-  getStats(): { size: number; refreshesInProgress: number } {
+  getStats(): {
+    size: number;
+    refreshesInProgress: number;
+    hits: number;
+    misses: number;
+    hitRatio: number;
+  } {
+    const total = this.hits + this.misses;
     return {
       size: this.cache.size,
       refreshesInProgress: this.refreshInProgress.size,
+      hits: this.hits,
+      misses: this.misses,
+      hitRatio: total > 0 ? this.hits / total : 0,
     };
   }
 }
