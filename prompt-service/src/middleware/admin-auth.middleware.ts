@@ -9,15 +9,15 @@
  * - Allows access in development mode without key if not configured
  * - Blocks access in production if admin key is not configured
  * @dependencies
- * - crypto for timing-safe comparison
+ * - @/utils/crypto for timing-safe comparison
  * - express for Request, Response, NextFunction types
  * - @/config for configuration
  */
 
-import crypto from 'crypto';
 import type { Request, Response, NextFunction } from 'express';
 import { config } from '@/config/index.js';
 import { AUTH_CONSTANTS } from '@/constants/auth.js';
+import { timingSafeCompare } from '@/utils/crypto.js';
 
 export function adminAuthMiddleware(
   req: Request,
@@ -44,13 +44,7 @@ export function adminAuthMiddleware(
   // Fall back to X-Admin-Key header for backward compatibility
   const apiKey = req.headers[AUTH_CONSTANTS.API_KEY_HEADER];
   if (apiKey && typeof apiKey === 'string') {
-    const apiKeyBuffer = Buffer.from(apiKey);
-    const configKeyBuffer = Buffer.from(config.adminApiKey);
-
-    if (
-      apiKeyBuffer.length === configKeyBuffer.length &&
-      crypto.timingSafeEqual(apiKeyBuffer, configKeyBuffer)
-    ) {
+    if (timingSafeCompare(apiKey, config.adminApiKey)) {
       next();
       return;
     }

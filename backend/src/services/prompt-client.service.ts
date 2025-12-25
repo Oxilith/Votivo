@@ -154,7 +154,9 @@ export class PromptClientService {
 
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+        // Truncate and sanitize error message to prevent information disclosure
+        const sanitizedError = errorText.slice(0, 200).replace(/[\r\n]/g, ' ');
+        throw new Error(`HTTP ${response.status}: ${sanitizedError}`);
       }
 
       const data = await response.json() as ResolvePromptResponse;
@@ -203,6 +205,17 @@ export class PromptClientService {
    * Executes a background refresh with retry logic
    */
   private async executeRefresh(key: string, thinkingEnabled: boolean): Promise<void> {
+    // Defensive check: ensure we're within limits even if called unexpectedly
+    // This guards against edge cases in async execution
+    if (this.activeRefreshCount >= MAX_CONCURRENT_REFRESHES) {
+      this.pendingRefreshQueue.push({ key, thinkingEnabled });
+      logger.debug(
+        { key, thinkingEnabled },
+        'Background refresh re-queued - defensive limit check triggered'
+      );
+      return;
+    }
+
     this.activeRefreshCount++;
 
     try {

@@ -7,14 +7,14 @@
  * - Provides verify endpoint to check authentication status
  * @dependencies
  * - express Router
- * - crypto for timing-safe comparison
+ * - @/utils/crypto for timing-safe comparison
  * - @/config for configuration
  */
 
-import crypto from 'crypto';
 import { Router, type Request, type Response } from 'express';
 import { config } from '@/config/index.js';
 import { AUTH_CONSTANTS } from '@/constants/auth.js';
+import { timingSafeCompare } from '@/utils/crypto.js';
 
 const router = Router();
 
@@ -43,13 +43,7 @@ router.post('/login', (req: Request, res: Response): void => {
   }
 
   // Validate API key using timing-safe comparison
-  const apiKeyBuffer = Buffer.from(apiKey);
-  const configKeyBuffer = Buffer.from(config.adminApiKey);
-
-  if (
-    apiKeyBuffer.length !== configKeyBuffer.length ||
-    !crypto.timingSafeEqual(apiKeyBuffer, configKeyBuffer)
-  ) {
+  if (!timingSafeCompare(apiKey, config.adminApiKey)) {
     res.status(401).json({ error: 'Invalid API key' });
     return;
   }
@@ -87,17 +81,9 @@ router.get('/verify', (req: Request, res: Response): void => {
 
   // Also check X-Admin-Key header for backward compatibility
   const apiKey = req.headers[AUTH_CONSTANTS.API_KEY_HEADER];
-  if (apiKey && config.adminApiKey) {
-    const apiKeyBuffer = Buffer.from(String(apiKey));
-    const configKeyBuffer = Buffer.from(config.adminApiKey);
-
-    if (
-      apiKeyBuffer.length === configKeyBuffer.length &&
-      crypto.timingSafeEqual(apiKeyBuffer, configKeyBuffer)
-    ) {
-      res.json({ authenticated: true });
-      return;
-    }
+  if (apiKey && config.adminApiKey && timingSafeCompare(String(apiKey), config.adminApiKey)) {
+    res.json({ authenticated: true });
+    return;
   }
 
   // Development mode without key configured

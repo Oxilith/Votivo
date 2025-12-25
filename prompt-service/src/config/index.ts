@@ -76,6 +76,13 @@ function loadConfig(): Config {
     );
   }
 
+  // Warn in development if DATABASE_KEY is not set (database will be unencrypted)
+  if (!isProduction && !process.env['DATABASE_KEY']) {
+    console.warn(
+      '[CONFIG WARNING] DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
+    );
+  }
+
   const result = configSchema.safeParse({
     port: process.env['PORT'],
     nodeEnv: process.env['NODE_ENV'],

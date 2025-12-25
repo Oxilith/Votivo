@@ -390,11 +390,12 @@ export class ABTestService {
     } else if (Math.abs(totalWeight - 1) > 0.001) {
       // Normalize using atomic raw SQL to prevent race conditions
       // This single statement reads and updates atomically
+      // ROUND to 6 decimal places to prevent floating-point precision issues
       await prisma.$executeRaw`
         UPDATE "ABVariant"
-        SET "weight" = "weight" / (
+        SET "weight" = ROUND("weight" / (
           SELECT COALESCE(SUM("weight"), 1) FROM "ABVariant" WHERE "abTestId" = ${testId}
-        )
+        ), 6)
         WHERE "abTestId" = ${testId}
       `;
     }
