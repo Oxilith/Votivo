@@ -1,0 +1,49 @@
+name: Issue Triage
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+jobs:
+  triage-issue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Triage issue with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            A new issue has been opened in the repository.
+
+            Repository: ${{ github.repository }}
+            Issue Number: ${{ github.event.issue.number }}
+            Issue Title: ${{ github.event.issue.title }}
+            Issue Body: ${{ github.event.issue.body }}
+
+            Please triage this issue:
+            1. Read the issue details using: gh issue view ${{ github.event.issue.number }}
+            2. Analyze the issue content and determine appropriate labels from:
+               - bug: Something isn't working
+               - enhancement: New feature or request
+               - documentation: Improvements or additions to documentation
+               - question: Further information is requested
+               - frontend: Related to React/UI components
+               - backend: Related to Express/API
+               - ai: Related to Claude API integration
+               - good first issue: Good for newcomers
+            3. Apply labels using: gh issue edit ${{ github.event.issue.number }} --add-label "label1,label2"
+            4. If the issue is unclear or missing information, add a comment asking for clarification
+
+            Be helpful and welcoming to contributors.
+          claude_args: '--allowed-tools "Read,Glob,Grep,Bash(gh issue:*),Bash(gh label:*)"'

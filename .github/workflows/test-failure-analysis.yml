@@ -1,0 +1,54 @@
+name: Test Failure Analysis
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+  id-token: write
+
+jobs:
+  analyze-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: Analyze test failures
+        id: analyze
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            The CI workflow failed: ${{ github.event.workflow_run.html_url }}
+
+            Analyze the failure by running: gh run view ${{ github.event.workflow_run.id }} --log-failed
+
+            Determine:
+            1. What type of failure occurred (lint, type-check, test, build)
+            2. If it's a test failure, is it likely flaky (timeout, race condition, network error)?
+            3. Root cause analysis
+            4. Suggested fix
+
+            If this is a PR build, comment on the PR with your analysis using:
+            gh pr comment <PR_NUMBER> --body "..."
+
+            Be concise and actionable in your analysis.
+          claude_args: '--allowed-tools "Read,Glob,Grep,Bash(gh:*)"'
+
+      - name: Comment on PR
+        if: github.event.workflow_run.event == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr_number=$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')
+          if [ -n "$pr_number" ] && [ "$pr_number" != "null" ]; then
+            echo "Analysis posted to PR #$pr_number"
+          fi
