@@ -12,15 +12,19 @@ This guide covers security considerations and configuration requirements for dep
 | `NODE_ENV` | Yes | development | Set to `production` |
 | `PORT` | No | 3001 | Server port |
 | `HTTPS_ENABLED` | No | true | Enable HTTPS |
+| `HTTPS_KEY_PATH` | No | ../certs/localhost+2-key.pem | Path to SSL key file |
+| `HTTPS_CERT_PATH` | No | ../certs/localhost+2.pem | Path to SSL certificate file |
 | `CORS_ORIGIN` | Yes | - | Allowed frontend origin |
 | `RATE_LIMIT_WINDOW_MS` | No | 60000 | Rate limit window (ms) |
 | `RATE_LIMIT_MAX_REQUESTS` | No | 10 | Max requests per window |
-| `CLAUDE_RATE_LIMIT_WINDOW_MS` | No | 60000 | Claude API rate limit window |
-| `CLAUDE_RATE_LIMIT_MAX_REQUESTS` | No | 5 | Claude API max requests |
+| `CLAUDE_RATE_LIMIT_WINDOW_MS` | No | 60000 | Claude API rate limit window (ms) |
+| `CLAUDE_RATE_LIMIT_MAX_REQUESTS` | No | 5 | Claude API max requests per window |
+| `LOG_LEVEL` | No | info | Pino log level (fatal, error, warn, info, debug, trace) |
+| `THINKING_ENABLED` | No | true | Enable Claude extended thinking |
 | `PROMPT_SERVICE_URL` | Yes | - | Prompt service internal URL |
 | `CIRCUIT_BREAKER_TIMEOUT` | No | 10000 | Circuit breaker timeout (ms) |
 | `CIRCUIT_BREAKER_RESET_TIMEOUT` | No | 30000 | Circuit breaker reset (ms) |
-| `CIRCUIT_BREAKER_ERROR_THRESHOLD` | No | 50 | Error threshold percentage |
+| `CIRCUIT_BREAKER_ERROR_THRESHOLD` | No | 50 | Error threshold percentage to open circuit |
 
 ### Prompt Service
 
@@ -33,8 +37,9 @@ This guide covers security considerations and configuration requirements for dep
 | `ADMIN_API_KEY` | Yes | - | 32+ char admin authentication key |
 | `SESSION_SECRET` | Yes | - | 32+ char cookie signing secret |
 | `CORS_ORIGINS` | Yes | - | Comma-separated allowed origins |
+| `LOG_LEVEL` | No | info | Pino log level (fatal, error, warn, info, debug, trace) |
 
-**Important:** `SESSION_SECRET` must differ from `ADMIN_API_KEY` in production for security.
+**Important:** `SESSION_SECRET` must differ from `ADMIN_API_KEY` in production for security. In development, `SESSION_SECRET` falls back to `ADMIN_API_KEY` with a warning.
 
 ## Docker Compose Configuration
 

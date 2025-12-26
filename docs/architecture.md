@@ -338,42 +338,7 @@ flowchart TB
 
 ## Environment Configuration
 
-### Backend Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| ANTHROPIC_API_KEY | Yes | - | Claude API key |
-| PORT | No | 3001 | Server port |
-| NODE_ENV | No | development | Environment mode |
-| HTTPS_ENABLED | No | true | Enable HTTPS |
-| HTTPS_KEY_PATH | No | ../certs/localhost+2-key.pem | Path to SSL key file |
-| HTTPS_CERT_PATH | No | ../certs/localhost+2.pem | Path to SSL certificate file |
-| CORS_ORIGIN | No | https://localhost:3000 | Allowed CORS origin |
-| RATE_LIMIT_WINDOW_MS | No | 60000 | Rate limit window (ms) |
-| RATE_LIMIT_MAX_REQUESTS | No | 10 | Max requests per window |
-| CLAUDE_RATE_LIMIT_WINDOW_MS | No | 60000 | Claude API rate limit window (ms) |
-| CLAUDE_RATE_LIMIT_MAX_REQUESTS | No | 5 | Claude API max requests per window |
-| LOG_LEVEL | No | info | Pino log level (fatal, error, warn, info, debug, trace) |
-| THINKING_ENABLED | No | true | Enable Claude extended thinking |
-| PROMPT_SERVICE_URL | No | http://localhost:3002 | Prompt service URL |
-| CIRCUIT_BREAKER_TIMEOUT | No | 10000 | Circuit breaker timeout (ms) |
-| CIRCUIT_BREAKER_RESET_TIMEOUT | No | 30000 | Circuit reset timeout (ms) |
-| CIRCUIT_BREAKER_ERROR_THRESHOLD | No | 50 | Error threshold percentage to open circuit |
-
-### Prompt Service Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| DATABASE_URL | Prod | file:./dev.db | SQLite database path (required in production) |
-| DATABASE_KEY | Yes | - | Encryption key (32+ chars) |
-| ADMIN_API_KEY | Prod | - | Admin authentication key (32+ chars) |
-| SESSION_SECRET | Prod | ADMIN_API_KEY* | Cookie signing secret (32+ chars, required in production) |
-| PORT | No | 3002 | Server port |
-| NODE_ENV | No | development | Environment mode |
-| CORS_ORIGINS | No | localhost | Allowed CORS origins (comma-separated) |
-| LOG_LEVEL | No | info | Pino log level (fatal, error, warn, info, debug, trace) |
-
-*In development, `SESSION_SECRET` falls back to `ADMIN_API_KEY` with a warning. In production, a separate `SESSION_SECRET` is required for security (prevents session forgery if API key is compromised).
+For complete environment variable reference, see [Production Deployment Guide](production-deployment.md#environment-variables).
 
 ## Monitoring & Observability
 

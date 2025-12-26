@@ -91,7 +91,7 @@ cp backend/.env.example backend/.env           # Add your ANTHROPIC_API_KEY
 cp prompt-service/.env.example prompt-service/.env  # Configure database encryption
 ```
 
-See [Architecture > Environment Configuration](docs/architecture.md#environment-configuration) for the complete environment variable reference.
+See [Production Deployment > Environment Variables](docs/production-deployment.md#environment-variables) for the complete environment variable reference.
 
 ## Project Structure
 
@@ -203,8 +203,9 @@ See [Docker Hub Workflow](docs/docker-hub.md) for complete documentation includi
 | Document | Description |
 |----------|-------------|
 | [Architecture](docs/architecture.md) | System design, diagrams, and technical decisions |
+| [Production Deployment](docs/production-deployment.md) | Environment variables, security, and deployment best practices |
 | [Docker Hub Workflow](docs/docker-hub.md) | Container deployment, publishing, and troubleshooting |
-| [Production Deployment](docs/ClaudeDocs/production-deployment.md) | Security, configuration, and deployment best practices |
+| [Known Limitations](docs/known-limitations.md) | Cache behavior, scaling considerations, and operational details |
 | [Motivation](docs/Motivation.md) | Theoretical framework and psychology principles |
 
 ## API Endpoints
