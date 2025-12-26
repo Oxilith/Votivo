@@ -127,13 +127,17 @@ docker compose up --build   # Build and run full stack
 docker compose up           # Run existing images
 docker compose down         # Stop containers
 ```
-Requires `ANTHROPIC_API_KEY` and `DATABASE_KEY` environment variables.
+Requires `ANTHROPIC_API_KEY`, `DATABASE_KEY`, `ADMIN_API_KEY`, and `SESSION_SECRET` environment variables.
 
 ### Docker (OCI Deployment)
 
 **Run from Docker Hub OCI:**
 ```bash
-ANTHROPIC_API_KEY=<key> DATABASE_KEY=<32+chars> docker compose -f oci://oxilith/votive-oci:latest up
+ANTHROPIC_API_KEY=<key> \
+DATABASE_KEY=<32+chars> \
+ADMIN_API_KEY=<32+chars> \
+SESSION_SECRET=<32+chars> \
+  docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
 **Build and publish multi-arch images:**
@@ -285,35 +289,15 @@ Frontend (Zustand) → ApiClient → Backend (Express) → Claude API
 
 ## Environment Variables
 
-### Backend (`/backend/.env`)
-```
-ANTHROPIC_API_KEY=sk-ant-...  # Required
-PORT=3001
-NODE_ENV=development
-HTTPS_ENABLED=true
-HTTPS_KEY_PATH=../certs/localhost+2-key.pem
-HTTPS_CERT_PATH=../certs/localhost+2.pem
-CORS_ORIGIN=https://localhost:3000
-THINKING_ENABLED=true         # Feature flag for Claude extended thinking mode
-```
+See [Architecture > Environment Configuration](../architecture.md#environment-configuration) for the complete environment variable reference.
 
-### Frontend (`/app/.env`)
-```
-VITE_API_URL=https://localhost:3001
-```
+### Docker Deployment
 
-### Prompt Service (`/prompt-service/.env`)
-```
-DATABASE_URL=file:./data/prompts.db          # Required in production (no fallback)
-DATABASE_KEY=<32+ character encryption key>  # Required
-ADMIN_API_KEY=<admin authentication key>     # Required in production
-SESSION_SECRET=<32+ char cookie signing>     # Required in production (separate from ADMIN_API_KEY for security)
-PORT=3002
-NODE_ENV=development
-CORS_ORIGINS=http://localhost:3000,http://localhost:3001
-```
-
-**Production Requirements**: In production, `DATABASE_URL`, `ADMIN_API_KEY`, and `SESSION_SECRET` are all required. `SESSION_SECRET` must be separate from `ADMIN_API_KEY` to prevent session forgery if the API key is compromised.
+Docker requires these environment variables:
+- `ANTHROPIC_API_KEY` - Claude API key
+- `DATABASE_KEY` - 32+ char encryption key
+- `ADMIN_API_KEY` - 32+ char admin auth key
+- `SESSION_SECRET` - 32+ char cookie signing secret (must differ from ADMIN_API_KEY)
 
 ### Feature Flags
 

@@ -24,12 +24,17 @@ All images support `linux/amd64` and `linux/arm64` platforms.
 
 ```bash
 # macOS/Linux
-ANTHROPIC_API_KEY=<YOUR_KEY> DATABASE_KEY=<32+_CHAR_SECRET> \
+ANTHROPIC_API_KEY=<YOUR_KEY> \
+DATABASE_KEY=<32+_CHAR_SECRET> \
+ADMIN_API_KEY=<32+_CHAR_SECRET> \
+SESSION_SECRET=<32+_CHAR_SECRET> \
   docker compose -f oci://oxilith/votive-oci:latest up
 
 # Windows (PowerShell)
 $env:ANTHROPIC_API_KEY="<YOUR_KEY>"
 $env:DATABASE_KEY="<32+_CHAR_SECRET>"
+$env:ADMIN_API_KEY="<32+_CHAR_SECRET>"
+$env:SESSION_SECRET="<32+_CHAR_SECRET>"
 docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
@@ -42,8 +47,10 @@ This starts:
 
 | Variable | Description |
 |----------|-------------|
-| `ANTHROPIC_API_KEY` | Your Claude API key (required) |
-| `DATABASE_KEY` | 32+ character encryption key for SQLite (required) |
+| `ANTHROPIC_API_KEY` | Your Claude API key |
+| `DATABASE_KEY` | 32+ character encryption key for SQLite |
+| `ADMIN_API_KEY` | 32+ character admin authentication key |
+| `SESSION_SECRET` | 32+ character cookie signing secret (must differ from ADMIN_API_KEY) |
 
 For the complete environment variable reference, see [Architecture > Environment Configuration](architecture.md#environment-configuration).
 
@@ -56,8 +63,12 @@ Build from source instead of using pre-built images:
 git clone https://github.com/Oxilith/votive.git
 cd votive
 
-# Build and run (requires ANTHROPIC_API_KEY and DATABASE_KEY)
-ANTHROPIC_API_KEY=<KEY> DATABASE_KEY=<SECRET> docker compose up --build
+# Build and run (requires all 4 environment variables)
+ANTHROPIC_API_KEY=<KEY> \
+DATABASE_KEY=<SECRET> \
+ADMIN_API_KEY=<SECRET> \
+SESSION_SECRET=<SECRET> \
+  docker compose up --build
 ```
 
 ### Development vs Production
@@ -92,7 +103,10 @@ mkcert localhost 127.0.0.1 ::1
 cd ..
 
 # Run with trusted certs (auto-detected from ./certs)
-ANTHROPIC_API_KEY=<KEY> DATABASE_KEY=<SECRET> \
+ANTHROPIC_API_KEY=<KEY> \
+DATABASE_KEY=<SECRET> \
+ADMIN_API_KEY=<SECRET> \
+SESSION_SECRET=<SECRET> \
   docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
@@ -151,7 +165,10 @@ If Docker pulls the wrong architecture:
 ```bash
 # Force specific platform
 DOCKER_DEFAULT_PLATFORM=linux/amd64 \
-  ANTHROPIC_API_KEY=<KEY> DATABASE_KEY=<SECRET> \
+ANTHROPIC_API_KEY=<KEY> \
+DATABASE_KEY=<SECRET> \
+ADMIN_API_KEY=<SECRET> \
+SESSION_SECRET=<SECRET> \
   docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
