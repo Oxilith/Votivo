@@ -11,6 +11,7 @@
  * - vitest for testing framework
  * - PromptClientService for service under test
  * - Mock fetch for HTTP simulation
+ * - Mock BackgroundRefreshManager for isolation
  */
 
 /* eslint-disable @typescript-eslint/unbound-method -- vitest mocks are safe to use unbound */
@@ -22,6 +23,23 @@ import type { PromptConfig } from 'shared/index.js';
 
 // Cast to mocked type for type safety
 const mockCacheService = vi.mocked(promptCacheService);
+
+// Track scheduled refresh tasks for testing
+const mockScheduledTasks: Array<{ key: string; thinkingEnabled: boolean }> = [];
+
+// Mock BackgroundRefreshManager to isolate tests from async background operations
+vi.mock('@/utils/background-refresh-manager.js', () => ({
+  BackgroundRefreshManager: vi.fn().mockImplementation(() => ({
+    schedule: vi.fn((task: { id: { key: string; thinkingEnabled: boolean } }) => {
+      // Track scheduled tasks for test assertions
+      mockScheduledTasks.push(task.id);
+      // Call markInProgress like the real implementation does
+      promptCacheService.markRefreshInProgress(task.id.key, task.id.thinkingEnabled);
+    }),
+    getActiveCount: vi.fn().mockReturnValue(0),
+    getQueueLength: vi.fn().mockReturnValue(0),
+  })),
+}));
 
 // Mock dependencies
 vi.mock('@/config/index.js', () => ({
@@ -93,6 +111,9 @@ describe('PromptClientService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+
+    // Clear mock scheduled tasks array
+    mockScheduledTasks.length = 0;
 
     // Mock fetch
     mockFetch = vi.fn();
@@ -283,11 +304,12 @@ describe('PromptClientService', () => {
       expect(result.config).toEqual(mockPromptConfig);
       expect(result.variantId).toBe('stale-variant');
 
-      // Should have attempted to schedule background refresh
-      expect(mockCacheService.markRefreshInProgress).toHaveBeenCalled();
+      // Should have scheduled a background refresh via BackgroundRefreshManager
+      expect(mockScheduledTasks).toHaveLength(1);
+      expect(mockScheduledTasks[0]).toEqual({ key: 'IDENTITY_ANALYSIS', thinkingEnabled: true });
     });
 
-    it('should not schedule duplicate refresh for same key', async () => {
+    it('should delegate to refresh manager for scheduling (deduplication handled by manager)', async () => {
       const staleEntry = {
         config: mockPromptConfig,
         variantId: 'stale-variant',
@@ -306,8 +328,10 @@ describe('PromptClientService', () => {
 
       await service.resolve('IDENTITY_ANALYSIS', true);
 
-      // markRefreshInProgress returns false, so no new refresh should be started
-      expect(mockCacheService.markRefreshInProgress).toHaveBeenCalledTimes(1);
+      // Service delegates to BackgroundRefreshManager which handles deduplication
+      // The manager calls markInProgress internally via callbacks
+      expect(mockScheduledTasks).toHaveLength(1);
+      expect(mockScheduledTasks[0]).toEqual({ key: 'IDENTITY_ANALYSIS', thinkingEnabled: true });
     });
   });
 

@@ -13,6 +13,7 @@
  * - @/config for prompt service URL configuration
  * - @/utils/logger for logging
  * - @/utils/error-sanitizer for secure error handling
+ * - @/utils/background-refresh-manager for background task management
  * - @/services/circuit-breaker.service for circuit breaker wrapper
  * - @/services/prompt-cache.service for in-memory caching
  * - shared/prompt.types for PromptConfig type
@@ -25,14 +26,22 @@ import { createClientError } from '@/utils/error-sanitizer.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { createCircuitBreaker } from '@/services/circuit-breaker.service.js';
 import { promptCacheService } from '@/services/prompt-cache.service.js';
+import {
+  BackgroundRefreshManager,
+  type BackgroundTask,
+} from '@/utils/background-refresh-manager.js';
 import type { PromptConfig } from 'shared/index.js';
 
 const REQUEST_TIMEOUT_MS = 5000;
-const MAX_BACKGROUND_RETRY_ATTEMPTS = 5;
-const MAX_CONCURRENT_REFRESHES = 3;
-const MAX_REFRESH_DURATION_MS = 60000;
-const MAX_RETRY_DELAY_MS = 10000;
-const MAX_PENDING_REFRESH_QUEUE_SIZE = 100;
+
+/**
+ * Task identifier for background refresh operations
+ * Used by BackgroundRefreshManager for deduplication and processing
+ */
+interface PromptRefreshTaskId {
+  key: string;
+  thinkingEnabled: boolean;
+}
 
 /**
  * Prompts to refresh when circuit breaker closes (service recovers)
@@ -60,18 +69,12 @@ export class PromptServiceUnavailableError extends Error {
   }
 }
 
-interface RefreshTask {
-  key: string;
-  thinkingEnabled: boolean;
-}
-
 export class PromptClientService {
   private readonly baseUrl: string;
   private readonly circuitBreaker: CircuitBreaker<[string, boolean], ResolvePromptResponse>;
   private readonly conversionCircuitBreaker: CircuitBreaker<[string], undefined>;
   private readonly healthCircuitBreaker: CircuitBreaker<[], boolean>;
-  private activeRefreshCount = 0;
-  private readonly pendingRefreshQueue: RefreshTask[] = [];
+  private readonly refreshManager: BackgroundRefreshManager<PromptRefreshTaskId>;
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl ?? config.promptServiceUrl;
@@ -106,6 +109,45 @@ export class PromptClientService {
         timeout: config.circuitBreakerTimeout,
         errorThresholdPercentage: config.circuitBreakerErrorThreshold,
         resetTimeout: config.circuitBreakerResetTimeout,
+      }
+    );
+
+    // Initialize background refresh manager with callbacks
+    this.refreshManager = new BackgroundRefreshManager<PromptRefreshTaskId>(
+      {
+        execute: async (task: BackgroundTask<PromptRefreshTaskId>) => {
+          const result = await this.resolveInternal(task.id.key, task.id.thinkingEnabled);
+          promptCacheService.set(task.id.key, task.id.thinkingEnabled, result.config, result.variantId);
+        },
+        markInProgress: (task: BackgroundTask<PromptRefreshTaskId>) =>
+          promptCacheService.markRefreshInProgress(task.id.key, task.id.thinkingEnabled),
+        clearInProgress: (task: BackgroundTask<PromptRefreshTaskId>) =>
+          promptCacheService.clearRefreshInProgress(task.id.key, task.id.thinkingEnabled),
+        shouldHalt: () => this.circuitBreaker.opened,
+        onSuccess: (task: BackgroundTask<PromptRefreshTaskId>) => {
+          logger.info(
+            { key: task.id.key, thinkingEnabled: task.id.thinkingEnabled },
+            'Background cache refresh successful'
+          );
+        },
+        onFailure: (task: BackgroundTask<PromptRefreshTaskId>, attempts: number) => {
+          logger.warn(
+            { key: task.id.key, thinkingEnabled: task.id.thinkingEnabled, attempts },
+            'Background refresh failed after max attempts'
+          );
+        },
+        onTimeout: (task: BackgroundTask<PromptRefreshTaskId>, durationMs: number) => {
+          logger.warn(
+            { key: task.id.key, thinkingEnabled: task.id.thinkingEnabled, durationMs },
+            'Background refresh cancelled - overall timeout exceeded'
+          );
+        },
+        onDropped: (task: BackgroundTask<PromptRefreshTaskId>) => {
+          logger.warn(
+            { key: task.id.key, thinkingEnabled: task.id.thinkingEnabled },
+            'Background refresh queue full - dropping oldest task'
+          );
+        },
       }
     );
 
@@ -210,135 +252,10 @@ export class PromptClientService {
 
   /**
    * Schedules a background refresh for a cached prompt
-   * Limits concurrent refreshes to prevent memory leaks from spawning too many retries
+   * Delegates to BackgroundRefreshManager for queue management and retry logic
    */
   private scheduleBackgroundRefresh(key: string, thinkingEnabled: boolean): void {
-    // Prevent duplicate refresh operations
-    if (!promptCacheService.markRefreshInProgress(key, thinkingEnabled)) {
-      return;
-    }
-
-    // Check if we can start immediately or need to queue
-    if (this.activeRefreshCount < MAX_CONCURRENT_REFRESHES) {
-      void this.executeRefresh(key, thinkingEnabled);
-    } else {
-      // Queue for later processing, with size limit to prevent memory issues
-      if (this.pendingRefreshQueue.length >= MAX_PENDING_REFRESH_QUEUE_SIZE) {
-        logger.warn(
-          { key, thinkingEnabled, queueLength: this.pendingRefreshQueue.length },
-          'Background refresh queue full - dropping oldest task'
-        );
-        this.pendingRefreshQueue.shift(); // Remove oldest
-      }
-      this.pendingRefreshQueue.push({ key, thinkingEnabled });
-      logger.debug(
-        { key, thinkingEnabled, queueLength: this.pendingRefreshQueue.length },
-        'Background refresh queued - max concurrent refreshes reached'
-      );
-    }
-  }
-
-  /**
-   * Executes a background refresh with retry logic and overall timeout
-   */
-  private async executeRefresh(key: string, thinkingEnabled: boolean): Promise<void> {
-    // Defensive check: ensure we're within limits even if called unexpectedly
-    // This guards against edge cases in async execution
-    if (this.activeRefreshCount >= MAX_CONCURRENT_REFRESHES) {
-      this.pendingRefreshQueue.push({ key, thinkingEnabled });
-      logger.debug(
-        { key, thinkingEnabled },
-        'Background refresh re-queued - defensive limit check triggered'
-      );
-      return;
-    }
-
-    this.activeRefreshCount++;
-    const startTime = Date.now();
-
-    try {
-      await this.retryRefresh(key, thinkingEnabled, 0, startTime);
-    } finally {
-      this.completeRefresh(key, thinkingEnabled);
-    }
-  }
-
-  /**
-   * Recursive retry logic with exponential backoff and overall timeout
-   */
-  private async retryRefresh(
-    key: string,
-    thinkingEnabled: boolean,
-    attempt: number,
-    startTime: number
-  ): Promise<void> {
-    // Check overall timeout first
-    if (Date.now() - startTime > MAX_REFRESH_DURATION_MS) {
-      logger.warn(
-        { key, thinkingEnabled, durationMs: Date.now() - startTime },
-        'Background refresh cancelled - overall timeout exceeded'
-      );
-      return;
-    }
-
-    // Exponential backoff: 1s, 2s, 4s, 8s (capped at 10s for faster recovery)
-    const delay = Math.min(1000 * Math.pow(2, attempt), MAX_RETRY_DELAY_MS);
-    await new Promise((r) => setTimeout(r, delay));
-
-    // If circuit is still open, stop retrying
-    if (this.circuitBreaker.opened) {
-      logger.debug({ key, thinkingEnabled }, 'Background refresh cancelled - circuit still open');
-      return;
-    }
-
-    try {
-      const result = await this.resolveInternal(key, thinkingEnabled);
-      promptCacheService.set(key, thinkingEnabled, result.config, result.variantId);
-      logger.info({ key, thinkingEnabled }, 'Background cache refresh successful');
-    } catch {
-      if (attempt < MAX_BACKGROUND_RETRY_ATTEMPTS) {
-        await this.retryRefresh(key, thinkingEnabled, attempt + 1, startTime);
-      } else {
-        logger.warn(
-          { key, thinkingEnabled, attempts: attempt + 1 },
-          'Background refresh failed after max attempts'
-        );
-      }
-    }
-  }
-
-  /**
-   * Completes a refresh operation and processes the next queued task
-   */
-  private completeRefresh(key: string, thinkingEnabled: boolean): void {
-    this.activeRefreshCount--;
-    promptCacheService.clearRefreshInProgress(key, thinkingEnabled);
-
-    // Process next queued task if any
-    this.processQueue();
-  }
-
-  /**
-   * Processes the next task in the refresh queue
-   * Uses setImmediate for recursive calls to prevent stack overflow under high load
-   */
-  private processQueue(): void {
-    if (this.pendingRefreshQueue.length === 0) {
-      return;
-    }
-
-    if (this.activeRefreshCount < MAX_CONCURRENT_REFRESHES) {
-      const nextTask = this.pendingRefreshQueue.shift();
-      if (nextTask) {
-        // Re-check if refresh is still needed (might have been completed by another path)
-        if (promptCacheService.markRefreshInProgress(nextTask.key, nextTask.thinkingEnabled)) {
-          void this.executeRefresh(nextTask.key, nextTask.thinkingEnabled);
-        } else {
-          // Task no longer needed, process next using setImmediate to prevent stack overflow
-          setImmediate(() => { this.processQueue(); });
-        }
-      }
-    }
+    this.refreshManager.schedule({ id: { key, thinkingEnabled } });
   }
 
   /**

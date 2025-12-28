@@ -152,4 +152,9 @@ build/
 
 # Playwright MCP screenshots
 .playwright-mcp/
+
+# Git worktrees
 .worktrees/
+
+# Auto Claude status
+.auto-claude-status
