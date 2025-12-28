@@ -297,44 +297,18 @@ When generating tests: think about edge cases, boundaries, null states, and fail
 
 ### Graphiti Memory (Knowledge Graph)
 
-Graphiti stores codebase knowledge as a graph with three core concepts:
+Knowledge graph for codebase memory. Use the **`/graphiti-memory`** skill when working on Votive.
+
+**Group ID**: `votive-codebase` (hardcoded for all operations)
+
+**Core Concepts**:
 - **Episodes**: Content snippets (source text added to memory)
 - **Nodes**: Entities extracted from episodes (services, types, packages)
 - **Facts**: Relationships between nodes (e.g., "Backend depends on prompt-service")
 
-**Group ID**: `votive-codebase` – use this for all Votive-related memory operations
+**When to READ**: Query before file exploration for architecture questions, pattern discovery, component relationships, or project context.
 
-**Key Operations**:
-```typescript
-// Add new knowledge to the graph
-mcp__graphiti__add_memory({
-  name: "Episode Name",
-  episode_body: "Content describing architecture, patterns, or decisions",
-  group_id: "votive-codebase",
-  source: "text",
-  source_description: "codebase analysis"
-})
-
-// Search for entities (nodes)
-mcp__graphiti__search_nodes({
-  query: "circuit breaker service",
-  group_ids: ["votive-codebase"],
-  max_nodes: 10
-})
-
-// Search for relationships (facts)
-mcp__graphiti__search_memory_facts({
-  query: "backend frontend communication",
-  group_ids: ["votive-codebase"],
-  max_facts: 10
-})
-
-// Get recent episodes
-mcp__graphiti__get_episodes({
-  group_ids: ["votive-codebase"],
-  max_episodes: 20
-})
-```
+**When to WRITE**: After adding new services/components, changing architecture, discovering undocumented patterns, or making design decisions with rationale.
 
 **Pre-loaded Knowledge**: The `votive-codebase` group contains episodes covering:
 - Project architecture and monorepo structure
@@ -344,10 +318,7 @@ mcp__graphiti__get_episodes({
 - Security implementation and configuration
 - Key file locations and package relationships
 
-**When to use Graphiti**:
-- Query existing codebase knowledge before exploring files
-- Store architectural decisions or patterns discovered during development
-- Capture relationships between components for future context
+See `.claude/skills/graphiti-memory/SKILL.md` for complete operations reference, naming conventions, and anti-patterns.
 
 **Plugins**:
 - `commit-commands` – structured commits

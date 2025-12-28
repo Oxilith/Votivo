@@ -1,3 +1,11 @@
+## [1.0.3] - 2025-12-28
+
+### Added
+- Graphiti memory skill (`/graphiti-memory`) for knowledge graph operations with pre-configured group ID, naming conventions, and anti-patterns guidance
+
+### Changed
+- Updated CLAUDE.md Graphiti section to reference dedicated skill instead of inline documentation
+
 ## [1.0.2] - 2025-12-28
 
 ### Fixed
