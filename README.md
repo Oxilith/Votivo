@@ -203,6 +203,7 @@ See [Docker Hub Workflow](docs/docker-hub.md) for complete documentation includi
 | Document | Description |
 |----------|-------------|
 | [Architecture](docs/architecture.md) | System design, diagrams, and technical decisions |
+| [Ink & Stone Design System](docs/votive-ink-design-system.md) | Visual language, component patterns, and animation guidelines |
 | [Production Deployment](docs/production-deployment.md) | Environment variables, security, and deployment best practices |
 | [Docker Hub Workflow](docs/docker-hub.md) | Container deployment, publishing, and troubleshooting |
 | [Known Limitations](docs/known-limitations.md) | Cache behavior, scaling considerations, and operational details |

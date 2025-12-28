@@ -232,6 +232,15 @@ Browser → nginx (HTTPS :443) → backend (HTTP :3001)
 - Shared package compiled to `dist/shared/src/`, copied to `node_modules/shared/` at runtime
 - Backend uses non-root user (expressjs) for security
 
+### Design System
+
+**Ink & Stone Design System**: See [docs/votive-ink-design-system.md](../docs/votive-ink-design-system.md) for the complete visual language including:
+- Japanese minimalism aesthetic (wabi-sabi, ma)
+- Color system (Rice Paper light / Night Ink dark themes)
+- Typography (Shippori Mincho, IBM Plex Sans/Mono)
+- Animation patterns (scroll reveals, ink drawing, brush reveals)
+- Component patterns (stone cards, CTA buttons, navigation)
+
 <frontend_aesthetics>
 You tend to converge toward generic, "on distribution" outputs. In frontend design, this creates what users call the "AI slop" aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight. Focus on:
 

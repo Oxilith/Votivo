@@ -1,3 +1,26 @@
+## [1.0.4] - 2025-12-28
+
+### Added
+- Paper texture overlay (washi grain SVG noise filter) for atmospheric depth
+- Fixed ink brush decoration at 80vh with SVG stroke drawing animation
+- Ma-vertical divider brush reveal animation on scroll
+- Ink splatter hover effect on stone cards
+- Quote marks fade-in animation for blockquotes
+- Calligraphic underline on navigation links (clip-path brush stroke)
+- Button active/press state with scale(0.96) shrink effect
+- Opacity-only animation pattern (`fade-up-opacity`) for interactive elements
+- Organic rotation on card reveal (-0.5deg/0.5deg alternating)
+
+### Changed
+- Relocated design system from `docs/DesignPropositions/` to `docs/votive-ink-design-system.md`
+- Updated README.md documentation table to include design system reference
+- Updated CLAUDE.md with design system section linking to documentation
+- Design system version bumped to 1.1.0
+
+### Fixed
+- Button animations now work correctly with hover lift and active shrink states
+- Resolved CSS animation `forwards` fill-mode blocking hover/active transforms
+
 ## [1.0.3] - 2025-12-28
 
 ### Added
