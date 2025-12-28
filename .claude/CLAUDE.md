@@ -293,6 +293,61 @@ When generating tests: think about edge cases, boundaries, null states, and fail
 **MCP Servers**:
 - `context7` – library documentation lookup
 - `playwright` – browser automation and testing
+- `graphiti` – knowledge graph memory for codebase context
+
+### Graphiti Memory (Knowledge Graph)
+
+Graphiti stores codebase knowledge as a graph with three core concepts:
+- **Episodes**: Content snippets (source text added to memory)
+- **Nodes**: Entities extracted from episodes (services, types, packages)
+- **Facts**: Relationships between nodes (e.g., "Backend depends on prompt-service")
+
+**Group ID**: `votive-codebase` – use this for all Votive-related memory operations
+
+**Key Operations**:
+```typescript
+// Add new knowledge to the graph
+mcp__graphiti__add_memory({
+  name: "Episode Name",
+  episode_body: "Content describing architecture, patterns, or decisions",
+  group_id: "votive-codebase",
+  source: "text",
+  source_description: "codebase analysis"
+})
+
+// Search for entities (nodes)
+mcp__graphiti__search_nodes({
+  query: "circuit breaker service",
+  group_ids: ["votive-codebase"],
+  max_nodes: 10
+})
+
+// Search for relationships (facts)
+mcp__graphiti__search_memory_facts({
+  query: "backend frontend communication",
+  group_ids: ["votive-codebase"],
+  max_facts: 10
+})
+
+// Get recent episodes
+mcp__graphiti__get_episodes({
+  group_ids: ["votive-codebase"],
+  max_episodes: 20
+})
+```
+
+**Pre-loaded Knowledge**: The `votive-codebase` group contains episodes covering:
+- Project architecture and monorepo structure
+- Domain types (assessment, analysis, prompts)
+- 5-phase psychological framework
+- Service layer patterns (circuit breaker, caching)
+- Security implementation and configuration
+- Key file locations and package relationships
+
+**When to use Graphiti**:
+- Query existing codebase knowledge before exploring files
+- Store architectural decisions or patterns discovered during development
+- Capture relationships between components for future context
 
 **Plugins**:
 - `commit-commands` – structured commits
