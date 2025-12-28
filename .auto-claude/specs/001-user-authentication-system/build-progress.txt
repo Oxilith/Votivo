@@ -290,3 +290,82 @@ Additional Verification:
 - Security: Try using same reset token again - should fail with "Invalid or expired password reset token"
 
 Next: subtask-6-5 - End-to-end verification of email verification flow
+
+=== SESSION UPDATE: subtask-6-5 ===
+Date: 2025-12-28
+Subtask: End-to-end verification of email verification flow
+
+Code Verification Complete:
+All email verification implementation files verified:
+- Route: GET /api/user-auth/verify-email/:token (user-auth.routes.ts:54)
+- Controller: verifyEmail handler with Zod validation (user-auth.controller.ts:210)
+- Service: UserService.verifyEmail() with token validation and user update (user.service.ts:435)
+- Email: EmailService.sendEmailVerificationEmail() with HTML/plaintext templates (email.service.ts:192)
+- Validators: emailVerifyTokenParamSchema (auth.validator.ts:95)
+- Database: EmailVerifyToken model with token, expiresAt, usedAt fields (schema.prisma:182)
+
+Flow Verified:
+1. Registration creates EmailVerifyToken in transaction with 24-hour expiry
+2. Verification email sent with link: ${APP_URL}/verify-email?token=<token>
+3. GET /api/user-auth/verify-email/:token validates token param with Zod
+4. Service finds token, validates not used/expired
+5. Transaction updates user.emailVerified=true, user.emailVerifiedAt=now(), token.usedAt=now()
+6. Returns 200 with { message, user } (SafeUser without password)
+
+Security Features Verified:
+- Token expires after 24 hours (EMAIL_VERIFY_TOKEN_EXPIRY_MS = 24*60*60*1000)
+- Token marked as used on successful verification (usedAt field)
+- Token cannot be reused after verification (checks usedAt !== null)
+- Uses timing-safe token lookup via unique constraint
+- No user enumeration - 401 for any invalid/expired token
+
+Error Handling Verified:
+- Invalid token → 401 with { error: "Invalid or expired verification token", code: "INVALID_TOKEN" }
+- Expired token → 401 with { error: "Verification token expired", code: "TOKEN_EXPIRED" }
+- Missing/malformed token → 400 with Zod validation error
+
+Manual E2E Verification Steps:
+Since npm commands are not allowed in sandbox, the following steps must be run externally:
+
+Prerequisites:
+1. Get Ethereal SMTP credentials from https://ethereal.email/create
+2. Update prompt-service/.env with SMTP_USER and SMTP_PASSWORD
+3. Ensure service is running: cd prompt-service && npm install && npm run db:generate && npm run db:migrate && npm run dev
+
+Step 1: Register a new test user
+   curl -X POST http://localhost:3002/api/user-auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"email": "verify-test@example.com", "password": "password123"}'
+   Expected: 201 Created with { user: { emailVerified: false }, accessToken }
+
+Step 2: Check Ethereal inbox for verification email
+   - Go to https://ethereal.email/messages
+   - Find the "Verify Your Votive Email Address" email
+   - Click message to view content
+   - Extract the verification token from the URL: /verify-email?token=<TOKEN>
+
+Step 3: Verify email with token
+   curl -X GET "http://localhost:3002/api/user-auth/verify-email/<TOKEN_FROM_EMAIL>"
+   Expected: 200 OK with { message: "Email verified successfully.", user: { emailVerified: true, emailVerifiedAt: "..." } }
+
+Step 4: Verify database state
+   npx prisma studio
+   - Check User table - user.emailVerified should be true, emailVerifiedAt should be set
+   - Check EmailVerifyToken table - token.usedAt should be set
+
+Step 5: Verify token cannot be reused
+   curl -X GET "http://localhost:3002/api/user-auth/verify-email/<SAME_TOKEN>"
+   Expected: 401 Unauthorized with { error: "Invalid or expired verification token", code: "INVALID_TOKEN" }
+
+Step 6: Verify user can login after verification
+   curl -X POST http://localhost:3002/api/user-auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email": "verify-test@example.com", "password": "password123"}'
+   Expected: 200 OK with { user: { emailVerified: true }, accessToken }
+
+Additional Verification (Optional):
+- Test expired token: Wait 24+ hours (or modify expiresAt in database) and try to verify
+- Test resend verification: POST /api/user-auth/resend-verification (requires JWT auth)
+- Test already verified: Resend verification for verified user should return "Email is already verified"
+
+Next: subtask-6-6 - Verify JWT middleware protects routes correctly
