@@ -6,6 +6,9 @@
  * - Tests error message is descriptive when no secret is configured
  * - Tests successful config loading when SESSION_SECRET is set
  * - Tests successful config loading when ADMIN_API_KEY is set as fallback
+ * - Tests warning log when using ADMIN_API_KEY as SESSION_SECRET fallback
+ * - Tests minimum length validation for SESSION_SECRET (32 characters)
+ * - Tests production mode requires explicit SESSION_SECRET
  * @dependencies
  * - vitest for testing framework
  */
@@ -42,7 +45,7 @@ describe('config validation', () => {
       if (originalEnv[key] !== undefined) {
         process.env[key] = originalEnv[key];
       } else {
-        delete process.env[key];
+        Reflect.deleteProperty(process.env, key);
       }
     }
     vi.resetModules();
@@ -53,10 +56,10 @@ describe('config validation', () => {
       // Set to development mode
       process.env['NODE_ENV'] = 'development';
       // Clear both secrets
-      delete process.env['SESSION_SECRET'];
-      delete process.env['ADMIN_API_KEY'];
+      Reflect.deleteProperty(process.env, 'SESSION_SECRET');
+      Reflect.deleteProperty(process.env, 'ADMIN_API_KEY');
       // Clear DATABASE_KEY to avoid unrelated validation
-      delete process.env['DATABASE_KEY'];
+      Reflect.deleteProperty(process.env, 'DATABASE_KEY');
     });
 
     it('should throw an error when neither SESSION_SECRET nor ADMIN_API_KEY is set', async () => {
@@ -122,6 +125,32 @@ describe('config validation', () => {
       // Assert
       expect(config.sessionSecret).toBe('primary-session-secret-at-least-32-characters');
     });
+
+    it('should log a warning when using ADMIN_API_KEY as SESSION_SECRET fallback', async () => {
+      // Arrange
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      process.env['ADMIN_API_KEY'] = 'test-admin-api-key-at-least-32-characters-long';
+
+      // Act
+      await import('../index.js');
+
+      // Assert
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('SESSION_SECRET not set, falling back to ADMIN_API_KEY')
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it('should reject SESSION_SECRET shorter than 32 characters', async () => {
+      // Arrange
+      process.env['SESSION_SECRET'] = 'short-secret'; // Only 12 characters
+
+      // Act & Assert
+      await expect(async () => {
+        await import('../index.js');
+      }).rejects.toThrow(/at least 32 character/i);
+    });
   });
 
   describe('production mode cookie secret validation', () => {
@@ -131,8 +160,8 @@ describe('config validation', () => {
       // Production requires DATABASE_URL
       process.env['DATABASE_URL'] = 'file:./test.db';
       // Clear secrets
-      delete process.env['SESSION_SECRET'];
-      delete process.env['ADMIN_API_KEY'];
+      Reflect.deleteProperty(process.env, 'SESSION_SECRET');
+      Reflect.deleteProperty(process.env, 'ADMIN_API_KEY');
     });
 
     it('should throw an error when SESSION_SECRET is not set in production', async () => {
