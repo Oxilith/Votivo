@@ -181,15 +181,22 @@ export class BackgroundRefreshManager<T> {
    * @param task The task to schedule
    */
   schedule(task: BackgroundTask<T>): void {
-    // Prevent duplicate tasks via the markInProgress callback
-    if (!this.callbacks.markInProgress(task)) {
-      return;
-    }
-
     // Check if we can start immediately or need to queue
     if (this.activeCount < this.config.maxConcurrent) {
+      // Mark in-progress only when actually executing
+      if (!this.callbacks.markInProgress(task)) {
+        return;
+      }
       void this.executeTask(task);
     } else {
+      // Check if task is already in progress (being executed)
+      // Use markInProgress to check - if it returns false, task is already executing
+      if (!this.callbacks.markInProgress(task)) {
+        return;
+      }
+      // Successfully marked - but we're queueing, not executing, so clear it
+      // The mark will be set again when dequeued and actually executed
+      this.callbacks.clearInProgress(task);
       this.enqueue(task);
     }
   }
@@ -269,7 +276,12 @@ export class BackgroundRefreshManager<T> {
 
     try {
       await this.callbacks.execute(task);
-      this.callbacks.onSuccess?.(task);
+      // Call onSuccess in a separate try-catch to prevent callback errors from triggering retry
+      try {
+        this.callbacks.onSuccess?.(task);
+      } catch {
+        // Ignore errors in onSuccess callback - task executed successfully
+      }
     } catch {
       if (attempt < this.config.maxRetryAttempts) {
         await this.retryTask(task, attempt + 1, startTime);

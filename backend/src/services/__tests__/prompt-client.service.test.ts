@@ -29,16 +29,16 @@ const mockScheduledTasks: Array<{ key: string; thinkingEnabled: boolean }> = [];
 
 // Mock BackgroundRefreshManager to isolate tests from async background operations
 vi.mock('@/utils/background-refresh-manager.js', () => ({
-  BackgroundRefreshManager: vi.fn().mockImplementation(() => ({
-    schedule: vi.fn((task: { id: { key: string; thinkingEnabled: boolean } }) => {
+  BackgroundRefreshManager: class MockBackgroundRefreshManager {
+    schedule = vi.fn((task: { id: { key: string; thinkingEnabled: boolean } }) => {
       // Track scheduled tasks for test assertions
       mockScheduledTasks.push(task.id);
       // Call markInProgress like the real implementation does
       promptCacheService.markRefreshInProgress(task.id.key, task.id.thinkingEnabled);
-    }),
-    getActiveCount: vi.fn().mockReturnValue(0),
-    getQueueLength: vi.fn().mockReturnValue(0),
-  })),
+    });
+    getActiveCount = vi.fn().mockReturnValue(0);
+    getQueueLength = vi.fn().mockReturnValue(0);
+  },
 }));
 
 // Mock dependencies

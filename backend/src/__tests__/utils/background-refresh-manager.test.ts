@@ -79,7 +79,7 @@ describe('BackgroundRefreshManager', () => {
   });
 
   describe('queue operations', () => {
-    it('should add task to queue when at max concurrency', async () => {
+    it('should add task to queue when at max concurrency', () => {
       const config: BackgroundRefreshManagerConfig = {
         maxConcurrent: 1,
       };
@@ -101,7 +101,7 @@ describe('BackgroundRefreshManager', () => {
       };
       const manager = new BackgroundRefreshManager(mockCallbacks, config);
 
-      let resolveFirst: () => void;
+      let resolveFirst: () => void = () => {};
       const firstPromise = new Promise<void>((resolve) => {
         resolveFirst = resolve;
       });
@@ -117,14 +117,14 @@ describe('BackgroundRefreshManager', () => {
       expect(manager.getQueueLength()).toBe(1);
 
       // Complete first task
-      resolveFirst!();
+      resolveFirst();
       await vi.runAllTimersAsync();
 
       // Queue should be processed
       expect(mockCallbacks.execute).toHaveBeenCalledTimes(2);
     });
 
-    it('should drop oldest task when queue exceeds maxQueueSize', async () => {
+    it('should drop oldest task when queue exceeds maxQueueSize', () => {
       const config: BackgroundRefreshManagerConfig = {
         maxConcurrent: 1,
         maxQueueSize: 2,
@@ -150,7 +150,7 @@ describe('BackgroundRefreshManager', () => {
       expect(mockCallbacks.onDropped).toHaveBeenCalledWith({ id: 'task-2' });
     });
 
-    it('should call onDropped callback when task is dropped', async () => {
+    it('should call onDropped callback when task is dropped', () => {
       const config: BackgroundRefreshManagerConfig = {
         maxConcurrent: 1,
         maxQueueSize: 1,
@@ -171,7 +171,7 @@ describe('BackgroundRefreshManager', () => {
   });
 
   describe('concurrency limiting', () => {
-    it('should not exceed maxConcurrent limit', async () => {
+    it('should not exceed maxConcurrent limit', () => {
       const config: BackgroundRefreshManagerConfig = {
         maxConcurrent: 3,
       };
@@ -213,7 +213,9 @@ describe('BackgroundRefreshManager', () => {
       expect(manager.getQueueLength()).toBe(1);
 
       // Complete first task
-      resolvers[0]();
+      const firstResolver = resolvers[0];
+      if (!firstResolver) throw new Error('Expected resolver to be defined');
+      firstResolver();
       await vi.runAllTimersAsync();
 
       // Task 3 should now be active
@@ -244,8 +246,11 @@ describe('BackgroundRefreshManager', () => {
       expect(manager.getQueueLength()).toBe(2);
 
       // Complete two tasks simultaneously
-      resolvers[0]();
-      resolvers[1]();
+      const resolver0 = resolvers[0];
+      const resolver1 = resolvers[1];
+      if (!resolver0 || !resolver1) throw new Error('Expected resolvers to be defined');
+      resolver0();
+      resolver1();
       await vi.runAllTimersAsync();
 
       // Both queued tasks should have started
@@ -397,7 +402,12 @@ describe('BackgroundRefreshManager', () => {
       // At this point ~3000ms elapsed, timeout should trigger
       expect(mockCallbacks.onTimeout).toHaveBeenCalled();
 
-      const [, durationMs] = vi.mocked(mockCallbacks.onTimeout).mock.calls[0];
+      const onTimeoutCallback = mockCallbacks.onTimeout;
+      if (!onTimeoutCallback) throw new Error('Expected onTimeout to be defined');
+      const onTimeoutMock = vi.mocked(onTimeoutCallback);
+      const onTimeoutCall = onTimeoutMock.mock.calls[0];
+      if (!onTimeoutCall) throw new Error('Expected onTimeout to have been called');
+      const durationMs = onTimeoutCall[1];
       expect(durationMs).toBeGreaterThan(3000);
     });
 
@@ -472,7 +482,9 @@ describe('BackgroundRefreshManager', () => {
         .mockRejectedValueOnce(new Error('First attempt failed'));
 
       // After first failure, shouldHalt returns true (e.g., circuit breaker opened)
-      vi.mocked(mockCallbacks.shouldHalt).mockReturnValueOnce(false).mockReturnValue(true);
+      const shouldHaltMock = mockCallbacks.shouldHalt;
+      if (!shouldHaltMock) throw new Error('Expected shouldHalt mock to be defined');
+      vi.mocked(shouldHaltMock).mockReturnValueOnce(false).mockReturnValue(true);
 
       manager.schedule({ id: 'task-1' });
 
@@ -514,7 +526,7 @@ describe('BackgroundRefreshManager', () => {
       await vi.runAllTimersAsync();
     });
 
-    it('should handle rapid task additions', async () => {
+    it('should handle rapid task additions', () => {
       const config: BackgroundRefreshManagerConfig = {
         maxConcurrent: 2,
         maxQueueSize: 5,
@@ -534,7 +546,9 @@ describe('BackgroundRefreshManager', () => {
       expect(manager.getQueueLength()).toBe(5); // Capped at maxQueueSize
 
       // Tasks 3-15 should have been dropped (first 2 are active, next 5 remain in queue)
-      const droppedCount = vi.mocked(mockCallbacks.onDropped).mock.calls.length;
+      const onDroppedMock = mockCallbacks.onDropped;
+      if (!onDroppedMock) throw new Error('Expected onDropped mock to be defined');
+      const droppedCount = vi.mocked(onDroppedMock).mock.calls.length;
       expect(droppedCount).toBe(13); // 20 - 2 active - 5 queued = 13 dropped
     });
 
@@ -579,7 +593,7 @@ describe('BackgroundRefreshManager', () => {
       };
       const manager = new BackgroundRefreshManager(mockCallbacks, config);
 
-      let resolveFirst: () => void;
+      let resolveFirst: () => void = () => {};
       const firstPromise = new Promise<void>((resolve) => {
         resolveFirst = resolve;
       });
@@ -606,7 +620,7 @@ describe('BackgroundRefreshManager', () => {
       manager.schedule({ id: 'task-3' });
 
       // Complete first task - should skip task-2 and process task-3
-      resolveFirst!();
+      resolveFirst();
       await vi.runAllTimersAsync();
 
       // task-2 should have been skipped
@@ -644,7 +658,7 @@ describe('BackgroundRefreshManager', () => {
       const setImmediateSpy = vi.fn(originalSetImmediate);
       globalThis.setImmediate = setImmediateSpy as typeof setImmediate;
 
-      let resolveFirst: () => void;
+      let resolveFirst: () => void = () => {};
       const firstPromise = new Promise<void>((resolve) => {
         resolveFirst = resolve;
       });
@@ -661,7 +675,7 @@ describe('BackgroundRefreshManager', () => {
 
       manager.schedule({ id: 'task-3' }); // Will also be skipped
 
-      resolveFirst!();
+      resolveFirst();
       await vi.runAllTimersAsync();
 
       // setImmediate should have been called for recursive processing
@@ -672,7 +686,7 @@ describe('BackgroundRefreshManager', () => {
   });
 
   describe('state getters', () => {
-    it('getActiveCount should return current active tasks', async () => {
+    it('getActiveCount should return current active tasks', () => {
       const config: BackgroundRefreshManagerConfig = {
         maxConcurrent: 3,
       };
@@ -697,7 +711,7 @@ describe('BackgroundRefreshManager', () => {
       expect(manager.getActiveCount()).toBe(3);
     });
 
-    it('getQueueLength should return pending queue size', async () => {
+    it('getQueueLength should return pending queue size', () => {
       const config: BackgroundRefreshManagerConfig = {
         maxConcurrent: 1,
       };
@@ -728,7 +742,9 @@ describe('BackgroundRefreshManager', () => {
       const manager = new BackgroundRefreshManager(mockCallbacks, config);
 
       let callCount = 0;
-      vi.mocked(mockCallbacks.onSuccess).mockImplementation(() => {
+      const onSuccessMock = mockCallbacks.onSuccess;
+      if (!onSuccessMock) throw new Error('Expected onSuccess mock to be defined');
+      vi.mocked(onSuccessMock).mockImplementation(() => {
         callCount++;
         if (callCount === 1) {
           throw new Error('onSuccess failed');

@@ -121,8 +121,9 @@ export class PromptClientService {
         },
         markInProgress: (task: BackgroundTask<PromptRefreshTaskId>) =>
           promptCacheService.markRefreshInProgress(task.id.key, task.id.thinkingEnabled),
-        clearInProgress: (task: BackgroundTask<PromptRefreshTaskId>) =>
-          promptCacheService.clearRefreshInProgress(task.id.key, task.id.thinkingEnabled),
+        clearInProgress: (task: BackgroundTask<PromptRefreshTaskId>) => {
+          promptCacheService.clearRefreshInProgress(task.id.key, task.id.thinkingEnabled);
+        },
         shouldHalt: () => this.circuitBreaker.opened,
         onSuccess: (task: BackgroundTask<PromptRefreshTaskId>) => {
           logger.info(
