@@ -2,10 +2,11 @@
  * @file prompt-service/src/routes/index.ts
  * @purpose Aggregates all API routes for the prompt service
  * @functionality
- * - Combines auth, prompt, A/B test, and resolve routes
+ * - Combines auth, prompt, A/B test, resolve, and user-auth routes
  * - Applies admin auth middleware to protected routes (prompts, ab-tests)
  * - Applies rate limiting to admin routes (100 req/15min)
  * - Applies strict rate limiting to auth routes (5 req/min) to prevent brute-force attacks
+ * - Applies strict rate limiting to user-auth routes (10 req/min) for login/register
  * - Applies lenient rate limiting to resolve routes (1000 req/min) for service-to-service
  * - Provides a single router for mounting in Express app
  * @dependencies
@@ -15,6 +16,7 @@
  * - @/routes/prompt.routes
  * - @/routes/ab-test.routes
  * - @/routes/resolve.routes
+ * - @/routes/user-auth.routes
  * - @/middleware/admin-auth.middleware
  */
 
@@ -24,6 +26,7 @@ import { authRoutes } from '@/routes/auth.routes.js';
 import { promptRoutes } from '@/routes/prompt.routes.js';
 import { abTestRoutes } from '@/routes/ab-test.routes.js';
 import { resolveRoutes } from '@/routes/resolve.routes.js';
+import { userAuthRoutes } from '@/routes/user-auth.routes.js';
 import { adminAuthMiddleware } from '@/middleware/admin-auth.middleware.js';
 
 const router = Router();
@@ -55,11 +58,23 @@ const resolveRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiter for user auth endpoints (prevent brute-force attacks on login/register)
+const userAuthRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // 10 requests per minute (allows some retries but prevents brute-force)
+  message: { error: 'Too many authentication attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Public routes (used by backend service) - rate limited to prevent abuse
 router.use('/resolve', resolveRateLimiter, resolveRoutes);
 
 // Auth routes (public - for login/logout) - rate limited to prevent brute-force attacks
 router.use('/auth', authRateLimiter, authRoutes);
+
+// User auth routes (public - for user registration/login/password reset) - rate limited
+router.use('/user-auth', userAuthRateLimiter, userAuthRoutes);
 
 // Protected admin routes (require X-Admin-Key header + rate limiting)
 router.use('/prompts', adminRateLimiter, adminAuthMiddleware, promptRoutes);
