@@ -13,12 +13,14 @@
  * - react-i18next (useTranslation)
  * - @/components/landing/shared/VotiveLogo
  * - @/components/landing/shared/VoteCounter
+ * - @/components/shared/icons (ArrowRightIcon, ChevronDownIcon, ArrowDownIcon)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import VotiveLogo from '@/components/landing/shared/VotiveLogo';
 import VoteCounter from '@/components/landing/shared/VoteCounter';
+import { ArrowRightIcon, ChevronDownIcon, ArrowDownIcon } from '@/components/shared/icons';
 
 interface HeroSectionProps {
   onStartDiscovery: () => void;
@@ -71,18 +73,14 @@ const HeroSection: FC<HeroSectionProps> = ({ onStartDiscovery }) => {
             className="cta-button inline-flex items-center gap-3 tech-gradient text-white px-8 py-4 text-base font-medium tracking-wide hover:opacity-90 transition-opacity shadow-lg shadow-[var(--color-electric)]/20"
           >
             {t('landing.hero.cta')}
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <ArrowRightIcon size="md" />
           </button>
           <a
             href="#philosophy"
             className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors px-4 py-4"
           >
             {t('landing.hero.learnMore')}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <ChevronDownIcon size="sm" />
           </a>
         </div>
 
@@ -105,9 +103,7 @@ const HeroSection: FC<HeroSectionProps> = ({ onStartDiscovery }) => {
         className="absolute bottom-8 left-1/2 -translate-x-1/2 scroll-indicator opacity-0 animate-fade delay-800"
         style={{ animationFillMode: 'forwards' }}
       >
-        <svg className="w-6 h-6 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
+        <ArrowDownIcon size="lg" className="text-[var(--text-muted)]" />
       </div>
     </section>
   );

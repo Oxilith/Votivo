@@ -13,12 +13,19 @@
  * - react-i18next (useTranslation)
  * - @/components/landing/shared/VotiveLogo
  * - @/hooks/useThemeContext
+ * - @/components/shared/icons (ArrowRightIcon, ChevronDownIcon, SunIcon, MoonIcon)
  */
 
 import { useState, useEffect, useRef, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import VotiveLogo from '@/components/landing/shared/VotiveLogo';
 import { useThemeContext } from '@/hooks/useThemeContext';
+import {
+  ArrowRightIcon,
+  ChevronDownIcon,
+  SunIcon,
+  MoonIcon,
+} from '@/components/shared/icons';
 
 interface NavSectionProps {
   onStartDiscovery: () => void;
@@ -85,9 +92,7 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery }) => {
             className="cta-button inline-flex items-center gap-2 bg-[var(--text-primary)] text-[var(--bg-primary)] px-5 py-2.5 text-sm font-medium tracking-wide hover:opacity-90 transition-opacity"
           >
             {t('landing.nav.beginDiscovery')}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <ArrowRightIcon size="sm" />
           </button>
 
           {/* Separator */}
@@ -100,9 +105,7 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery }) => {
               className="px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]  font-medium transition-colors flex items-center gap-1.5"
             >
               <span>{i18n.language === 'pl' ? 'PL' : 'EN'}</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDownIcon size="sm" />
             </button>
             {langMenuOpen && (
               <div className="absolute right-0 mt-1 py-1 w-32 bg-[var(--bg-card)] border border-[var(--border-subtle)]  shadow-lg z-50">
@@ -136,25 +139,7 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery }) => {
             className="p-2  text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors"
             aria-label={isDark ? t('header.theme.toggleLight') : t('header.theme.toggleDark')}
           >
-            {isDark ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-            )}
+            {isDark ? <SunIcon size="md" /> : <MoonIcon size="md" />}
           </button>
         </div>
 
@@ -165,25 +150,7 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery }) => {
             onClick={toggleTheme}
             className="p-2  text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors"
           >
-            {isDark ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-            )}
+            {isDark ? <SunIcon size="md" /> : <MoonIcon size="md" />}
           </button>
           <button
             onClick={onStartDiscovery}

@@ -12,11 +12,13 @@
  * - React
  * - react-i18next (useTranslation)
  * - @/components/landing/shared/VotiveLogo
+ * - @/components/shared/icons (ArrowRightIcon)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import VotiveLogo from '@/components/landing/shared/VotiveLogo';
+import { ArrowRightIcon } from '@/components/shared/icons';
 
 interface CTASectionProps {
   onStartDiscovery: () => void;
@@ -64,9 +66,7 @@ const CTASection: FC<CTASectionProps> = ({ onStartDiscovery }) => {
           className="cta-button inline-flex items-center gap-3 tech-gradient text-white px-8 py-4 text-base font-medium tracking-wide hover:opacity-90 transition-opacity shadow-lg shadow-[var(--color-electric)]/30 mb-8"
         >
           {t('landing.cta.button')}
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+          <ArrowRightIcon size="md" />
         </button>
 
         {/* Time Estimate */}
