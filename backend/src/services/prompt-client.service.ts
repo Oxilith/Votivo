@@ -392,18 +392,11 @@ export class PromptClientService {
    * This is wrapped by the circuit breaker
    */
   private async healthCheckInternal(): Promise<boolean> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
+    const response = await fetchWithTimeout(`${this.baseUrl}/health`, {
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    });
 
-    try {
-      const response = await fetch(`${this.baseUrl}/health`, {
-        signal: controller.signal,
-      });
-
-      return response.ok;
-    } finally {
-      clearTimeout(timeoutId);
-    }
+    return response.ok;
   }
 
   /**
