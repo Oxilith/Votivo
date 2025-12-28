@@ -62,11 +62,11 @@ export interface InsightCardProps {
  * Uses type-safe 'in' operator checks for conditional rendering based on
  * which properties exist on the insight item.
  */
-const InsightCard: React.FC<InsightCardProps> = ({ item, type }) => {
+const InsightCard: React.FC<InsightCardProps> = ({ item, type: _type }) => {
   const { t } = useTranslation();
 
   // Use shared theme styles - all insight types use consistent neutral colors
-  void type; // Type is kept for potential future per-type styling
+  // _type is kept for potential future per-type styling
 
   return (
     <div className={`p-5 ${cardStyles.base} space-y-3`}>
