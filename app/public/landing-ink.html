@@ -177,6 +177,21 @@
       color: white;
     }
 
+    /* Paper texture overlay - washi paper grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .dark body::before {
+      opacity: 0.015;
+    }
+
     /* ========================================
        MA - INTENTIONAL SPACE
        ======================================== */
@@ -185,6 +200,25 @@
       background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
       margin: var(--space-3xl) auto;
       max-width: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ma-vertical::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      transform: scaleX(0);
+      transform-origin: center;
+    }
+
+    .ma-vertical.visible::after {
+      animation: brush-reveal 1.5s var(--ease-out) forwards;
+    }
+
+    @keyframes brush-reveal {
+      to { transform: scaleX(1); }
     }
 
     .ma-breath {
@@ -395,13 +429,17 @@
     .nav-link::after {
       content: '';
       position: absolute;
-      bottom: -2px;
+      bottom: -3px;
       left: 0;
       right: 0;
-      height: 1px;
+      height: 2px;
       background: var(--accent);
       transform: scaleX(0);
+      transform-origin: left;
       transition: transform var(--duration-normal) var(--ease-out);
+      border-radius: 1px;
+      /* Brush stroke variation */
+      clip-path: polygon(0 40%, 5% 0, 95% 20%, 100% 60%, 98% 100%, 2% 80%);
     }
 
     .nav-link:hover {
@@ -420,7 +458,8 @@
       color: white;
       background: var(--accent);
       transition: background var(--duration-fast) var(--ease-out),
-                  transform var(--duration-fast) var(--ease-out);
+                  transform var(--duration-fast) var(--ease-out),
+                  box-shadow var(--duration-fast) var(--ease-out);
     }
 
     @media (min-width: 768px) {
@@ -432,6 +471,13 @@
     .nav-cta:hover {
       background: var(--accent-soft);
       transform: translateY(-1px);
+    }
+
+    .nav-cta:active,
+    .nav-cta:active:hover {
+      transform: translateY(0) scale(0.96);
+      box-shadow: 0 2px 8px rgba(199, 62, 29, 0.3);
+      transition-duration: 50ms;
     }
 
     .nav-controls {
@@ -508,7 +554,7 @@
       align-items: center;
       padding: var(--space-4xl) 0;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .hero-inner {
@@ -612,6 +658,16 @@
       }
     }
 
+    /* Opacity-only animation for buttons - prevents transform conflicts with hover/active states */
+    @keyframes fade-up-opacity {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
     .hero-cta {
       display: inline-flex;
       align-items: center;
@@ -622,7 +678,7 @@
       color: white;
       background: var(--accent);
       opacity: 0;
-      animation: fade-up 0.8s var(--ease-out) 0.6s forwards;
+      animation: fade-up-opacity 0.8s var(--ease-out) 0.6s forwards;
       transition: background var(--duration-fast) var(--ease-out),
                   transform var(--duration-fast) var(--ease-out),
                   box-shadow var(--duration-fast) var(--ease-out);
@@ -632,6 +688,13 @@
       background: var(--accent-soft);
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(199, 62, 29, 0.25);
+    }
+
+    .hero-cta:active,
+    .hero-cta:active:hover {
+      transform: translateY(0) scale(0.96);
+      box-shadow: 0 2px 8px rgba(199, 62, 29, 0.3);
+      transition-duration: 50ms;
     }
 
     .hero-cta-icon {
@@ -700,16 +763,44 @@
 
     /* Ink brush decoration */
     .hero__ink {
-      position: absolute;
-      right: -5%;
-      top: 0;
-      bottom: 0;
-      height: 100%;
+      position: fixed;
+      right: 0;
+      top: 10%;
+      height: 80vh;
       width: auto;
       max-width: 500px;
       opacity: 0.06;
       pointer-events: none;
       z-index: 1;
+    }
+
+    .hero__ink path {
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      animation: ink-draw 3s var(--ease-out) 0.5s forwards;
+    }
+
+    .hero__ink circle {
+      opacity: 0;
+      animation: ink-splash 0.8s var(--ease-out) forwards;
+    }
+
+    .hero__ink circle:nth-child(2) {
+      animation-delay: 2s;
+    }
+
+    .hero__ink circle:nth-child(3) {
+      animation-delay: 2.5s;
+    }
+
+    @keyframes ink-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes ink-splash {
+      0% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 0.4; }
+      100% { opacity: 0.3; transform: scale(1); }
     }
 
     .dark .hero__ink {
@@ -790,14 +881,28 @@
       padding-left: var(--space-xl);
     }
 
+    .philosophy-quote blockquote::before,
+    .philosophy-quote blockquote::after {
+      display: inline-block;
+      color: var(--accent);
+      opacity: 0;
+    }
+
     .philosophy-quote blockquote::before {
       content: '"';
-      color: var(--accent);
     }
 
     .philosophy-quote blockquote::after {
       content: '"';
-      color: var(--accent);
+    }
+
+    .philosophy-quote.visible blockquote::before,
+    .philosophy-quote.visible blockquote::after {
+      animation: quote-fade 0.8s var(--ease-out) 0.4s forwards;
+    }
+
+    @keyframes quote-fade {
+      to { opacity: 1; }
     }
 
     .philosophy-quote cite {
@@ -868,8 +973,33 @@
       border-color: var(--border-strong);
     }
 
+    /* Ink splatter decoration on hover */
+    .stone::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0);
+      transition: all var(--duration-slow) var(--ease-out);
+      pointer-events: none;
+    }
+
+    .stone:hover::after {
+      opacity: 0.15;
+      transform: scale(1);
+    }
+
     .stone.coming-soon {
       opacity: 0.5;
+    }
+
+    .stone.coming-soon::after {
+      display: none;
     }
 
     /* Asymmetric grid placement - zen garden style */
@@ -1170,6 +1300,13 @@
       box-shadow: 0 8px 24px rgba(199, 62, 29, 0.25);
     }
 
+    .cta-button:active,
+    .cta-button:active:hover {
+      transform: translateY(0) scale(0.96);
+      box-shadow: 0 2px 8px rgba(199, 62, 29, 0.3);
+      transition-duration: 50ms;
+    }
+
     .cta-button-icon {
       width: 16px;
       height: 16px;
@@ -1178,6 +1315,29 @@
 
     .cta-button:hover .cta-button-icon {
       transform: translateX(4px);
+    }
+
+    /* Button reveal: only animate opacity, keep transform free for interactions */
+    .cta-button.reveal {
+      transform: none;  /* Override the translateY(24px) from .reveal */
+    }
+
+    .cta-button.reveal.visible {
+      transform: none;
+      transition: opacity var(--duration-reveal) var(--ease-out),
+                  background var(--duration-fast) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out),
+                  box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .cta-button.reveal.visible:hover {
+      transform: translateY(-2px);
+    }
+
+    .cta-button.reveal.visible:active,
+    .cta-button.reveal.visible:active:hover {
+      transform: translateY(0) scale(0.96);
+      transition-duration: 50ms;
     }
 
     .cta-meta {
@@ -1292,6 +1452,19 @@
     .reveal-delay-4 { transition-delay: 0.4s; }
     .reveal-delay-5 { transition-delay: 0.5s; }
 
+    /* Stone cards - organic rotation on reveal */
+    .stone.reveal {
+      transform: translateY(24px) rotate(-0.5deg);
+    }
+
+    .stone.reveal:nth-child(odd) {
+      transform: translateY(24px) rotate(0.5deg);
+    }
+
+    .stone.reveal.visible {
+      transform: translateY(0) rotate(0deg);
+    }
+
     /* ========================================
        ACCESSIBILITY
        ======================================== */
@@ -1302,7 +1475,8 @@
         transition-duration: 0.01ms !important;
       }
 
-      .reveal {
+      .reveal,
+      .stone.reveal {
         opacity: 1;
         transform: none;
       }
@@ -1310,6 +1484,23 @@
       .hero-word {
         opacity: 1;
         transform: none;
+      }
+
+      .hero__ink path {
+        stroke-dashoffset: 0;
+      }
+
+      .hero__ink circle {
+        opacity: 0.3;
+      }
+
+      .ma-vertical::after {
+        transform: scaleX(1);
+      }
+
+      .philosophy-quote blockquote::before,
+      .philosophy-quote blockquote::after {
+        opacity: 1;
       }
     }
 
@@ -1468,6 +1659,7 @@
     </div>
   </section>
 
+  <div class="ma-vertical"></div>
   <div class="ma-breath"></div>
 
   <!-- Journey Section -->
@@ -1595,6 +1787,8 @@
     </div>
   </section>
 
+  <div class="ma-vertical"></div>
+
   <!-- CTA Section -->
   <section class="cta">
     <div class="cta-inner">
@@ -1706,7 +1900,7 @@
     const revealObserver = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-    document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+    document.querySelectorAll('.reveal, .ma-vertical, .philosophy-quote').forEach(function(el) { revealObserver.observe(el); });
 
     const voteCounter = document.getElementById('voteCounter');
     const targetVotes = 47832;

@@ -201,12 +201,34 @@ Special spacing components for intentional negative space:
   background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
   margin: var(--space-3xl) auto;
   max-width: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brush reveal animation - line draws in from center on scroll */
+.ma-vertical::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  transform: scaleX(0);
+  transform-origin: center;
+}
+
+.ma-vertical.visible::after {
+  animation: brush-reveal 1.5s var(--ease-out) forwards;
+}
+
+@keyframes brush-reveal {
+  to { transform: scaleX(1); }
 }
 
 .ma-breath {
   height: var(--space-3xl);
 }
 ```
+
+**Usage:** Place `.ma-vertical` between sections and observe with IntersectionObserver to add `.visible` class on scroll.
 
 ---
 
@@ -225,6 +247,68 @@ Shadows are minimal and ink-like to maintain the contemplative aesthetic:
 - **Prefer subtle elevation** — shadows should be barely perceptible
 - **Use borders primarily** — 1px borders with low opacity maintain airiness
 - **Reserve shadow-md for hover** — creates gentle lift effect
+
+---
+
+## Texture & Atmosphere
+
+### Paper Texture Overlay
+
+A subtle washi paper grain effect applied globally via SVG noise filter:
+
+```css
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.dark body::before {
+  opacity: 0.015;  /* Subtler in dark mode */
+}
+```
+
+### Ink Brush Decoration
+
+Decorative ink brush strokes as fixed overlays, creating atmosphere without interfering with content:
+
+```css
+.ink-decoration {
+  position: fixed;
+  right: 0;
+  top: 10%;
+  height: 80vh;
+  width: auto;
+  max-width: 500px;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dark .ink-decoration {
+  opacity: 0.08;
+}
+
+@media (max-width: 1024px) {
+  .ink-decoration {
+    display: none;  /* Hide on mobile for performance */
+  }
+}
+```
+
+**SVG Structure:**
+```html
+<svg class="ink-decoration" viewBox="0 0 400 800" fill="none" aria-hidden="true">
+  <path d="M200 0 Q 250 200 180 400 Q 120 600 220 800"
+        stroke="currentColor" stroke-width="80" stroke-linecap="round"/>
+  <circle cx="200" cy="150" r="60" fill="currentColor" opacity="0.3"/>
+  <circle cx="180" cy="450" r="40" fill="currentColor" opacity="0.2"/>
+</svg>
+```
 
 ---
 
@@ -289,6 +373,135 @@ Words reveal with staggered delays:
 }
 ```
 
+### Ink Drawing Animation
+
+SVG stroke animation for calligraphic brush effects:
+
+```css
+.ink-stroke path {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: ink-draw 3s var(--ease-out) 0.5s forwards;
+}
+
+.ink-stroke circle {
+  opacity: 0;
+  animation: ink-splash 0.8s var(--ease-out) forwards;
+}
+
+/* Stagger circle reveals */
+.ink-stroke circle:nth-child(2) { animation-delay: 2s; }
+.ink-stroke circle:nth-child(3) { animation-delay: 2.5s; }
+
+@keyframes ink-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes ink-splash {
+  0% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.3; transform: scale(1); }
+}
+```
+
+### Brush Reveal Animation
+
+Horizontal line reveals like a calligraphy stroke:
+
+```css
+.brush-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.brush-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  transform: scaleX(0);
+  transform-origin: center;
+}
+
+.brush-line.visible::after {
+  animation: brush-reveal 1.5s var(--ease-out) forwards;
+}
+
+@keyframes brush-reveal {
+  to { transform: scaleX(1); }
+}
+```
+
+### Quote Marks Animation
+
+Decorative quote marks that fade in after content:
+
+```css
+.animated-quote::before,
+.animated-quote::after {
+  display: inline-block;
+  color: var(--accent);
+  opacity: 0;
+}
+
+.animated-quote::before { content: '"'; }
+.animated-quote::after { content: '"'; }
+
+.animated-quote.visible::before,
+.animated-quote.visible::after {
+  animation: quote-fade 0.8s var(--ease-out) 0.4s forwards;
+}
+
+@keyframes quote-fade {
+  to { opacity: 1; }
+}
+```
+
+### Interactive Element Animation
+
+For buttons and interactive elements that need both entry animation AND hover/active states, use opacity-only animations to prevent transform conflicts:
+
+```css
+/* Problem: animation with forwards keeps transform applied, blocking hover */
+/* DON'T use fade-up with transform on interactive elements */
+
+/* Solution: opacity-only animation for interactive elements */
+@keyframes fade-up-opacity {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.interactive-reveal {
+  opacity: 0;
+  animation: fade-up-opacity 0.8s var(--ease-out) 0.6s forwards;
+  /* Transform is free for hover/active states */
+}
+
+.interactive-reveal:hover {
+  transform: translateY(-2px);
+}
+
+.interactive-reveal:active {
+  transform: translateY(0) scale(0.96);
+}
+```
+
+**When using `.reveal` class on buttons:**
+```css
+/* Override reveal transform for buttons to enable interactions */
+.button.reveal {
+  transform: none;  /* Remove initial translateY from .reveal */
+}
+
+.button.reveal.visible {
+  transform: none;
+  transition: opacity var(--duration-reveal) var(--ease-out),
+              background var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+```
+
 ### Reduced Motion
 
 ```css
@@ -321,6 +534,37 @@ Words reveal with staggered delays:
   background: rgba(250, 249, 247, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border);
+}
+```
+
+### Navigation Link with Calligraphic Underline
+
+Brush-stroke style underline using clip-path for organic edges:
+
+```css
+.nav-link {
+  position: relative;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-normal) var(--ease-out);
+  border-radius: 1px;
+  /* Brush stroke variation - irregular edges */
+  clip-path: polygon(0 40%, 5% 0, 95% 20%, 100% 60%, 98% 100%, 2% 80%);
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
 }
 ```
 
@@ -365,30 +609,54 @@ Cards placed like stones in a zen garden:
 .stone:nth-child(5) { grid-column: 7 / 11; margin-top: var(--space-xl); }
 ```
 
-### Vermilion Seal Mark
-
-A decorative hanko-style stamp in the hero:
-
+**Ink Splatter Hover Effect:**
 ```css
-.hero-seal {
-  position: absolute;
-  top: -40px;
-  left: -20px;
-  width: 60px;
-  height: 60px;
-  opacity: 0;
-  animation: seal-appear 0.6s var(--ease-out) 0.8s forwards;
+.stone {
+  position: relative;
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
 
-@keyframes seal-appear {
-  from {
-    opacity: 0;
-    transform: scale(0.8) rotate(-10deg);
-  }
-  to {
-    opacity: 0.15;
-    transform: scale(1) rotate(0deg);
-  }
+.stone:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Ink splatter decoration on hover */
+.stone::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+
+.stone:hover::after {
+  opacity: 0.15;
+  transform: scale(1);
+}
+```
+
+**Organic Rotation on Reveal:**
+```css
+/* Cards rotate slightly on scroll reveal for hand-placed aesthetic */
+.stone.reveal {
+  transform: translateY(24px) rotate(-0.5deg);
+}
+
+.stone.reveal:nth-child(odd) {
+  transform: translateY(24px) rotate(0.5deg);
+}
+
+.stone.reveal.visible {
+  transform: translateY(0) rotate(0deg);
 }
 ```
 
@@ -415,6 +683,8 @@ A decorative hanko-style stamp in the hero:
 
 ### CTA Button
 
+Complete button pattern with hover lift and active press states:
+
 ```css
 .cta-button {
   display: inline-flex;
@@ -430,10 +700,30 @@ A decorative hanko-style stamp in the hero:
               box-shadow var(--duration-fast) var(--ease-out);
 }
 
+/* Hover: lift effect */
 .cta-button:hover {
   background: var(--accent-soft);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(199, 62, 29, 0.25);
+}
+
+/* Active: press/shrink effect */
+.cta-button:active,
+.cta-button:active:hover {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 2px 8px rgba(199, 62, 29, 0.3);
+  transition-duration: 50ms;  /* Faster response on press */
+}
+
+/* Arrow icon animation on hover */
+.cta-button-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.cta-button:hover .cta-button-icon {
+  transform: translateX(4px);
 }
 ```
 
@@ -562,23 +852,47 @@ function setTheme(isDark) {
 
 ## Implementation Checklist
 
-### Landing Page
+### Core Patterns
 - [x] Rice paper warm background
-- [x] Floating navigation with backdrop blur
-- [x] Hero with staggered word reveal animation
-- [x] Vermilion seal mark decoration
-- [x] Vote counter with animated counting
-- [x] Philosophy section with blockquote
-- [x] Asymmetric stone card grid for journey phases
-- [x] Ma breathing space elements
-- [x] Insights section with sample card
-- [x] CTA section centered
+- [x] Paper texture overlay (washi grain)
 - [x] Dark/light theme toggle
-- [x] EN/PL language toggle
-- [x] Scroll reveal animations
+- [x] Golden ratio spacing system
 - [x] Reduced motion support
+
+### Navigation
+- [x] Floating navigation with backdrop blur
+- [x] Calligraphic underline on links
+- [x] Button hover lift + active shrink
+
+### Hero Section
+- [x] Staggered word reveal animation
+- [x] Fixed ink brush decoration (80vh overlay)
+- [x] Ink drawing SVG animation
+- [x] Opacity-only animation for CTA button
+
+### Content Sections
+- [x] Philosophy section with animated blockquote
+- [x] Quote marks fade-in animation
+- [x] Ma-vertical dividers with brush reveal
+- [x] Ma breathing space elements
+
+### Cards & Components
+- [x] Asymmetric stone card grid (zen garden)
+- [x] Ink splatter hover effect on cards
+- [x] Organic rotation on card reveal
+- [x] Insights section with sample card
+
+### Interactive Elements
+- [x] Button hover: lift (-2px) + shadow
+- [x] Button active: press (scale 0.96)
+- [x] Arrow icon slide on hover
+- [x] Scroll reveal animations
+
+### Internationalization
+- [x] EN/PL language toggle
+- [x] Polish diacritics support
 
 ---
 
 *Last updated: December 2024*
-*Design system version: 1.0.0 (Ink & Stone)*
+*Design system version: 1.1.0 (Ink & Stone)*
