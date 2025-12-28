@@ -124,3 +124,72 @@ model ABVariantConfig {
   @@unique([abVariantId, variantType])
   @@index([abVariantId])
 }
+
+// ============================================================================
+// User Authentication Models
+// ============================================================================
+
+/// User account - stores user credentials and profile information
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  password        String    // bcrypt hashed password
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerifyTokens   EmailVerifyToken[]
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+/// Refresh token - enables token refresh without re-login (7 day expiry)
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+/// Password reset token - enables secure password reset flow (1 hour expiry)
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+/// Email verification token - enables email verification flow (24 hour expiry)
+model EmailVerifyToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
