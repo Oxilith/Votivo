@@ -9,20 +9,19 @@
  * @dependencies
  * - @/config for prompt service URL configuration
  * - @/health/types for HealthCheck, ComponentHealth types
+ * - @/utils/fetch-with-timeout for HTTP requests with timeout
  */
 
 import { config } from '@/config/index.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import type { HealthCheck, ComponentHealth } from '../types.js';
 
 const HEALTH_CHECK_TIMEOUT_MS = 5000;
 
 async function checkPromptServiceHealth(): Promise<ComponentHealth> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => { controller.abort(); }, HEALTH_CHECK_TIMEOUT_MS);
-
   try {
-    const response = await fetch(`${config.promptServiceUrl}/health`, {
-      signal: controller.signal,
+    const response = await fetchWithTimeout(`${config.promptServiceUrl}/health`, {
+      timeoutMs: HEALTH_CHECK_TIMEOUT_MS,
     });
 
     if (response.ok) {
@@ -48,8 +47,6 @@ async function checkPromptServiceHealth(): Promise<ComponentHealth> {
       status: 'unhealthy',
       message,
     };
-  } finally {
-    clearTimeout(timeoutId);
   }
 }
 

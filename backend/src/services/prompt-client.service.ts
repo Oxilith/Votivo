@@ -22,6 +22,7 @@ import type CircuitBreaker from 'opossum';
 import { config } from '@/config/index.js';
 import { logger } from '@/utils/logger.js';
 import { createClientError } from '@/utils/error-sanitizer.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { createCircuitBreaker } from '@/services/circuit-breaker.service.js';
 import { promptCacheService } from '@/services/prompt-cache.service.js';
 import type { PromptConfig } from 'shared/index.js';
@@ -170,15 +171,12 @@ export class PromptClientService {
    * This is wrapped by the circuit breaker
    */
   private async resolveInternal(key: string, thinkingEnabled: boolean): Promise<ResolvePromptResponse> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
-
     try {
-      const response = await fetch(`${this.baseUrl}/api/resolve`, {
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, thinkingEnabled }),
-        signal: controller.signal,
+        timeoutMs: REQUEST_TIMEOUT_MS,
       });
 
       if (!response.ok) {
@@ -207,8 +205,6 @@ export class PromptClientService {
       }
 
       throw error;
-    } finally {
-      clearTimeout(timeoutId);
     }
   }
 
@@ -362,23 +358,16 @@ export class PromptClientService {
    * This is wrapped by the circuit breaker
    */
   private async recordConversionInternal(variantId: string): Promise<undefined> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
+    const response = await fetchWithTimeout(`${this.baseUrl}/api/resolve/${variantId}/conversion`, {
+      method: 'POST',
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    });
 
-    try {
-      const response = await fetch(`${this.baseUrl}/api/resolve/${variantId}/conversion`, {
-        method: 'POST',
-        signal: controller.signal,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      logger.debug({ variantId }, 'A/B test conversion recorded');
-      return undefined;
-    } finally {
-      clearTimeout(timeoutId);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
+    logger.debug({ variantId }, 'A/B test conversion recorded');
+    return undefined;
   }
 
   /**
@@ -403,18 +392,11 @@ export class PromptClientService {
    * This is wrapped by the circuit breaker
    */
   private async healthCheckInternal(): Promise<boolean> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
+    const response = await fetchWithTimeout(`${this.baseUrl}/health`, {
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    });
 
-    try {
-      const response = await fetch(`${this.baseUrl}/health`, {
-        signal: controller.signal,
-      });
-
-      return response.ok;
-    } finally {
-      clearTimeout(timeoutId);
-    }
+    return response.ok;
   }
 
   /**
