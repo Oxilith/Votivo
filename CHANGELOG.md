@@ -1,3 +1,8 @@
+## [1.0.2] - 2025-12-28
+
+### Fixed
+- Removed hardcoded fallback cookie signing secret that could be exploited if environment variables are not properly configured. The application now requires explicit configuration of SESSION_SECRET or ADMIN_API_KEY for secure session management.
+
 ## [1.0.1] - 2025-12-28
 
 ### Added

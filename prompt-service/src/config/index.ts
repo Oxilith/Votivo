@@ -83,6 +83,14 @@ function loadConfig(): Config {
     );
   }
 
+  // Require at least one cookie signing secret in development mode
+  if (!isProduction && !sessionSecretRaw && !adminApiKeyRaw) {
+    throw new Error(
+      'Cookie signing secret is required. Set either SESSION_SECRET (recommended, min 32 characters) or ADMIN_API_KEY in your environment.\n' +
+        'Example: SESSION_SECRET=your-secure-random-string-at-least-32-chars'
+    );
+  }
+
   // Warn in development if DATABASE_KEY is not set (database will be unencrypted)
   if (!isProduction && !process.env['DATABASE_KEY']) {
     console.warn(

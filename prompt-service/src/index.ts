@@ -101,7 +101,12 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Cookie parsing with signing secret for secure session cookies
-const cookieSecret = config.sessionSecret ?? config.adminApiKey ?? 'dev-secret-key';
+// Config validation ensures either SESSION_SECRET or ADMIN_API_KEY is set
+// Defensive runtime check as a safety net for the type assertion
+if (!config.sessionSecret) {
+  throw new Error('FATAL: Cookie signing secret is not configured. This should not happen if config validation passed.');
+}
+const cookieSecret = config.sessionSecret;
 app.use(cookieParser(cookieSecret));
 
 // Health check endpoint with database connectivity verification

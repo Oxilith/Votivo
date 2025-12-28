@@ -39,7 +39,7 @@ This guide covers security considerations and configuration requirements for dep
 | `CORS_ORIGINS` | Yes | - | Comma-separated allowed origins |
 | `LOG_LEVEL` | No | info | Pino log level (fatal, error, warn, info, debug, trace) |
 
-**Important:** `SESSION_SECRET` must differ from `ADMIN_API_KEY` in production for security. In development, `SESSION_SECRET` falls back to `ADMIN_API_KEY` with a warning.
+**Important:** `SESSION_SECRET` must differ from `ADMIN_API_KEY` in production for security. In development, at least one of `SESSION_SECRET` or `ADMIN_API_KEY` must be set—the service will fail to start with a clear error message if neither is configured. When only `ADMIN_API_KEY` is set, it's used as the session secret and a warning is logged.
 
 ## Docker Compose Configuration
 
