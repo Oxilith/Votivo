@@ -22,6 +22,7 @@ import type CircuitBreaker from 'opossum';
 import { config } from '@/config/index.js';
 import { logger } from '@/utils/logger.js';
 import { createClientError } from '@/utils/error-sanitizer.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { createCircuitBreaker } from '@/services/circuit-breaker.service.js';
 import { promptCacheService } from '@/services/prompt-cache.service.js';
 import type { PromptConfig } from 'shared/index.js';
@@ -170,15 +171,12 @@ export class PromptClientService {
    * This is wrapped by the circuit breaker
    */
   private async resolveInternal(key: string, thinkingEnabled: boolean): Promise<ResolvePromptResponse> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, REQUEST_TIMEOUT_MS);
-
     try {
-      const response = await fetch(`${this.baseUrl}/api/resolve`, {
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, thinkingEnabled }),
-        signal: controller.signal,
+        timeoutMs: REQUEST_TIMEOUT_MS,
       });
 
       if (!response.ok) {
@@ -207,8 +205,6 @@ export class PromptClientService {
       }
 
       throw error;
-    } finally {
-      clearTimeout(timeoutId);
     }
   }
 
