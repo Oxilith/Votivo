@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votive | Every Action Is a Vote</title>
+  <meta name="description" content="Discover who you are before designing who you want to become. AI-powered self-discovery for sustainable identity change.">
+
+  <!-- Fonts with Polish character support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Prevent flash of unstyled content -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('votive-theme-luxury');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+      const lang = localStorage.getItem('votive-lang-luxury') || 'en';
+      document.documentElement.lang = lang;
+    })();
+  </script>
+
+  <style>
+    /* ========================================
+       CSS RESET
+       ======================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    img, picture, video, canvas, svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ul, ol {
+      list-style: none;
+    }
+
+    /* ========================================
+       CSS CUSTOM PROPERTIES
+       ======================================== */
+    :root {
+      /* Light Theme - Soft Cream */
+      --color-cream: #FDFCFA;
+      --color-cream-dark: #F5F3EF;
+      --color-white: #FFFFFF;
+      --color-black: #1A1A1A;
+      --color-gray: #5C5C5C;
+      --color-muted: #8A8A8A;
+      --color-gold: #C9A227;
+      --color-gold-dark: #8B6914;
+      --color-emerald: #50C878;
+
+      /* Typography */
+      --font-serif: 'Fraunces', Georgia, serif;
+      --font-sans: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      /* Theme-aware semantic colors */
+      --bg-primary: var(--color-cream);
+      --bg-secondary: var(--color-cream-dark);
+      --bg-surface: var(--color-white);
+      --text-primary: var(--color-black);
+      --text-secondary: var(--color-gray);
+      --text-muted: var(--color-muted);
+      --accent: var(--color-gold);
+      --accent-dark: var(--color-gold-dark);
+      --accent-secondary: var(--color-emerald);
+      --border: rgba(26, 26, 26, 0.08);
+
+      /* Gradients */
+      --gradient-gold: linear-gradient(135deg, #C9A227 0%, #A08520 100%);
+      --gradient-text: linear-gradient(135deg, #1A1A1A 20%, #C9A227 80%);
+      --gradient-bg: linear-gradient(180deg, #FDFCFA 0%, #F5F3EF 100%);
+      --gradient-spotlight: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201, 162, 39, 0.06) 0%, transparent 60%);
+
+      /* Animation */
+      --ease-luxury: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      --duration-fast: 300ms;
+      --duration-normal: 500ms;
+      --duration-slow: 800ms;
+      --duration-reveal: 1000ms;
+
+      /* Spacing */
+      --space-xs: 0.5rem;
+      --space-sm: 1rem;
+      --space-md: 1.5rem;
+      --space-lg: 2rem;
+      --space-xl: 3rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+      --space-4xl: 8rem;
+      --space-5xl: 12rem;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(26, 26, 26, 0.04);
+      --shadow-md: 0 4px 12px rgba(26, 26, 26, 0.06);
+      --shadow-lg: 0 12px 32px rgba(26, 26, 26, 0.08);
+      --shadow-glow: 0 0 40px rgba(201, 162, 39, 0.15);
+    }
+
+    .dark {
+      /* Dark Theme - Deep Forest Green */
+      --color-forest-deep: #0A1612;
+      --color-forest-elevated: #0F1F1A;
+      --color-white-soft: #F5F5F3;
+      --color-stone: #9A9A96;
+      --color-muted-dark: #666663;
+      --color-gold-soft: #D4AF37;
+      --color-gold-muted: #AA8C2C;
+      --color-emerald-soft: #50C878;
+
+      --bg-primary: var(--color-forest-deep);
+      --bg-secondary: var(--color-forest-elevated);
+      --bg-surface: #142822;
+      --text-primary: var(--color-white-soft);
+      --text-secondary: var(--color-stone);
+      --text-muted: var(--color-muted-dark);
+      --accent: var(--color-gold-soft);
+      --accent-dark: var(--color-gold-muted);
+      --accent-secondary: var(--color-emerald-soft);
+      --border: rgba(245, 245, 243, 0.08);
+
+      --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #AA8C2C 100%);
+      --gradient-text: linear-gradient(135deg, #F5F5F3 20%, #D4AF37 80%);
+      --gradient-bg: linear-gradient(180deg, #0A1612 0%, #0F1F1A 100%);
+      --gradient-spotlight: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(80, 200, 120, 0.08) 0%, transparent 60%);
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+      --shadow-glow: 0 0 60px rgba(80, 200, 120, 0.15);
+    }
+
+    /* ========================================
+       BASE STYLES
+       ======================================== */
+    body {
+      font-family: var(--font-sans);
+      background: var(--gradient-bg);
+      color: var(--text-primary);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    /* ========================================
+       LAYOUT
+       ======================================== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+    }
+
+    .container-narrow {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+    }
+
+    /* ========================================
+       NAVIGATION
+       ======================================== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(253, 252, 250, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--duration-normal) var(--ease-smooth);
+    }
+
+    .dark .nav {
+      background: rgba(10, 22, 18, 0.85);
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md) var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xl);
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+
+    .nav-link {
+      position: relative;
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width var(--duration-normal) var(--ease-luxury);
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      display: none;
+      padding: var(--space-xs) var(--space-md);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      transition: all var(--duration-normal) var(--ease-smooth);
+    }
+
+    @media (min-width: 768px) {
+      .nav-cta {
+        display: block;
+      }
+    }
+
+    .nav-cta:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .lang-toggle button {
+      padding: 0.25rem 0.5rem;
+      color: var(--text-muted);
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+
+    .lang-toggle button:hover,
+    .lang-toggle button.active {
+      color: var(--text-primary);
+    }
+
+    .lang-toggle .separator {
+      color: var(--border);
+    }
+
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+
+    .theme-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .theme-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .theme-icon-sun,
+    .theme-icon-moon {
+      display: none;
+    }
+
+    :root:not(.dark) .theme-icon-moon {
+      display: block;
+    }
+
+    .dark .theme-icon-sun {
+      display: block;
+    }
+
+    /* ========================================
+       HERO SECTION
+       ======================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--space-5xl) var(--space-lg);
+      background: var(--gradient-spotlight), var(--gradient-bg);
+    }
+
+    .hero-content {
+      max-width: 900px;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-serif);
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero-tagline-highlight {
+      background: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-style: italic;
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 550px;
+      margin: 0 auto var(--space-2xl);
+      line-height: 1.8;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: var(--gradient-gold);
+      color: white;
+      padding: var(--space-md) var(--space-xl);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: transform var(--duration-normal) var(--ease-luxury), box-shadow var(--duration-normal) var(--ease-luxury);
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .hero-cta-icon {
+      width: 18px;
+      height: 18px;
+      transition: transform var(--duration-normal) var(--ease-luxury);
+    }
+
+    .hero-cta:hover .hero-cta-icon {
+      transform: translateX(4px);
+    }
+
+    .hero-votes {
+      margin-top: var(--space-4xl);
+    }
+
+    .hero-votes-count {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      color: var(--accent);
+      margin-bottom: var(--space-xs);
+    }
+
+    .hero-votes-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ========================================
+       PHILOSOPHY SECTION
+       ======================================== */
+    .philosophy {
+      padding: var(--space-5xl) var(--space-lg);
+      background: var(--bg-secondary);
+    }
+
+    .philosophy-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .philosophy-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-md);
+    }
+
+    .philosophy-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .philosophy-text {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      line-height: 1.9;
+      margin-bottom: var(--space-3xl);
+    }
+
+    .philosophy-text p + p {
+      margin-top: var(--space-lg);
+    }
+
+    .philosophy-quote {
+      position: relative;
+      padding: var(--space-2xl) 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .philosophy-quote::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: var(--gradient-gold);
+    }
+
+    .philosophy-quote blockquote {
+      font-family: var(--font-serif);
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--text-primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .philosophy-quote cite {
+      font-family: var(--font-sans);
+      font-style: normal;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* ========================================
+       JOURNEY SECTION
+       ======================================== */
+    .journey {
+      padding: var(--space-5xl) var(--space-lg);
+    }
+
+    .journey-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto var(--space-3xl);
+    }
+
+    .journey-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-md);
+    }
+
+    .journey-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+
+    .journey-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .journey-grid {
+      display: grid;
+      gap: var(--space-lg);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 640px) {
+      .journey-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .journey-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .phase-card {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: var(--space-xl);
+      transition: transform var(--duration-slow) var(--ease-luxury), box-shadow var(--duration-slow) var(--ease-luxury);
+    }
+
+    .phase-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .phase-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .phase-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .phase-card.coming-soon {
+      opacity: 0.6;
+    }
+
+    .phase-card.coming-soon:hover {
+      opacity: 0.75;
+    }
+
+    .phase-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .phase-number {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .phase-card.coming-soon .phase-number {
+      color: var(--text-muted);
+    }
+
+    .phase-soon-badge {
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .phase-name {
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .phase-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: var(--space-sm);
+    }
+
+    .phase-description {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+    }
+
+    .phase-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .phase-feature {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 0.25rem 0.75rem;
+      background: var(--bg-secondary);
+      border-radius: 2px;
+    }
+
+    /* ========================================
+       INSIGHTS SECTION
+       ======================================== */
+    .insights {
+      padding: var(--space-5xl) var(--space-lg);
+      background: var(--bg-secondary);
+    }
+
+    .insights-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto var(--space-3xl);
+    }
+
+    .insights-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-md);
+    }
+
+    .insights-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+
+    .insights-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .insights-card {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .insights-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: var(--space-2xl);
+      right: var(--space-2xl);
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .insights-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .insights-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights-card-label {
+      font-size: 0.6875rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .insights-card-category {
+      font-size: 0.6875rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 0.25rem 0.75rem;
+      border: 1px solid var(--accent);
+    }
+
+    .insights-card-quote {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-style: italic;
+      line-height: 1.7;
+      color: var(--text-primary);
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights-card-quote .highlight {
+      color: var(--accent);
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    .insights-card-analysis {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--border);
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights-card-footer {
+      font-size: 0.6875rem;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* ========================================
+       CTA SECTION
+       ======================================== */
+    .cta {
+      padding: var(--space-5xl) var(--space-lg);
+      background: var(--gradient-spotlight), var(--gradient-bg);
+    }
+
+    .cta-content {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+
+    .cta-subtitle {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-2xl);
+      line-height: 1.8;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: var(--gradient-gold);
+      color: white;
+      padding: var(--space-md) var(--space-2xl);
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: var(--space-xl);
+      transition: transform var(--duration-normal) var(--ease-luxury), box-shadow var(--duration-normal) var(--ease-luxury);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .cta-button-icon {
+      width: 18px;
+      height: 18px;
+      transition: transform var(--duration-normal) var(--ease-luxury);
+    }
+
+    .cta-button:hover .cta-button-icon {
+      transform: translateX(4px);
+    }
+
+    .cta-meta {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .cta-meta span {
+      display: block;
+    }
+
+    /* ========================================
+       FOOTER
+       ======================================== */
+    .footer {
+      padding: var(--space-xl) var(--space-lg);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      .footer-content {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
+
+    .footer-brand {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      font-weight: 500;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      transition: color var(--duration-fast) var(--ease-smooth);
+    }
+
+    .footer-link:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-link-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .footer-meta {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* ========================================
+       ANIMATIONS
+       ======================================== */
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fade-scale {
+      from {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity var(--duration-reveal) var(--ease-luxury), transform var(--duration-reveal) var(--ease-luxury);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .animate-fade-up {
+      animation: fade-up var(--duration-reveal) var(--ease-luxury) forwards;
+    }
+
+    .animate-fade-in {
+      animation: fade-in var(--duration-slow) var(--ease-luxury) forwards;
+    }
+
+    .animate-fade-scale {
+      animation: fade-scale var(--duration-reveal) var(--ease-luxury) forwards;
+    }
+
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; }
+    .delay-500 { animation-delay: 500ms; }
+    .delay-600 { animation-delay: 600ms; }
+    .delay-700 { animation-delay: 700ms; }
+    .delay-800 { animation-delay: 800ms; }
+
+    /* ========================================
+       ACCESSIBILITY
+       ======================================== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand" data-i18n="nav.brand">Votive</a>
+
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="#philosophy" class="nav-link" data-i18n="nav.philosophy">Philosophy</a>
+          <a href="#journey" class="nav-link" data-i18n="nav.journey">The Journey</a>
+          <a href="#insights" class="nav-link" data-i18n="nav.insights">AI Insights</a>
+        </div>
+
+        <button class="nav-cta" data-i18n="nav.beginDiscovery">Begin Discovery</button>
+
+        <div class="nav-controls">
+          <div class="lang-toggle">
+            <button data-lang="en" class="active">EN</button>
+            <span class="separator">|</span>
+            <button data-lang="pl">PL</button>
+          </div>
+
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+            <svg class="theme-icon theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg class="theme-icon theme-icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-tagline animate-fade-up delay-100" style="opacity: 0;">
+        <span data-i18n="hero.tagline1">Every action is</span><br>
+        <span data-i18n="hero.tagline2Prefix">a</span> <span class="hero-tagline-highlight" data-i18n="hero.tagline2Highlight">vote for who</span><br>
+        <span data-i18n="hero.tagline3">you're becoming.</span>
+      </h1>
+
+      <p class="hero-subtitle animate-fade-up delay-300" style="opacity: 0;" data-i18n="hero.subtitle">
+        Most habit apps fail because they skip the foundation: understanding who you already are. Votive guides you through AI-powered self-discovery before goal-setting.
+      </p>
+
+      <button class="hero-cta animate-fade-up delay-400" style="opacity: 0;">
+        <span data-i18n="hero.cta">Start Your Discovery</span>
+        <svg class="hero-cta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </button>
+
+      <div class="hero-votes animate-fade-in delay-600" style="opacity: 0;">
+        <p class="hero-votes-count" id="voteCounter">0</p>
+        <p class="hero-votes-label" data-i18n="hero.votesLabel">votes cast toward better selves</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Philosophy Section -->
+  <section class="philosophy" id="philosophy">
+    <div class="philosophy-inner">
+      <p class="philosophy-label reveal" data-i18n="philosophy.label">The Problem</p>
+      <h2 class="philosophy-title reveal" data-i18n="philosophy.title">Goals fail when they skip the self</h2>
+
+      <div class="philosophy-text reveal">
+        <p data-i18n="philosophy.p1">You've tried habit trackers. Morning routines. The 21-day challenges. They work for a while, then dissolve. Not because you lack discipline, but because you started in the wrong place.</p>
+        <p data-i18n="philosophy.p2">Real change doesn't begin with goals. It begins with understanding who you already are: your energy patterns, your hidden motivations, the unconscious behaviors that shape your days.</p>
+      </div>
+
+      <div class="philosophy-quote reveal">
+        <blockquote data-i18n="philosophy.quote">
+          "The curious paradox is that when I accept myself just as I am, then I can change."
+        </blockquote>
+        <cite>— <span data-i18n="philosophy.quoteAuthor">Carl Rogers</span></cite>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey Section -->
+  <section class="journey" id="journey">
+    <div class="container">
+      <div class="journey-header">
+        <p class="journey-label reveal" data-i18n="journey.label">The Journey</p>
+        <h2 class="journey-title reveal" data-i18n="journey.title">Five phases of transformation</h2>
+        <p class="journey-subtitle reveal" data-i18n="journey.subtitle">Votive guides you through a deliberate progression: from understanding who you are to becoming who you aspire to be.</p>
+      </div>
+
+      <div class="journey-grid">
+        <!-- Phase 1 -->
+        <div class="phase-card reveal">
+          <div class="phase-card-header">
+            <span class="phase-number">01</span>
+          </div>
+          <p class="phase-name" data-i18n="journey.phases.1.name">State Awareness</p>
+          <h3 class="phase-title" data-i18n="journey.phases.1.title">Know Your Rhythms</h3>
+          <p class="phase-description" data-i18n="journey.phases.1.description">Map your energy cycles, mood triggers, and willpower patterns. Discover what drains you and what restores you.</p>
+          <div class="phase-features">
+            <span class="phase-feature" data-i18n="journey.phases.1.features.0">Peak energy times</span>
+            <span class="phase-feature" data-i18n="journey.phases.1.features.1">Emotional triggers</span>
+            <span class="phase-feature" data-i18n="journey.phases.1.features.2">Willpower patterns</span>
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="phase-card reveal">
+          <div class="phase-card-header">
+            <span class="phase-number">02</span>
+          </div>
+          <p class="phase-name" data-i18n="journey.phases.2.name">Identity Mapping</p>
+          <h3 class="phase-title" data-i18n="journey.phases.2.title">See Yourself Clearly</h3>
+          <p class="phase-description" data-i18n="journey.phases.2.description">Examine your current identity, automatic behaviors, and keystone habits. Surface your core values and natural strengths.</p>
+          <div class="phase-features">
+            <span class="phase-feature" data-i18n="journey.phases.2.features.0">Self-perception gaps</span>
+            <span class="phase-feature" data-i18n="journey.phases.2.features.1">Core values alignment</span>
+            <span class="phase-feature" data-i18n="journey.phases.2.features.2">Keystone behaviors</span>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="phase-card coming-soon reveal">
+          <div class="phase-card-header">
+            <span class="phase-number">03</span>
+            <span class="phase-soon-badge" data-i18n="journey.comingSoon">Coming Soon</span>
+          </div>
+          <p class="phase-name" data-i18n="journey.phases.3.name">Identity Design</p>
+          <h3 class="phase-title" data-i18n="journey.phases.3.title">Envision Your Future Self</h3>
+          <p class="phase-description" data-i18n="journey.phases.3.description">Define your aspirational identity and create believable stepping-stones to bridge the gap.</p>
+          <div class="phase-features">
+            <span class="phase-feature" data-i18n="journey.phases.3.features.0">Aspirational identity</span>
+            <span class="phase-feature" data-i18n="journey.phases.3.features.1">Identity bridges</span>
+            <span class="phase-feature" data-i18n="journey.phases.3.features.2">Behavior mapping</span>
+          </div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="phase-card coming-soon reveal">
+          <div class="phase-card-header">
+            <span class="phase-number">04</span>
+            <span class="phase-soon-badge" data-i18n="journey.comingSoon">Coming Soon</span>
+          </div>
+          <p class="phase-name" data-i18n="journey.phases.4.name">System Design</p>
+          <h3 class="phase-title" data-i18n="journey.phases.4.title">Build Your Architecture</h3>
+          <p class="phase-description" data-i18n="journey.phases.4.description">Design habit loops, optimize your environment, and create accountability structures.</p>
+          <div class="phase-features">
+            <span class="phase-feature" data-i18n="journey.phases.4.features.0">Habit architecture</span>
+            <span class="phase-feature" data-i18n="journey.phases.4.features.1">Environment design</span>
+            <span class="phase-feature" data-i18n="journey.phases.4.features.2">Accountability</span>
+          </div>
+        </div>
+
+        <!-- Phase 5 -->
+        <div class="phase-card coming-soon reveal">
+          <div class="phase-card-header">
+            <span class="phase-number">05</span>
+            <span class="phase-soon-badge" data-i18n="journey.comingSoon">Coming Soon</span>
+          </div>
+          <p class="phase-name" data-i18n="journey.phases.5.name">Integration</p>
+          <h3 class="phase-title" data-i18n="journey.phases.5.title">Embody the Change</h3>
+          <p class="phase-description" data-i18n="journey.phases.5.description">Track progress, collect behavioral evidence, and reinforce your evolving identity.</p>
+          <div class="phase-features">
+            <span class="phase-feature" data-i18n="journey.phases.5.features.0">Progress tracking</span>
+            <span class="phase-feature" data-i18n="journey.phases.5.features.1">Identity reinforcement</span>
+            <span class="phase-feature" data-i18n="journey.phases.5.features.2">Evidence collection</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Insights Section -->
+  <section class="insights" id="insights">
+    <div class="container">
+      <div class="insights-header">
+        <p class="insights-label reveal" data-i18n="insights.label">AI Insights</p>
+        <h2 class="insights-title reveal" data-i18n="insights.title">Intelligence that understands you</h2>
+        <p class="insights-subtitle reveal" data-i18n="insights.subtitle">Claude analyzes your responses to find patterns, contradictions, and leverage points that rule-based systems would miss.</p>
+      </div>
+
+      <div class="insights-card reveal">
+        <div class="insights-card-header">
+          <span class="insights-card-label" data-i18n="insights.sampleCard.label">Sample Insight</span>
+          <span class="insights-card-category" data-i18n="insights.sampleCard.category">Identity Synthesis</span>
+        </div>
+        <p class="insights-card-quote">
+          "<span data-i18n-html="insights.sampleCard.quote">You describe yourself as <span class="highlight">disciplined</span>, yet your energy crashes and mood triggers suggest you're running on <span class="highlight">willpower alone</span>, a finite resource. Your keystone behavior of morning exercise could be the anchor that replenishes rather than depletes, if you shift from forcing performance to honoring rhythm.</span>"
+        </p>
+        <p class="insights-card-analysis" data-i18n="insights.sampleCard.analysis">
+          This isn't hypocrisy, it's a gap between your aspirational and actual identity. Understanding this tension is the first step to bridging it.
+        </p>
+        <p class="insights-card-footer" data-i18n="insights.sampleCard.poweredBy">Powered by Claude AI</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="cta-content">
+      <h2 class="cta-title reveal" data-i18n="cta.title">Ready to understand yourself?</h2>
+      <p class="cta-subtitle reveal" data-i18n="cta.subtitle">The assessment takes about 15 minutes. No accounts, no tracking, just honest reflection.</p>
+      <button class="cta-button reveal">
+        <span data-i18n="cta.button">Begin Your Discovery</span>
+        <svg class="cta-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </button>
+      <div class="cta-meta reveal">
+        <span data-i18n="cta.timeEstimate">~15 minutes of honest reflection</span>
+        <span data-i18n="cta.openSource">Free to use · No account required · Open source</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <span class="footer-brand" data-i18n="footer.brand">Votive</span>
+
+      <div class="footer-links">
+        <a href="https://github.com" class="footer-link" target="_blank" rel="noopener noreferrer">
+          <svg class="footer-link-icon" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          <span data-i18n="footer.github">GitHub</span>
+        </a>
+        <span data-i18n="footer.license">MIT License</span>
+      </div>
+
+      <span class="footer-meta" data-i18n="footer.author">by Konrad Jagusiak</span>
+    </div>
+  </footer>
+
+  <script>
+    // ========================================
+    // TRANSLATIONS
+    // ========================================
+    const translations = {
+      en: {
+        nav: {
+          brand: "Votive",
+          philosophy: "Philosophy",
+          journey: "The Journey",
+          insights: "AI Insights",
+          beginDiscovery: "Begin Discovery"
+        },
+        hero: {
+          tagline1: "Every action is",
+          tagline2Prefix: "a",
+          tagline2Highlight: "vote for who",
+          tagline3: "you're becoming.",
+          subtitle: "Most habit apps fail because they skip the foundation: understanding who you already are. Votive guides you through AI-powered self-discovery before goal-setting.",
+          cta: "Start Your Discovery",
+          votesLabel: "votes cast toward better selves"
+        },
+        philosophy: {
+          label: "The Problem",
+          title: "Goals fail when they skip the self",
+          p1: "You've tried habit trackers. Morning routines. The 21-day challenges. They work for a while, then dissolve. Not because you lack discipline, but because you started in the wrong place.",
+          p2: "Real change doesn't begin with goals. It begins with understanding who you already are: your energy patterns, your hidden motivations, the unconscious behaviors that shape your days.",
+          quote: "\"The curious paradox is that when I accept myself just as I am, then I can change.\"",
+          quoteAuthor: "Carl Rogers"
+        },
+        journey: {
+          label: "The Journey",
+          title: "Five phases of transformation",
+          subtitle: "Votive guides you through a deliberate progression: from understanding who you are to becoming who you aspire to be.",
+          comingSoon: "Coming Soon",
+          phases: {
+            1: { name: "State Awareness", title: "Know Your Rhythms", description: "Map your energy cycles, mood triggers, and willpower patterns. Discover what drains you and what restores you.", features: ["Peak energy times", "Emotional triggers", "Willpower patterns"] },
+            2: { name: "Identity Mapping", title: "See Yourself Clearly", description: "Examine your current identity, automatic behaviors, and keystone habits. Surface your core values and natural strengths.", features: ["Self-perception gaps", "Core values alignment", "Keystone behaviors"] },
+            3: { name: "Identity Design", title: "Envision Your Future Self", description: "Define your aspirational identity and create believable stepping-stones to bridge the gap.", features: ["Aspirational identity", "Identity bridges", "Behavior mapping"] },
+            4: { name: "System Design", title: "Build Your Architecture", description: "Design habit loops, optimize your environment, and create accountability structures.", features: ["Habit architecture", "Environment design", "Accountability"] },
+            5: { name: "Integration", title: "Embody the Change", description: "Track progress, collect behavioral evidence, and reinforce your evolving identity.", features: ["Progress tracking", "Identity reinforcement", "Evidence collection"] }
+          }
+        },
+        insights: {
+          label: "AI Insights",
+          title: "Intelligence that understands you",
+          subtitle: "Claude analyzes your responses to find patterns, contradictions, and leverage points that rule-based systems would miss.",
+          sampleCard: {
+            label: "Sample Insight",
+            category: "Identity Synthesis",
+            quote: "You describe yourself as <span class=\"highlight\">disciplined</span>, yet your energy crashes and mood triggers suggest you're running on <span class=\"highlight\">willpower alone</span>, a finite resource. Your keystone behavior of morning exercise could be the anchor that replenishes rather than depletes, if you shift from forcing performance to honoring rhythm.",
+            analysis: "This isn't hypocrisy, it's a gap between your aspirational and actual identity. Understanding this tension is the first step to bridging it.",
+            poweredBy: "Powered by Claude AI"
+          }
+        },
+        cta: {
+          title: "Ready to understand yourself?",
+          subtitle: "The assessment takes about 15 minutes. No accounts, no tracking, just honest reflection.",
+          button: "Begin Your Discovery",
+          timeEstimate: "~15 minutes of honest reflection",
+          openSource: "Free to use · No account required · Open source"
+        },
+        footer: { brand: "Votive", github: "GitHub", license: "MIT License", author: "by Konrad Jagusiak" }
+      },
+      pl: {
+        nav: {
+          brand: "Votive",
+          philosophy: "Filozofia",
+          journey: "Podróż",
+          insights: "Analizy AI",
+          beginDiscovery: "Rozpocznij odkrywanie"
+        },
+        hero: {
+          tagline1: "Każde działanie to",
+          tagline2Prefix: "",
+          tagline2Highlight: "głos za tym, kim",
+          tagline3: "się stajesz.",
+          subtitle: "Większość aplikacji do nawyków zawodzi, bo pomija fundament: zrozumienie kim już jesteś. Votive prowadzi Cię przez samopoznanie wspierane AI, zanim przejdziesz do celów.",
+          cta: "Rozpocznij odkrywanie",
+          votesLabel: "głosów oddanych ku lepszym wersjom siebie"
+        },
+        philosophy: {
+          label: "Problem",
+          title: "Cele zawodzą gdy pomijają jaźń",
+          p1: "Próbowałeś aplikacji do nawyków. Porannych rutyn. 21-dniowych wyzwań. Działają przez chwilę, potem się rozpadają. Nie dlatego, że brakuje Ci dyscypliny, ale dlatego, że zacząłeś w złym miejscu.",
+          p2: "Prawdziwa zmiana nie zaczyna się od celów. Zaczyna się od zrozumienia kim już jesteś: Twoich wzorców energii, ukrytych motywacji, nieświadomych zachowań kształtujących Twoje dni.",
+          quote: "\"Ciekawym paradoksem jest to, że kiedy akceptuję siebie takim, jakim jestem, wtedy mogę się zmienić.\"",
+          quoteAuthor: "Carl Rogers"
+        },
+        journey: {
+          label: "Podróż",
+          title: "Pięć faz transformacji",
+          subtitle: "Votive prowadzi Cię przez świadomą progresję: od zrozumienia kim jesteś do stawania się tym, kim chcesz być.",
+          comingSoon: "Wkrótce",
+          phases: {
+            1: { name: "Świadomość Stanu", title: "Poznaj swoje rytmy", description: "Zmapuj cykle energii, wyzwalacze nastroju i wzorce siły woli. Odkryj co Cię wyczerpuje i co Cię regeneruje.", features: ["Szczyty energii", "Wyzwalacze emocji", "Wzorce siły woli"] },
+            2: { name: "Mapowanie Tożsamości", title: "Zobacz siebie wyraźnie", description: "Zbadaj swoją obecną tożsamość, automatyczne zachowania i kluczowe nawyki. Odkryj swoje wartości i naturalne mocne strony.", features: ["Luki w samopostrzeganiu", "Zgodność z wartościami", "Kluczowe zachowania"] },
+            3: { name: "Projektowanie Tożsamości", title: "Wyobraź sobie przyszłego siebie", description: "Zdefiniuj swoją aspiracyjną tożsamość i stwórz wiarygodne kamienie milowe by zbudować most.", features: ["Aspiracyjna tożsamość", "Mosty tożsamości", "Mapowanie zachowań"] },
+            4: { name: "Projektowanie Systemu", title: "Zbuduj swoją architekturę", description: "Zaprojektuj pętle nawyków, zoptymalizuj środowisko i stwórz struktury odpowiedzialności.", features: ["Architektura nawyków", "Projektowanie środowiska", "Odpowiedzialność"] },
+            5: { name: "Integracja", title: "Ucieleśnij zmianę", description: "Śledź postępy, zbieraj dowody behawioralne i wzmacniaj swoją ewoluującą tożsamość.", features: ["Śledzenie postępów", "Wzmacnianie tożsamości", "Zbieranie dowodów"] }
+          }
+        },
+        insights: {
+          label: "Analizy AI",
+          title: "Inteligencja która Cię rozumie",
+          subtitle: "Claude analizuje Twoje odpowiedzi by znaleźć wzorce, sprzeczności i punkty dźwigni, które systemy oparte na regułach by przeoczyły.",
+          sampleCard: {
+            label: "Przykładowa analiza",
+            category: "Synteza tożsamości",
+            quote: "Opisujesz siebie jako <span class=\"highlight\">zdyscyplinowanego</span>, ale spadki energii i wyzwalacze nastroju sugerują, że działasz wyłącznie na <span class=\"highlight\">sile woli</span> — ograniczonym zasobie. Twoje kluczowe zachowanie, poranne ćwiczenia, może stać się kotwicą, która regeneruje zamiast wyczerpywać, jeśli przejdziesz od wymuszania wydajności do szanowania rytmu.",
+            analysis: "To nie hipokryzja, to luka między Twoją aspiracyjną a rzeczywistą tożsamością. Zrozumienie tego napięcia to pierwszy krok do jego pokonania.",
+            poweredBy: "Wspierane przez Claude AI"
+          }
+        },
+        cta: {
+          title: "Gotowy by zrozumieć siebie?",
+          subtitle: "Ocena zajmuje około 15 minut. Bez kont, bez śledzenia, tylko szczera refleksja.",
+          button: "Rozpocznij odkrywanie",
+          timeEstimate: "~15 minut szczerej refleksji",
+          openSource: "Darmowe · Bez rejestracji · Open source"
+        },
+        footer: { brand: "Votive", github: "GitHub", license: "Licencja MIT", author: "Konrad Jagusiak" }
+      }
+    };
+
+    // ========================================
+    // UTILITIES
+    // ========================================
+    function getNestedValue(obj, path) {
+      return path.split('.').reduce((current, key) => current && current[key], obj);
+    }
+
+    // ========================================
+    // THEME TOGGLE
+    // ========================================
+    const themeToggle = document.getElementById('themeToggle');
+
+    function setTheme(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('votive-theme-luxury', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('votive-theme-luxury', 'light');
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(!isDark);
+    });
+
+    // ========================================
+    // LANGUAGE SWITCHING
+    // ========================================
+    const langButtons = document.querySelectorAll('.lang-toggle button');
+    let currentLang = localStorage.getItem('votive-lang-luxury') || 'en';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      localStorage.setItem('votive-lang-luxury', lang);
+
+      langButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const value = getNestedValue(translations[lang], key);
+        if (value && typeof value === 'string') {
+          el.textContent = value;
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        const value = getNestedValue(translations[lang], key);
+        if (value) {
+          el.innerHTML = value;
+        }
+      });
+
+      for (let i = 1; i <= 5; i++) {
+        const features = translations[lang].journey.phases[i].features;
+        const featureEls = document.querySelectorAll(`[data-i18n="journey.phases.${i}.features.0"], [data-i18n="journey.phases.${i}.features.1"], [data-i18n="journey.phases.${i}.features.2"]`);
+        featureEls.forEach((el, idx) => {
+          if (features[idx]) el.textContent = features[idx];
+        });
+      }
+    }
+
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    });
+
+    setLanguage(currentLang);
+
+    // ========================================
+    // SCROLL REVEAL
+    // ========================================
+    const revealElements = document.querySelectorAll('.reveal');
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ========================================
+    // VOTE COUNTER
+    // ========================================
+    const voteCounter = document.getElementById('voteCounter');
+    const targetVotes = 47832;
+    const duration = 2500;
+    let startTime = null;
+    let hasAnimated = false;
+
+    function animateCounter(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 4);
+      const currentValue = Math.floor(easeOut * targetVotes);
+      voteCounter.textContent = currentValue.toLocaleString();
+
+      if (progress < 1) {
+        requestAnimationFrame(animateCounter);
+      }
+    }
+
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !hasAnimated) {
+          hasAnimated = true;
+          setTimeout(() => {
+            requestAnimationFrame(animateCounter);
+          }, 1200);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    heroObserver.observe(document.querySelector('.hero'));
+  </script>
+</body>
+</html>

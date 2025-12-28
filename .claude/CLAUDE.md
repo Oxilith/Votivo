@@ -2,187 +2,90 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**See also**: @README.md for user-facing documentation, setup instructions, and feature overview.
+
 ## Project Overview
 
 Votive - a full-stack behavioral psychology assessment application with AI-powered analysis.
 
 **Architecture**: Monorepo with four packages:
-- `/app` - React frontend
-- `/backend` - Express API proxy
+- `/app` - React 19 frontend (Vite + Zustand + Tailwind v4)
+- `/backend` - Express API proxy (protects Anthropic API key)
 - `/prompt-service` - Prompt management microservice with admin UI and A/B testing
 - `/shared` - Shared TypeScript types (single source of truth)
 
-## Monorepo Workspaces
+## Commands
 
-This repository uses **npm workspaces** for unified dependency management. All commands should be run from the project root.
+All commands run from project root via npm workspaces:
 
-### Root Commands (Preferred)
 ```bash
-npm install              # Install all workspaces
-npm run lint             # Lint all projects
-npm run type-check       # Type-check all projects
-npm run build            # Build all projects
-npm run test:run         # Run all tests (once)
-npm run test:coverage    # Run all tests with coverage
-```
-
-### Development Servers
-```bash
+# Development
 npm run dev:app                  # Frontend (https://localhost:3000)
 npm run dev:backend              # Backend (https://localhost:3001)
 npm run dev:prompt-service       # Prompt service API (http://localhost:3002)
 npm run dev:prompt-service:all   # Prompt service API + admin UI
-```
 
-### Production
-```bash
+# Quality
+npm run lint                     # Lint all projects
+npm run type-check               # Type-check all projects
+npm run test:run                 # Run all tests (once)
+npm run test:coverage            # Run all tests with coverage
+
+# Build & Production
+npm run build                    # Build all projects
 npm run start:backend            # Run compiled backend
 npm run start:prompt-service     # Run compiled prompt-service
-npm run preview:app              # Preview frontend build (Vite preview)
+
+# Database (prompt-service)
+npm run db:migrate               # Run migrations
+npm run db:generate              # Generate Prisma client
+npm run db:seed                  # Seed initial data
+npm run db:studio                # Open Prisma Studio
+
+# Per-workspace
+npm run test -w backend          # Run tests in specific workspace
 ```
 
-### Database Commands
-```bash
-npm run db:migrate       # Run migrations
-npm run db:generate      # Generate Prisma client
-npm run db:seed          # Seed initial data
-npm run db:studio        # Open Prisma Studio
-```
+## Contribution
 
-### Per-Workspace Commands
-```bash
-npm run dev -w app           # Run command in specific workspace
-npm run test -w backend      # Run tests in backend only
-```
-
-## License & Contribution
-
-**License**: Votive Source Available License (proprietary, non-commercial)
-- View and study code: ✅
-- Submit contributions: ✅
-- Commercial use: ❌ (requires license)
-- Redistribution: ❌
-
-**Contribution Workflow**:
 - Target `develop` branch (not `main`)
 - Branch naming: `feature/short-desc`, `bugfix/issue-123-desc`, `docs/what-changed`
 - Commit format: `type(scope): brief description`
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 - Security issues: Email konrad.jagusiak@oxilogic.com (not public issues)
 
-## Build & Development Commands
+## Docker
 
-**Note:** Use root commands from [Monorepo Workspaces](#monorepo-workspaces) section for most operations. Per-workspace commands below are for reference when targeting a specific workspace.
-
-### Frontend (`/app`)
 ```bash
-npm run dev           # Vite dev server (https://localhost:3000)
-npm run build         # TypeScript + Vite production build
-npm run lint          # ESLint
-npm run type-check    # TypeScript only
-npm run test          # Vitest watch mode
-npm run test:run      # Vitest single run
-npm run test:coverage # Coverage report (80% threshold)
-```
-
-### Backend (`/backend`)
-```bash
-npm run dev           # tsx watch (https://localhost:3001)
-npm run build         # TypeScript compile
-npm run start         # Run compiled dist/
-npm run lint          # ESLint
-npm run type-check    # TypeScript only
-npm run test          # Vitest
-npm run test:coverage # Coverage report
-```
-
-### Prompt Service (`/prompt-service`)
-```bash
-npm run dev           # tsx watch (http://localhost:3002)
-npm run build         # TypeScript compile
-npm run start         # Run compiled dist/
-npm run lint          # ESLint
-npm run type-check    # TypeScript only
-npm run test          # Vitest watch mode
-npm run test:run      # Vitest single run
-npm run test:coverage # Coverage report
-npm run db:generate   # Generate Prisma client
-npm run db:migrate    # Run database migrations
-npm run db:seed       # Seed initial prompt data
-npm run admin:dev     # Vite dev server for admin UI
-npm run admin:build   # Build admin UI
-```
-
-### Shared (`/shared`)
-```bash
-npm run lint          # ESLint
-npm run type-check    # TypeScript only
-npm run test          # Vitest watch mode
-npm run test:run      # Vitest single run
-```
-
-### Docker (Local Development)
-```bash
+# Local development
 docker compose up --build   # Build and run full stack
-docker compose up           # Run existing images
-docker compose down         # Stop containers
-```
-Requires `ANTHROPIC_API_KEY`, `DATABASE_KEY`, `ADMIN_API_KEY`, and `SESSION_SECRET` environment variables.
 
-### Docker (OCI Deployment)
-
-**Run from Docker Hub OCI:**
-```bash
-ANTHROPIC_API_KEY=<key> \
-DATABASE_KEY=<32+chars> \
-ADMIN_API_KEY=<32+chars> \
-SESSION_SECRET=<32+chars> \
+# Production (OCI deployment)
+ANTHROPIC_API_KEY=<key> DATABASE_KEY=<32+chars> ADMIN_API_KEY=<32+chars> SESSION_SECRET=<32+chars> \
   docker compose -f oci://oxilith/votive-oci:latest up
 ```
-
-**Build and publish multi-arch images:**
-```bash
-# Clean rebuild for multi-arch (linux/amd64 + linux/arm64)
-docker rmi oxilith/votive-frontend:latest
-docker rmi oxilith/votive-backend:latest
-docker rmi oxilith/votive-prompt-service:latest
-docker buildx prune -f
-
-# Build and push using docker-bake.hcl
-docker buildx bake --push --no-cache
-
-# Publish OCI compose artifact (--resolve-image-digests for multi-arch)
-docker compose publish --resolve-image-digests --with-env oxilith/votive-oci:latest
-```
-
-**Clear OCI cache (when images updated):**
-```bash
-# macOS
-rm -rf "$HOME/Library/Caches/docker-compose/"
-```
-
-**Docker Hub repositories:**
-- `oxilith/votive-backend` - Backend API (multi-arch)
-- `oxilith/votive-frontend` - Nginx + React (multi-arch)
-- `oxilith/votive-prompt-service` - Prompt microservice (multi-arch)
-- `oxilith/votive-oci` - OCI compose artifact
 
 See [docs/docker-hub.md](../docker-hub.md) for complete workflow documentation.
 
 ### HTTPS Setup (Local Development)
 ```bash
-# Install mkcert (macOS)
-brew install mkcert
-mkcert -install
-
-# Generate certificates in project root
-mkdir -p certs && cd certs
-mkcert localhost 127.0.0.1 ::1
-cd ..
+brew install mkcert && mkcert -install
+mkdir -p certs && cd certs && mkcert localhost 127.0.0.1 ::1
 ```
-Both frontend and backend use HTTPS by default in development.
 
 ## Code Standards
+
+### Environment Files
+- **NEVER read or edit `.env` files** - these contain secrets and should not be accessed
+- **Exception**: `.env.example` files may be read and edited to document required configuration
+- When setting up a new environment, populate `.env.example` with all required variable names and placeholder/example values
+- **docker-compose.yml**: Use `${VARIABLE}` syntax for sensitive values so they're injected at runtime, not hardcoded:
+  ```yaml
+  environment:
+    - NODE_ENV=production          # Safe: non-sensitive
+    - DATABASE_KEY=${DATABASE_KEY} # Required: injected from environment
+    - ADMIN_API_KEY=${ADMIN_API_KEY}
+  ```
 
 ### TypeScript
 - **No `any` types** - use specific types or `unknown`
@@ -289,47 +192,22 @@ Frontend (Zustand) → ApiClient → Backend (Express) → Claude API
 
 ## Environment Variables
 
-See [Production Deployment > Environment Variables](../production-deployment.md#environment-variables) for the complete environment variable reference.
+See [docs/production-deployment.md](../production-deployment.md#environment-variables) for complete reference.
 
-### Frontend
-
-Frontend uses build-time environment variables (baked into the JS bundle):
-```
-VITE_API_URL=https://localhost:3001
-```
-
-For Docker deployments, leave `VITE_API_URL` empty so requests go through the nginx proxy.
-
-### Docker Deployment
-
-Docker requires these environment variables:
+Key variables:
+- `VITE_API_URL` - Frontend build-time (leave empty for Docker, set to `https://localhost:3001` for local dev)
 - `ANTHROPIC_API_KEY` - Claude API key
-- `DATABASE_KEY` - 32+ char encryption key
-- `ADMIN_API_KEY` - 32+ char admin auth key
-- `SESSION_SECRET` - 32+ char cookie signing secret (must differ from ADMIN_API_KEY)
-
-### Feature Flags
-
-**`THINKING_ENABLED`** (backend) - Controls Claude's extended thinking mode:
-- `true` (default): Uses extended thinking with 8000 token budget, temperature=1, max_tokens=16000
-- `false`: Standard mode with temperature=0.6, max_tokens=8000
-
-The prompt-service resolves the appropriate prompt configuration variant based on this flag.
+- `DATABASE_KEY` / `ADMIN_API_KEY` / `SESSION_SECRET` - 32+ char secrets for prompt-service
+- `THINKING_ENABLED` - Backend flag for Claude extended thinking mode (default: true)
 
 ## Testing
 
-- Frontend: Vitest + React Testing Library + MSW for mocking
-- Backend: Vitest + Supertest
-- Prompt Service: Vitest (unit tests for services and middleware)
-- Shared: Vitest (unit tests for validation and utilities)
+- All packages use Vitest with 80% coverage thresholds (75% branches)
+- Frontend: React Testing Library + MSW for mocking
+- Backend: Supertest for API tests
 - Test files: `**/__tests__/*.test.ts` or `**/*.test.tsx`
-- Coverage thresholds: 80% lines/functions/statements, 75% branches
 
-### Test Locations
-- `app/src/**/__tests__/` - Frontend component and store tests
-- `backend/src/**/__tests__/` - Backend service and controller tests
-- `prompt-service/src/**/__tests__/` - A/B test service, auth middleware, error types, and validation tests
-- `shared/src/__tests__/` - Validation constants and response formatter tests
+Sample test personas in `/personas/` for quick testing.
 
 ## Domain Framework
 
@@ -340,58 +218,19 @@ The prompt-service resolves the appropriate prompt configuration variant based o
 4. **System Implementation** - Habit loops, environment design
 5. **Feedback & Integration** - Progress tracking
 
-**AI Analysis Output** (`AIAnalysisResult` type):
-- `patterns` - Behavioral patterns with evidence
-- `contradictions` - Tensions between values and behaviors
-- `blindSpots` - Data-revealed but user-unseen insights
-- `leveragePoints` - High-ROI areas for change
-- `risks` - Why change attempts might fail
-- `identitySynthesis` - Core identity, hidden strengths, next steps
+**AI Analysis Output** (`AIAnalysisResult` type): `patterns`, `contradictions`, `blindSpots`, `leveragePoints`, `risks`, `identitySynthesis`
 
 ## Docker Architecture
 
-### Network Architecture
 ```
 Browser → nginx (HTTPS :443) → backend (HTTP :3001)
                 ↑
-         SSL termination
+         SSL termination (API requests: /api/* → backend:3001)
 ```
-- Frontend serves on HTTPS via nginx with SSL termination
-- Backend runs HTTP only (no SSL needed - nginx handles it)
-- API requests proxied: `/api/*` → `http://backend:3001`
 
-### Build-time Configuration
-- `VITE_API_URL` is a **build-time** variable (baked into JS bundle)
-- For Docker: leave empty (`VITE_API_URL=`) so requests go through nginx proxy
-- For local dev: set to `https://localhost:3001` in `.env.local`
-- `.dockerignore` excludes `.env` files to prevent override
-
-### Multi-Architecture Support
-Images built for both `linux/amd64` and `linux/arm64`:
-- Works on Intel/AMD x64 machines (Linux, Windows, older Macs)
-- Works on ARM64 machines (Apple Silicon, AWS Graviton, Raspberry Pi)
-
-### Shared Package in Docker
-
-The shared package uses `file:../shared` dependency. In Docker:
-- TypeScript compiles shared code to `dist/shared/src/`
-- Dockerfile copies compiled shared to `node_modules/shared/` at runtime
-- Backend imports resolve to `node_modules/shared/` in production
-
-### Container Setup
-- Frontend: Nginx Alpine serving Vite build on port 443 (HTTPS)
-- Backend: Node.js 22 Alpine running Express on port 3001
-- Backend health check (`/health`) required before frontend starts
-- Non-root user (expressjs) in backend container for security
-- Certificates volume mount: `${PWD}/certs:/etc/nginx/ssl`
-- Self-signed certs auto-generated if not provided (browser warning)
-
-## Test Data
-
-Sample personas in `/personas/`:
-- `persona-1-burned-out-achiever-{en,pl}.json`
-- `persona-2-scattered-creative-{en,pl}.json`
-- `persona-3-careful-planner-{en,pl}.json`
+- Multi-arch images: `linux/amd64` + `linux/arm64`
+- Shared package compiled to `dist/shared/src/`, copied to `node_modules/shared/` at runtime
+- Backend uses non-root user (expressjs) for security
 
 <frontend_aesthetics>
 You tend to converge toward generic, "on distribution" outputs. In frontend design, this creates what users call the "AI slop" aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight. Focus on:
@@ -446,3 +285,20 @@ Red-Green-Refactor means: write a failing test FIRST, make it pass with minimal 
 
 When generating tests: think about edge cases, boundaries, null states, and failure modes. Don't just test the happy path. Ask: "How could this break in production?"
 </testing_philosophy>
+
+## Code Intelligence & Tools
+
+**LSP**: `typescript-lsp` installed – use for jump to definition, find references, type checking.
+
+**MCP Servers**:
+- `context7` – library documentation lookup
+- `playwright` – browser automation and testing
+
+**Plugins**:
+- `commit-commands` – structured commits
+- `security-guidance` – security best practices
+- `pr-review-toolkit` – PR review assistance
+- `frontend-design` – UI/UX guidance
+- `feature-dev` – feature development workflow
+
+Leverage these tools proactively during development.

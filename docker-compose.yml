@@ -18,7 +18,7 @@ services:
       - DATABASE_URL=file:/app/data/prompts.db
       - DATABASE_KEY=${DATABASE_KEY}
       - ADMIN_API_KEY=${ADMIN_API_KEY}
-      - SESSION_SECRET=${SESSION_SECRET}  # Must differ from ADMIN_API_KEY in production
+      - SESSION_SECRET=${SESSION_SECRET}
       - CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://backend:3001
       - LOG_LEVEL=info
     volumes:

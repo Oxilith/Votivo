@@ -146,3 +146,9 @@ secrets/
 *.cache
 out/
 build/
+
+# Auto Claude data directory
+.auto-claude/
+
+# Playwright MCP screenshots
+.playwright-mcp/

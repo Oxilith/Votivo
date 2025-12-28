@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votive — Ink & Stone</title>
+  <meta name="description" content="Discover your behavioral patterns through AI-powered psychological assessment. Transform self-awareness into intentional growth.">
+
+  <!-- Fonts: Shippori Mincho (Japanese-inspired serif) + IBM Plex Sans/Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       CSS Custom Properties — Ink & Stone Theme
+       Inspired by Japanese minimalism (wabi-sabi, ma 間)
+    ═══════════════════════════════════════════════════════════════ */
+    :root {
+      /* Typography */
+      --font-display: 'Shippori Mincho', 'Hiragino Mincho Pro', serif;
+      --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+
+      /* Golden ratio-inspired spacing (φ ≈ 1.618) */
+      --space-xs: 0.382rem;
+      --space-sm: 0.618rem;
+      --space-md: 1rem;
+      --space-lg: 1.618rem;
+      --space-xl: 2.618rem;
+      --space-2xl: 4.236rem;
+      --space-3xl: 6.854rem;
+      --space-ma: 8rem; /* 間 — intentional negative space */
+
+      /* Timing */
+      --ease-gentle: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-fast: 150ms;
+      --duration-normal: 300ms;
+      --duration-slow: 600ms;
+      --duration-reveal: 1000ms;
+    }
+
+    /* Light theme — Rice paper warmth */
+    [data-theme="light"] {
+      --color-bg: #faf9f7;
+      --color-bg-elevated: #ffffff;
+      --color-bg-subtle: #f5f4f2;
+      --color-ink: #1a1a1a;
+      --color-ink-secondary: #4a4a4a;
+      --color-ink-tertiary: #7a7a7a;
+      --color-ink-faint: #b0b0b0;
+      --color-vermilion: #c73e1d;
+      --color-vermilion-soft: rgba(199, 62, 29, 0.1);
+      --color-stone: #e8e6e3;
+      --color-stone-dark: #d4d2cf;
+      --color-border: rgba(26, 26, 26, 0.08);
+      --color-border-strong: rgba(26, 26, 26, 0.15);
+      --shadow-soft: 0 2px 20px rgba(0, 0, 0, 0.04);
+      --shadow-medium: 0 4px 40px rgba(0, 0, 0, 0.06);
+      --shadow-stone: 0 8px 60px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Dark theme — Sumi ink on stone */
+    [data-theme="dark"] {
+      --color-bg: #0f0f0f;
+      --color-bg-elevated: #1a1a1a;
+      --color-bg-subtle: #141414;
+      --color-ink: #f5f4f2;
+      --color-ink-secondary: #c0bfbd;
+      --color-ink-tertiary: #8a8987;
+      --color-ink-faint: #5a5958;
+      --color-vermilion: #e85a3c;
+      --color-vermilion-soft: rgba(232, 90, 60, 0.15);
+      --color-stone: #252525;
+      --color-stone-dark: #1f1f1f;
+      --color-border: rgba(245, 244, 242, 0.08);
+      --color-border-strong: rgba(245, 244, 242, 0.15);
+      --shadow-soft: 0 2px 20px rgba(0, 0, 0, 0.3);
+      --shadow-medium: 0 4px 40px rgba(0, 0, 0, 0.4);
+      --shadow-stone: 0 8px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Reset & Base
+    ═══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--color-ink);
+      background-color: var(--color-bg);
+      transition: background-color var(--duration-slow) var(--ease-gentle),
+                  color var(--duration-slow) var(--ease-gentle);
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+
+    /* Focus visible */
+    :focus-visible {
+      outline: 2px solid var(--color-vermilion);
+      outline-offset: 3px;
+    }
+
+    /* Screen reader only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Typography
+    ═══════════════════════════════════════════════════════════════ */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+    h2 { font-size: clamp(1.75rem, 4vw, 2.75rem); }
+    h3 { font-size: clamp(1.25rem, 2.5vw, 1.75rem); }
+
+    p {
+      max-width: 65ch;
+      color: var(--color-ink-secondary);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 0.875em;
+      letter-spacing: 0.02em;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Layout
+    ═══════════════════════════════════════════════════════════════ */
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+    }
+
+    @media (min-width: 768px) {
+      .container { padding: 0 var(--space-xl); }
+    }
+
+    section {
+      padding: var(--space-ma) 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Navigation — Floating, minimal
+    ═══════════════════════════════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      top: var(--space-lg);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: 100px;
+      box-shadow: var(--shadow-medium);
+      opacity: 0;
+      animation: navReveal var(--duration-reveal) var(--ease-reveal) 0.5s forwards;
+    }
+
+    @keyframes navReveal {
+      to { opacity: 1; }
+    }
+
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      text-decoration: none;
+      color: var(--color-ink);
+    }
+
+    .nav__seal {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-vermilion);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 4px;
+      transform: rotate(-3deg);
+    }
+
+    .nav__wordmark {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    .nav__divider {
+      width: 1px;
+      height: 20px;
+      background: var(--color-border-strong);
+    }
+
+    .nav__controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .nav__btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      color: var(--color-ink-secondary);
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-gentle),
+                  color var(--duration-fast) var(--ease-gentle);
+    }
+
+    .nav__btn:hover {
+      background: var(--color-bg-subtle);
+      color: var(--color-ink);
+    }
+
+    .nav__btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .nav__lang {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Hero — Asymmetric composition with 間 (ma)
+    ═══════════════════════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      padding-top: var(--space-3xl);
+    }
+
+    .hero__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      color: var(--color-ink-tertiary);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: reveal var(--duration-reveal) var(--ease-reveal) 0.3s forwards;
+    }
+
+    .hero__eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--color-vermilion);
+    }
+
+    .hero__title {
+      margin-bottom: var(--space-xl);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: reveal var(--duration-reveal) var(--ease-reveal) 0.5s forwards;
+    }
+
+    .hero__title-accent {
+      color: var(--color-vermilion);
+    }
+
+    .hero__subtitle {
+      font-size: clamp(1.125rem, 2vw, 1.375rem);
+      margin-bottom: var(--space-2xl);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: reveal var(--duration-reveal) var(--ease-reveal) 0.7s forwards;
+    }
+
+    .hero__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-xl);
+      background: var(--color-ink);
+      color: var(--color-bg);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: transform var(--duration-fast) var(--ease-gentle),
+                  box-shadow var(--duration-fast) var(--ease-gentle);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: reveal var(--duration-reveal) var(--ease-reveal) 0.9s forwards;
+    }
+
+    .hero__cta:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .hero__cta svg {
+      width: 16px;
+      height: 16px;
+      transition: transform var(--duration-fast) var(--ease-gentle);
+    }
+
+    .hero__cta:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* Ink stroke decoration */
+    .hero__ink {
+      position: absolute;
+      right: -5%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40%;
+      max-width: 500px;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] .hero__ink {
+      opacity: 0.08;
+    }
+
+    @keyframes reveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Philosophy — Centered contemplation
+    ═══════════════════════════════════════════════════════════════ */
+    .philosophy {
+      text-align: center;
+      background: var(--color-bg-subtle);
+    }
+
+    .philosophy__inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .philosophy__quote {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-style: italic;
+      line-height: 1.5;
+      margin-bottom: var(--space-xl);
+      color: var(--color-ink);
+    }
+
+    .philosophy__quote::before {
+      content: '"';
+      color: var(--color-vermilion);
+    }
+
+    .philosophy__quote::after {
+      content: '"';
+      color: var(--color-vermilion);
+    }
+
+    .philosophy__source {
+      color: var(--color-ink-tertiary);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Journey — Asymmetric stone garden layout
+    ═══════════════════════════════════════════════════════════════ */
+    .journey {
+      position: relative;
+    }
+
+    .journey__header {
+      margin-bottom: var(--space-3xl);
+    }
+
+    .journey__label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      color: var(--color-ink-tertiary);
+    }
+
+    .journey__label::before {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--color-vermilion);
+    }
+
+    /* Stone grid — asymmetric placement */
+    .stones {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--space-lg);
+      position: relative;
+    }
+
+    .stone {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      transition: transform var(--duration-normal) var(--ease-gentle),
+                  box-shadow var(--duration-normal) var(--ease-gentle);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .stone.revealed {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity var(--duration-reveal) var(--ease-reveal),
+                  transform var(--duration-reveal) var(--ease-reveal);
+    }
+
+    .stone:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-stone);
+    }
+
+    /* Asymmetric grid placement */
+    .stone:nth-child(1) { grid-column: 1 / 6; }
+    .stone:nth-child(2) { grid-column: 7 / 13; }
+    .stone:nth-child(3) { grid-column: 2 / 7; }
+    .stone:nth-child(4) { grid-column: 8 / 13; }
+    .stone:nth-child(5) { grid-column: 1 / 7; }
+
+    @media (max-width: 768px) {
+      .stone:nth-child(n) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .stone__number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      margin-bottom: var(--space-md);
+      background: var(--color-vermilion-soft);
+      color: var(--color-vermilion);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 4px;
+    }
+
+    .stone__title {
+      margin-bottom: var(--space-sm);
+    }
+
+    .stone__desc {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Insights — AI Analysis preview
+    ═══════════════════════════════════════════════════════════════ */
+    .insights {
+      background: var(--color-bg-subtle);
+    }
+
+    .insights__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .insights__grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+    }
+
+    .insights__content {
+      max-width: 480px;
+    }
+
+    .insights__label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      color: var(--color-ink-tertiary);
+    }
+
+    .insights__label::before {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--color-vermilion);
+    }
+
+    .insights__title {
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights__list {
+      list-style: none;
+      margin-top: var(--space-xl);
+    }
+
+    .insights__item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .insights__item:last-child {
+      border-bottom: none;
+    }
+
+    .insights__icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      color: var(--color-vermilion);
+    }
+
+    .insights__item-title {
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+
+    .insights__item-desc {
+      font-size: 0.875rem;
+      color: var(--color-ink-tertiary);
+    }
+
+    /* Preview card */
+    .insights__preview {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .insights__preview-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .insights__preview-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--color-vermilion);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .insights__preview-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-ink-tertiary);
+    }
+
+    .insights__preview-content {
+      font-size: 0.9375rem;
+    }
+
+    .insights__preview-pattern {
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+      background: var(--color-bg-subtle);
+      border-radius: 6px;
+    }
+
+    .insights__preview-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-vermilion);
+      margin-bottom: var(--space-xs);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CTA — Final call to action
+    ═══════════════════════════════════════════════════════════════ */
+    .cta {
+      text-align: center;
+      position: relative;
+    }
+
+    .cta__inner {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta__title {
+      margin-bottom: var(--space-lg);
+    }
+
+    .cta__subtitle {
+      margin-bottom: var(--space-2xl);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta__button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-lg) var(--space-2xl);
+      background: var(--color-vermilion);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 1.125rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: transform var(--duration-fast) var(--ease-gentle),
+                  box-shadow var(--duration-fast) var(--ease-gentle);
+    }
+
+    .cta__button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(199, 62, 29, 0.3);
+    }
+
+    .cta__button svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Footer
+    ═══════════════════════════════════════════════════════════════ */
+    .footer {
+      padding: var(--space-xl) 0;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .footer__inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .footer__logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .footer__seal {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-vermilion);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 3px;
+      transform: rotate(-3deg);
+    }
+
+    .footer__copy {
+      font-size: 0.875rem;
+      color: var(--color-ink-tertiary);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Utilities
+    ═══════════════════════════════════════════════════════════════ */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity var(--duration-reveal) var(--ease-reveal),
+                  transform var(--duration-reveal) var(--ease-reveal);
+    }
+
+    .reveal-on-scroll.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <a href="#" class="nav__logo">
+      <span class="nav__seal" aria-hidden="true">V</span>
+      <span class="nav__wordmark">Votive</span>
+    </a>
+    <div class="nav__divider" aria-hidden="true"></div>
+    <div class="nav__controls">
+      <button class="nav__btn" id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button class="nav__btn nav__lang" id="lang-toggle" aria-label="Toggle language">
+        <span data-i18n-key="lang">EN</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero__content">
+        <p class="hero__eyebrow mono" data-i18n-key="hero.eyebrow">Behavioral Psychology × AI</p>
+        <h1 class="hero__title">
+          <span data-i18n-key="hero.title.1">Understand yourself</span><br>
+          <span class="hero__title-accent" data-i18n-key="hero.title.2">with clarity</span>
+        </h1>
+        <p class="hero__subtitle" data-i18n-key="hero.subtitle">
+          Discover the patterns that shape your behavior. Transform self-awareness into intentional growth through AI-powered psychological assessment.
+        </p>
+        <a href="#journey" class="hero__cta">
+          <span data-i18n-key="hero.cta">Begin Your Assessment</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Decorative ink stroke -->
+    <svg class="hero__ink" viewBox="0 0 400 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M200 0 Q 250 200 180 400 Q 120 600 220 800" stroke="currentColor" stroke-width="80" stroke-linecap="round"/>
+      <circle cx="200" cy="150" r="60" fill="currentColor" opacity="0.3"/>
+      <circle cx="180" cy="450" r="40" fill="currentColor" opacity="0.2"/>
+    </svg>
+  </section>
+
+  <!-- Philosophy Section -->
+  <section class="philosophy reveal-on-scroll" id="philosophy">
+    <div class="container">
+      <div class="philosophy__inner">
+        <blockquote class="philosophy__quote" data-i18n-key="philosophy.quote">
+          The greatest discovery of my generation is that human beings can alter their lives by altering their attitudes of mind.
+        </blockquote>
+        <p class="philosophy__source mono" data-i18n-key="philosophy.source">— William James</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey Section — 5 Phases -->
+  <section class="journey reveal-on-scroll" id="journey">
+    <div class="container">
+      <header class="journey__header">
+        <p class="journey__label mono" data-i18n-key="journey.label">The Five Phases</p>
+        <h2 data-i18n-key="journey.title">A structured path to self-understanding</h2>
+      </header>
+
+      <div class="stones">
+        <article class="stone" style="transition-delay: 0.1s">
+          <span class="stone__number">01</span>
+          <h3 class="stone__title" data-i18n-key="journey.phases.1.title">State Awareness</h3>
+          <p class="stone__desc" data-i18n-key="journey.phases.1.desc">Map your energy patterns, mood triggers, and motivation rhythms throughout the day.</p>
+        </article>
+
+        <article class="stone" style="transition-delay: 0.2s">
+          <span class="stone__number">02</span>
+          <h3 class="stone__title" data-i18n-key="journey.phases.2.title">Identity Mapping</h3>
+          <p class="stone__desc" data-i18n-key="journey.phases.2.desc">Understand your current self through behaviors, habits, and core values.</p>
+        </article>
+
+        <article class="stone" style="transition-delay: 0.3s">
+          <span class="stone__number">03</span>
+          <h3 class="stone__title" data-i18n-key="journey.phases.3.title">Identity Design</h3>
+          <p class="stone__desc" data-i18n-key="journey.phases.3.desc">Define your aspirational self with stepping-stone identities for the transition.</p>
+        </article>
+
+        <article class="stone" style="transition-delay: 0.4s">
+          <span class="stone__number">04</span>
+          <h3 class="stone__title" data-i18n-key="journey.phases.4.title">System Implementation</h3>
+          <p class="stone__desc" data-i18n-key="journey.phases.4.desc">Build habit loops and design your environment for sustainable change.</p>
+        </article>
+
+        <article class="stone" style="transition-delay: 0.5s">
+          <span class="stone__number">05</span>
+          <h3 class="stone__title" data-i18n-key="journey.phases.5.title">Feedback & Integration</h3>
+          <p class="stone__desc" data-i18n-key="journey.phases.5.desc">Track progress and integrate insights into lasting transformation.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Insights Section -->
+  <section class="insights reveal-on-scroll" id="insights">
+    <div class="container">
+      <div class="insights__grid">
+        <div class="insights__content">
+          <p class="insights__label mono" data-i18n-key="insights.label">AI-Powered Analysis</p>
+          <h2 class="insights__title" data-i18n-key="insights.title">Discover what you cannot see</h2>
+          <p data-i18n-key="insights.desc">Our AI analyzes your responses to surface patterns, contradictions, and leverage points that would take years of self-reflection to discover.</p>
+
+          <ul class="insights__list">
+            <li class="insights__item">
+              <svg class="insights__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              <div>
+                <p class="insights__item-title" data-i18n-key="insights.features.1.title">Pattern Recognition</p>
+                <p class="insights__item-desc" data-i18n-key="insights.features.1.desc">Identify recurring behavioral themes across contexts</p>
+              </div>
+            </li>
+            <li class="insights__item">
+              <svg class="insights__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <div>
+                <p class="insights__item-title" data-i18n-key="insights.features.2.title">Blind Spot Detection</p>
+                <p class="insights__item-desc" data-i18n-key="insights.features.2.desc">Reveal hidden assumptions and unconscious biases</p>
+              </div>
+            </li>
+            <li class="insights__item">
+              <svg class="insights__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <div>
+                <p class="insights__item-title" data-i18n-key="insights.features.3.title">Leverage Points</p>
+                <p class="insights__item-desc" data-i18n-key="insights.features.3.desc">Pinpoint high-impact changes for maximum growth</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="insights__preview">
+          <div class="insights__preview-header">
+            <span class="insights__preview-dot"></span>
+            <span class="insights__preview-title" data-i18n-key="insights.preview.title">Sample Insight</span>
+          </div>
+          <div class="insights__preview-content">
+            <div class="insights__preview-pattern">
+              <p class="insights__preview-label" data-i18n-key="insights.preview.label">Pattern Detected</p>
+              <p data-i18n-key="insights.preview.pattern">Your morning energy peaks align with creative work, but you consistently schedule administrative tasks during this window—a significant optimization opportunity.</p>
+            </div>
+            <div class="insights__preview-pattern">
+              <p class="insights__preview-label" data-i18n-key="insights.preview.label2">Contradiction</p>
+              <p data-i18n-key="insights.preview.contradiction">You value deep work but have optimized your environment for accessibility—consider designated focus periods.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta reveal-on-scroll" id="cta">
+    <div class="container">
+      <div class="cta__inner">
+        <h2 class="cta__title" data-i18n-key="cta.title">Begin your journey inward</h2>
+        <p class="cta__subtitle" data-i18n-key="cta.subtitle">
+          The assessment takes approximately 15 minutes. Your responses are processed locally and never stored.
+        </p>
+        <a href="#" class="cta__button">
+          <span data-i18n-key="cta.button">Start Assessment</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div class="footer__logo">
+          <span class="footer__seal" aria-hidden="true">V</span>
+          <span class="footer__copy">Votive</span>
+        </div>
+        <p class="footer__copy" data-i18n-key="footer.copy">© 2025 · Privacy-first behavioral assessment</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════════════
+       Internationalization (i18n)
+    ═══════════════════════════════════════════════════════════════ */
+    const translations = {
+      en: {
+        lang: 'EN',
+        'hero.eyebrow': 'Behavioral Psychology × AI',
+        'hero.title.1': 'Understand yourself',
+        'hero.title.2': 'with clarity',
+        'hero.subtitle': 'Discover the patterns that shape your behavior. Transform self-awareness into intentional growth through AI-powered psychological assessment.',
+        'hero.cta': 'Begin Your Assessment',
+        'philosophy.quote': 'The greatest discovery of my generation is that human beings can alter their lives by altering their attitudes of mind.',
+        'philosophy.source': '— William James',
+        'journey.label': 'The Five Phases',
+        'journey.title': 'A structured path to self-understanding',
+        'journey.phases.1.title': 'State Awareness',
+        'journey.phases.1.desc': 'Map your energy patterns, mood triggers, and motivation rhythms throughout the day.',
+        'journey.phases.2.title': 'Identity Mapping',
+        'journey.phases.2.desc': 'Understand your current self through behaviors, habits, and core values.',
+        'journey.phases.3.title': 'Identity Design',
+        'journey.phases.3.desc': 'Define your aspirational self with stepping-stone identities for the transition.',
+        'journey.phases.4.title': 'System Implementation',
+        'journey.phases.4.desc': 'Build habit loops and design your environment for sustainable change.',
+        'journey.phases.5.title': 'Feedback & Integration',
+        'journey.phases.5.desc': 'Track progress and integrate insights into lasting transformation.',
+        'insights.label': 'AI-Powered Analysis',
+        'insights.title': 'Discover what you cannot see',
+        'insights.desc': 'Our AI analyzes your responses to surface patterns, contradictions, and leverage points that would take years of self-reflection to discover.',
+        'insights.features.1.title': 'Pattern Recognition',
+        'insights.features.1.desc': 'Identify recurring behavioral themes across contexts',
+        'insights.features.2.title': 'Blind Spot Detection',
+        'insights.features.2.desc': 'Reveal hidden assumptions and unconscious biases',
+        'insights.features.3.title': 'Leverage Points',
+        'insights.features.3.desc': 'Pinpoint high-impact changes for maximum growth',
+        'insights.preview.title': 'Sample Insight',
+        'insights.preview.label': 'Pattern Detected',
+        'insights.preview.pattern': 'Your morning energy peaks align with creative work, but you consistently schedule administrative tasks during this window—a significant optimization opportunity.',
+        'insights.preview.label2': 'Contradiction',
+        'insights.preview.contradiction': 'You value deep work but have optimized your environment for accessibility—consider designated focus periods.',
+        'cta.title': 'Begin your journey inward',
+        'cta.subtitle': 'The assessment takes approximately 15 minutes. Your responses are processed locally and never stored.',
+        'cta.button': 'Start Assessment',
+        'footer.copy': '© 2025 · Privacy-first behavioral assessment'
+      },
+      pl: {
+        lang: 'PL',
+        'hero.eyebrow': 'Psychologia behawioralna × AI',
+        'hero.title.1': 'Zrozum siebie',
+        'hero.title.2': 'z jasnością',
+        'hero.subtitle': 'Odkryj wzorce kształtujące Twoje zachowanie. Przekształć samoświadomość w celowy rozwój dzięki ocenie psychologicznej wspieranej przez AI.',
+        'hero.cta': 'Rozpocznij ocenę',
+        'philosophy.quote': 'Największym odkryciem mojego pokolenia jest to, że ludzie mogą zmieniać swoje życie, zmieniając swoje nastawienie umysłu.',
+        'philosophy.source': '— William James',
+        'journey.label': 'Pięć faz',
+        'journey.title': 'Ustrukturyzowana ścieżka do zrozumienia siebie',
+        'journey.phases.1.title': 'Świadomość stanu',
+        'journey.phases.1.desc': 'Mapuj swoje wzorce energii, wyzwalacze nastroju i rytmy motywacji w ciągu dnia.',
+        'journey.phases.2.title': 'Mapowanie tożsamości',
+        'journey.phases.2.desc': 'Zrozum swoje obecne ja poprzez zachowania, nawyki i podstawowe wartości.',
+        'journey.phases.3.title': 'Projektowanie tożsamości',
+        'journey.phases.3.desc': 'Zdefiniuj swoje aspiracyjne ja z tożsamościami przejściowymi.',
+        'journey.phases.4.title': 'Wdrożenie systemu',
+        'journey.phases.4.desc': 'Buduj pętle nawyków i projektuj środowisko dla trwałej zmiany.',
+        'journey.phases.5.title': 'Informacja zwrotna i integracja',
+        'journey.phases.5.desc': 'Śledź postępy i integruj wnioski w trwałą transformację.',
+        'insights.label': 'Analiza wspierana przez AI',
+        'insights.title': 'Odkryj to, czego nie widzisz',
+        'insights.desc': 'Nasza AI analizuje Twoje odpowiedzi, aby wydobyć wzorce, sprzeczności i punkty dźwigni, których odkrycie wymagałoby lat autorefleksji.',
+        'insights.features.1.title': 'Rozpoznawanie wzorców',
+        'insights.features.1.desc': 'Identyfikacja powtarzających się motywów behawioralnych',
+        'insights.features.2.title': 'Wykrywanie martwych punktów',
+        'insights.features.2.desc': 'Ujawnianie ukrytych założeń i nieświadomych uprzedzeń',
+        'insights.features.3.title': 'Punkty dźwigni',
+        'insights.features.3.desc': 'Wskazanie zmian o wysokim wpływie dla maksymalnego wzrostu',
+        'insights.preview.title': 'Przykładowy wgląd',
+        'insights.preview.label': 'Wykryty wzorzec',
+        'insights.preview.pattern': 'Twoje szczyty energii porannej pokrywają się z pracą twórczą, ale konsekwentnie planujesz zadania administracyjne w tym oknie—znacząca możliwość optymalizacji.',
+        'insights.preview.label2': 'Sprzeczność',
+        'insights.preview.contradiction': 'Cenisz głęboką pracę, ale zoptymalizowałeś środowisko pod kątem dostępności—rozważ wyznaczone okresy skupienia.',
+        'cta.title': 'Rozpocznij swoją podróż w głąb siebie',
+        'cta.subtitle': 'Ocena zajmuje około 15 minut. Twoje odpowiedzi są przetwarzane lokalnie i nigdy nie są przechowywane.',
+        'cta.button': 'Rozpocznij ocenę',
+        'footer.copy': '© 2025 · Ocena behawioralna z priorytetem prywatności'
+      }
+    };
+
+    let currentLang = localStorage.getItem('votive-lang') || 'en';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('votive-lang', lang);
+      document.querySelectorAll('[data-i18n-key]').forEach(el => {
+        const key = el.getAttribute('data-i18n-key');
+        if (translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       Theme Toggle
+    ═══════════════════════════════════════════════════════════════ */
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+    const iconSun = themeToggle.querySelector('.icon-sun');
+    const iconMoon = themeToggle.querySelector('.icon-moon');
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('votive-theme', theme);
+      if (theme === 'dark') {
+        iconSun.style.display = 'none';
+        iconMoon.style.display = 'block';
+      } else {
+        iconSun.style.display = 'block';
+        iconMoon.style.display = 'none';
+      }
+    }
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('votive-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       Language Toggle
+    ═══════════════════════════════════════════════════════════════ */
+    const langToggle = document.getElementById('lang-toggle');
+    langToggle.addEventListener('click', () => {
+      const newLang = currentLang === 'en' ? 'pl' : 'en';
+      setLanguage(newLang);
+    });
+
+    // Initialize language
+    setLanguage(currentLang);
+
+    /* ═══════════════════════════════════════════════════════════════
+       Scroll Reveal
+    ═══════════════════════════════════════════════════════════════ */
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+
+          // For stone cards, add staggered reveal
+          const stones = entry.target.querySelectorAll('.stone');
+          stones.forEach((stone, index) => {
+            setTimeout(() => {
+              stone.classList.add('revealed');
+            }, index * 100);
+          });
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+      observer.observe(el);
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       Smooth scroll for anchor links
+    ═══════════════════════════════════════════════════════════════ */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

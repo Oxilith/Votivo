@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votive | Every Action Is a Vote</title>
+  <meta name="description" content="Discover who you are before designing who you want to become. AI-powered self-discovery for sustainable identity change.">
+
+  <!-- SEO & Social -->
+  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
+  <meta property="og:title" content="Votive | Every Action Is a Vote">
+  <meta property="og:description" content="Discover who you are before designing who you want to become. AI-powered self-discovery for sustainable identity change.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Fonts: Shippori Mincho (Japanese-inspired serif) + IBM Plex Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Prevent flash of unstyled content -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('votive-theme-ink');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+      const lang = localStorage.getItem('votive-lang-ink') || 'en';
+      document.documentElement.lang = lang;
+    })();
+  </script>
+
+  <style>
+    /* ========================================
+       CSS RESET
+       ======================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    img, picture, video, canvas, svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ul, ol {
+      list-style: none;
+    }
+
+    /* ========================================
+       CSS CUSTOM PROPERTIES - INK & STONE
+       ======================================== */
+    :root {
+      /* Light Theme - Rice Paper */
+      --color-paper: #faf9f7;
+      --color-paper-warm: #f5f3ef;
+      --color-stone: #e8e5df;
+      --color-ink: #1a1a1a;
+      --color-ink-soft: #3d3d3d;
+      --color-ink-muted: #6b6b6b;
+      --color-ink-faint: #9a9a9a;
+      --color-vermilion: #c73e1d;
+      --color-vermilion-soft: #d45a3a;
+
+      /* Typography */
+      --font-display: 'Shippori Mincho', 'Hiragino Mincho ProN', serif;
+      --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', Consolas, monospace;
+
+      /* Semantic mappings */
+      --bg-primary: var(--color-paper);
+      --bg-secondary: var(--color-paper-warm);
+      --bg-tertiary: var(--color-stone);
+      --text-primary: var(--color-ink);
+      --text-secondary: var(--color-ink-soft);
+      --text-muted: var(--color-ink-muted);
+      --text-faint: var(--color-ink-faint);
+      --accent: var(--color-vermilion);
+      --accent-soft: var(--color-vermilion-soft);
+      --border: rgba(26, 26, 26, 0.08);
+      --border-strong: rgba(26, 26, 26, 0.15);
+
+      /* Spacing - Golden ratio inspired */
+      --space-xs: 0.382rem;
+      --space-sm: 0.618rem;
+      --space-md: 1rem;
+      --space-lg: 1.618rem;
+      --space-xl: 2.618rem;
+      --space-2xl: 4.236rem;
+      --space-3xl: 6.854rem;
+      --space-4xl: 11.09rem;
+
+      /* Animation - Gentle, purposeful */
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --duration-fast: 200ms;
+      --duration-normal: 400ms;
+      --duration-slow: 800ms;
+      --duration-reveal: 1200ms;
+
+      /* Shadows - Subtle, ink-like */
+      --shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.04);
+      --shadow-md: 0 4px 12px rgba(26, 26, 26, 0.06);
+      --shadow-ink: 2px 2px 0 rgba(26, 26, 26, 0.08);
+    }
+
+    .dark {
+      /* Dark Theme - Night Ink */
+      --color-night: #0f0f0f;
+      --color-night-soft: #1a1a1a;
+      --color-night-elevated: #242424;
+      --color-moon: #e8e5df;
+      --color-moon-soft: #b8b5af;
+      --color-moon-muted: #7a7875;
+      --color-moon-faint: #4a4845;
+      --color-vermilion-night: #e85a3a;
+      --color-vermilion-night-soft: #ff7a5a;
+
+      --bg-primary: var(--color-night);
+      --bg-secondary: var(--color-night-soft);
+      --bg-tertiary: var(--color-night-elevated);
+      --text-primary: var(--color-moon);
+      --text-secondary: var(--color-moon-soft);
+      --text-muted: var(--color-moon-muted);
+      --text-faint: var(--color-moon-faint);
+      --accent: var(--color-vermilion-night);
+      --accent-soft: var(--color-vermilion-night-soft);
+      --border: rgba(232, 229, 223, 0.06);
+      --border-strong: rgba(232, 229, 223, 0.12);
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-ink: 2px 2px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    /* ========================================
+       BASE STYLES
+       ======================================== */
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 17px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    /* ========================================
+       MA - INTENTIONAL SPACE
+       ======================================== */
+    .ma-vertical {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+      margin: var(--space-3xl) auto;
+      max-width: 200px;
+    }
+
+    .ma-breath {
+      height: var(--space-3xl);
+    }
+
+    /* ========================================
+       LAYOUT
+       ======================================== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    .container-narrow {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    /* ========================================
+       NAVIGATION - FLOATING, MINIMAL
+       ======================================== */
+    .nav {
+      position: fixed;
+      top: var(--space-lg);
+      left: var(--space-xl);
+      right: var(--space-xl);
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(250, 249, 247, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      transition: background var(--duration-normal) var(--ease-out),
+                  border-color var(--duration-normal) var(--ease-out);
+    }
+
+    .dark .nav {
+      background: rgba(15, 15, 15, 0.9);
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        left: var(--space-md);
+        right: var(--space-md);
+        top: var(--space-md);
+      }
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+    }
+
+    .nav-seal {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 4px;
+      transform: rotate(-3deg);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xl);
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+
+    /* Mobile menu toggle */
+    .nav-menu-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 32px;
+      height: 32px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      transition: border-color var(--duration-fast) var(--ease-out);
+    }
+
+    .nav-menu-toggle:hover {
+      border-color: var(--border-strong);
+    }
+
+    .nav-menu-toggle span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--text-primary);
+      transition: transform var(--duration-normal) var(--ease-out),
+                  opacity var(--duration-fast) var(--ease-out);
+    }
+
+    .nav-menu-toggle.active span:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .nav-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    @media (min-width: 768px) {
+      .nav-menu-toggle {
+        display: none;
+      }
+    }
+
+    /* Mobile menu overlay */
+    .nav-mobile {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-xl);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--duration-normal) var(--ease-out),
+                  visibility var(--duration-normal) var(--ease-out);
+    }
+
+    .nav-mobile.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .nav-mobile-link {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity var(--duration-normal) var(--ease-out),
+                  transform var(--duration-normal) var(--ease-out),
+                  color var(--duration-fast) var(--ease-out);
+    }
+
+    .nav-mobile.active .nav-mobile-link {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .nav-mobile.active .nav-mobile-link:nth-child(1) { transition-delay: 0.1s; }
+    .nav-mobile.active .nav-mobile-link:nth-child(2) { transition-delay: 0.15s; }
+    .nav-mobile.active .nav-mobile-link:nth-child(3) { transition-delay: 0.2s; }
+    .nav-mobile.active .nav-mobile-link:nth-child(4) { transition-delay: 0.25s; }
+
+    .nav-mobile-link:hover {
+      color: var(--accent);
+    }
+
+    @media (min-width: 768px) {
+      .nav-mobile {
+        display: none;
+      }
+    }
+
+    .nav-link {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      position: relative;
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform var(--duration-normal) var(--ease-out);
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+
+    .nav-cta {
+      display: none;
+      padding: var(--space-sm) var(--space-lg);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: white;
+      background: var(--accent);
+      transition: background var(--duration-fast) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out);
+    }
+
+    @media (min-width: 768px) {
+      .nav-cta {
+        display: block;
+      }
+    }
+
+    .nav-cta:hover {
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-faint);
+    }
+
+    .lang-toggle button {
+      padding: var(--space-xs) var(--space-sm);
+      color: var(--text-faint);
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+
+    .lang-toggle button:hover,
+    .lang-toggle button.active {
+      color: var(--text-primary);
+    }
+
+    .lang-toggle .separator {
+      color: var(--border-strong);
+    }
+
+    .theme-toggle {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      transition: color var(--duration-fast) var(--ease-out),
+                  border-color var(--duration-fast) var(--ease-out);
+    }
+
+    .theme-toggle:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .theme-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .theme-icon-sun,
+    .theme-icon-moon {
+      display: none;
+    }
+
+    :root:not(.dark) .theme-icon-moon {
+      display: block;
+    }
+
+    .dark .theme-icon-sun {
+      display: block;
+    }
+
+    /* ========================================
+       HERO - ASYMMETRIC, BREATHING SPACE
+       ======================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: var(--space-4xl) 0;
+      position: relative;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-3xl);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    @media (min-width: 1024px) {
+      .hero-inner {
+        grid-template-columns: 1.4fr 0.6fr;
+        align-items: end;
+      }
+    }
+
+    .hero-content {
+      position: relative;
+    }
+
+    /* Vermilion ink brush seal */
+    .hero-seal {
+      position: absolute;
+      top: -60px;
+      left: -40px;
+      transform: rotate(-8deg);
+      width: 72px;
+      height: 72px;
+      opacity: 0;
+      animation: seal-appear 0.6s var(--ease-out) 1s forwards;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes seal-appear {
+      from {
+        opacity: 0;
+        transform: rotate(-8deg) scale(0.8);
+      }
+      to {
+        opacity: 0.55;
+        transform: rotate(-8deg) scale(1);
+      }
+    }
+
+    .hero-seal svg {
+      width: 100%;
+      height: 100%;
+      fill: var(--accent);
+      filter: url(#brush-filter);
+    }
+
+    @media (max-width: 768px) {
+      .hero-seal {
+        display: none;
+      }
+    }
+
+    .hero-tagline {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-xl);
+    }
+
+    .hero-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: word-rise 0.8s var(--ease-out) forwards;
+    }
+
+    .hero-word:nth-child(1) { animation-delay: 0.1s; }
+    .hero-word:nth-child(2) { animation-delay: 0.15s; }
+    .hero-word:nth-child(3) { animation-delay: 0.2s; }
+    .hero-word:nth-child(4) { animation-delay: 0.25s; }
+    .hero-word:nth-child(5) { animation-delay: 0.3s; }
+    .hero-word:nth-child(6) { animation-delay: 0.35s; }
+    .hero-word:nth-child(7) { animation-delay: 0.4s; }
+    .hero-word:nth-child(8) { animation-delay: 0.45s; }
+
+    @keyframes word-rise {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-highlight {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .hero-subtitle {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      max-width: 480px;
+      line-height: 1.9;
+      margin-bottom: var(--space-2xl);
+      opacity: 0;
+      animation: fade-up 0.8s var(--ease-out) 0.5s forwards;
+    }
+
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-xl);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: white;
+      background: var(--accent);
+      opacity: 0;
+      animation: fade-up 0.8s var(--ease-out) 0.6s forwards;
+      transition: background var(--duration-fast) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out),
+                  box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .hero-cta:hover {
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(199, 62, 29, 0.25);
+    }
+
+    .hero-cta-icon {
+      width: 16px;
+      height: 16px;
+      transition: transform var(--duration-normal) var(--ease-out);
+    }
+
+    .hero-cta:hover .hero-cta-icon {
+      transform: translateX(4px);
+    }
+
+    .hero-aside {
+      display: none;
+      opacity: 0;
+      animation: fade-up 0.8s var(--ease-out) 0.9s forwards;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-aside {
+        display: block;
+      }
+    }
+
+    .hero-votes-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: var(--space-sm);
+    }
+
+    .hero-votes-count {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: var(--space-sm);
+    }
+
+    .hero-votes-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      max-width: 180px;
+    }
+
+    /* Decorative ink stroke */
+    .hero-stroke {
+      position: absolute;
+      bottom: 10%;
+      right: 5%;
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0;
+      animation: stroke-draw 1s var(--ease-out) 1s forwards;
+    }
+
+    @keyframes stroke-draw {
+      to {
+        opacity: 0.3;
+      }
+    }
+
+    /* ========================================
+       PHILOSOPHY - CENTERED WISDOM
+       ======================================== */
+    .philosophy {
+      padding: var(--space-4xl) 0;
+      background: var(--bg-secondary);
+    }
+
+    .philosophy-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    .section-marker {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .section-marker::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .philosophy-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .philosophy-text {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      line-height: 2;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .philosophy-text p + p {
+      margin-top: var(--space-lg);
+    }
+
+    .philosophy-quote {
+      position: relative;
+      padding: var(--space-2xl) 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .philosophy-quote blockquote {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 3vw, 1.625rem);
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--text-primary);
+      margin-bottom: var(--space-md);
+      padding-left: var(--space-xl);
+    }
+
+    .philosophy-quote cite {
+      font-family: var(--font-mono);
+      font-style: normal;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding-left: var(--space-xl);
+    }
+
+    /* ========================================
+       JOURNEY - STONES IN GARDEN
+       ======================================== */
+    .journey {
+      padding: var(--space-4xl) 0;
+    }
+
+    .journey-header {
+      max-width: 520px;
+      margin-bottom: var(--space-3xl);
+      padding: 0 var(--space-xl);
+    }
+
+    @media (min-width: 1024px) {
+      .journey-header {
+        margin-left: calc((100% - 1200px) / 2 + var(--space-xl));
+      }
+    }
+
+    .journey-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: var(--space-md);
+    }
+
+    .journey-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    /* Stone-like cards - asymmetric placement */
+    .journey-stones {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    .stone {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      padding: var(--space-xl);
+      position: relative;
+      transition: transform var(--duration-slow) var(--ease-out),
+                  box-shadow var(--duration-slow) var(--ease-out),
+                  border-color var(--duration-slow) var(--ease-out);
+    }
+
+    .stone:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+    }
+
+    .stone.coming-soon {
+      opacity: 0.5;
+    }
+
+    /* Asymmetric grid placement */
+    .stone:nth-child(1) { grid-column: 1 / 5; }
+    .stone:nth-child(2) { grid-column: 5 / 9; margin-top: var(--space-2xl); }
+    .stone:nth-child(3) { grid-column: 9 / 13; }
+    .stone:nth-child(4) { grid-column: 2 / 6; }
+    .stone:nth-child(5) { grid-column: 7 / 11; margin-top: var(--space-lg); }
+
+    @media (max-width: 1024px) {
+      .stone:nth-child(1),
+      .stone:nth-child(2),
+      .stone:nth-child(3),
+      .stone:nth-child(4),
+      .stone:nth-child(5) {
+        grid-column: span 6;
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stone:nth-child(1),
+      .stone:nth-child(2),
+      .stone:nth-child(3),
+      .stone:nth-child(4),
+      .stone:nth-child(5) {
+        grid-column: span 12;
+      }
+    }
+
+    .stone-number {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 400;
+      color: var(--accent);
+      opacity: 0.3;
+      line-height: 1;
+      margin-bottom: var(--space-md);
+      transition: opacity var(--duration-normal) var(--ease-out);
+    }
+
+    .stone:hover .stone-number {
+      opacity: 0.6;
+    }
+
+    .stone.coming-soon .stone-number {
+      color: var(--text-faint);
+    }
+
+    .stone-soon-badge {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      font-family: var(--font-mono);
+      font-size: 0.5625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--border);
+    }
+
+    .stone-name {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: var(--space-xs);
+    }
+
+    .stone-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: var(--space-sm);
+    }
+
+    .stone-description {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+    }
+
+    .stone-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .stone-feature {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--bg-tertiary);
+    }
+
+    /* ========================================
+       INSIGHTS - FOCUSED REVELATION
+       ======================================== */
+    .insights {
+      padding: var(--space-4xl) 0;
+      background: var(--bg-secondary);
+    }
+
+    .insights-inner {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-3xl);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+
+    @media (min-width: 1024px) {
+      .insights-inner {
+        grid-template-columns: 0.4fr 0.6fr;
+        align-items: start;
+      }
+    }
+
+    .insights-header {
+      max-width: 400px;
+    }
+
+    .insights-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: var(--space-md);
+    }
+
+    .insights-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: var(--space-xl);
+    }
+
+    .insights-features {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .insights-feature {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      border: 1px solid transparent;
+      transition: border-color var(--duration-fast) var(--ease-out),
+                  background var(--duration-fast) var(--ease-out);
+    }
+
+    .insights-feature:hover {
+      border-color: var(--border);
+      background: var(--bg-tertiary);
+    }
+
+    .insights-feature-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .insights-feature-text {
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+    }
+
+    .insights-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      padding: var(--space-2xl);
+      position: relative;
+    }
+
+    .insights-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: var(--space-xl);
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .insights-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights-card-label {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
+    .insights-card-category {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--accent);
+    }
+
+    .insights-card-quote {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-style: italic;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights-card-quote .highlight {
+      color: var(--accent);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    .insights-card-analysis {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--border);
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights-card-footer {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.05em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+    }
+
+    /* ========================================
+       CTA - QUIET INVITATION
+       ======================================== */
+    .cta {
+      padding: var(--space-4xl) 0;
+    }
+
+    .cta-inner {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+      text-align: center;
+    }
+
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: var(--space-md);
+    }
+
+    .cta-subtitle {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-2xl);
+      font-size: 1rem;
+      font-weight: 500;
+      color: white;
+      background: var(--accent);
+      margin-bottom: var(--space-xl);
+      transition: background var(--duration-fast) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out),
+                  box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .cta-button:hover {
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(199, 62, 29, 0.25);
+    }
+
+    .cta-button-icon {
+      width: 16px;
+      height: 16px;
+      transition: transform var(--duration-normal) var(--ease-out);
+    }
+
+    .cta-button:hover .cta-button-icon {
+      transform: translateX(4px);
+    }
+
+    .cta-meta {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .cta-meta span {
+      display: block;
+    }
+
+    /* ========================================
+       FOOTER - MINIMAL
+       ======================================== */
+    .footer {
+      padding: var(--space-xl) 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      .footer-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-seal {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 3px;
+      transform: rotate(-3deg);
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+
+    .footer-link:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-link-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .footer-meta {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* ========================================
+       SCROLL REVEAL
+       ======================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity var(--duration-reveal) var(--ease-out),
+                  transform var(--duration-reveal) var(--ease-out);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+    /* ========================================
+       ACCESSIBILITY
+       ======================================== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+
+      .hero-word {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ========================================
+       PRINT STYLES
+       ======================================== */
+    @media print {
+      .nav, .theme-toggle, .lang-toggle,
+      .hero-cta, .nav-cta, .cta-button, .hero-seal, .hero-stroke {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+        color: black;
+        font-size: 12pt;
+      }
+
+      .hero { min-height: auto; padding: 2rem 0; }
+      section { padding: 2rem 0; }
+      .stone { break-inside: avoid; }
+      .insights-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="#" class="nav-brand">
+      <span class="nav-seal" aria-hidden="true">V</span>
+      <span data-i18n="nav.brand">Votive</span>
+    </a>
+
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#philosophy" class="nav-link" data-i18n="nav.philosophy">Philosophy</a>
+        <a href="#journey" class="nav-link" data-i18n="nav.journey">The Journey</a>
+        <a href="#insights" class="nav-link" data-i18n="nav.insights">AI Insights</a>
+      </div>
+
+      <button type="button" class="nav-cta" data-i18n="nav.beginDiscovery">Begin Discovery</button>
+
+      <div class="nav-controls">
+        <div class="lang-toggle">
+          <button type="button" data-lang="en" class="active">EN</button>
+          <span class="separator">|</span>
+          <button type="button" data-lang="pl">PL</button>
+        </div>
+
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg class="theme-icon theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <svg class="theme-icon theme-icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+
+        <button type="button" class="nav-menu-toggle" id="navMenuToggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="nav-mobile" id="navMobile">
+    <a href="#philosophy" class="nav-mobile-link" data-i18n="nav.philosophy">Philosophy</a>
+    <a href="#journey" class="nav-mobile-link" data-i18n="nav.journey">The Journey</a>
+    <a href="#insights" class="nav-mobile-link" data-i18n="nav.insights">AI Insights</a>
+    <button type="button" class="nav-cta" data-i18n="nav.beginDiscovery">Begin Discovery</button>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <!-- Ink brush seal accent -->
+        <div class="hero-seal">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <filter id="brush-filter" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+            </defs>
+            <rect x="5" y="5" width="90" height="90" rx="8"/>
+          </svg>
+        </div>
+
+        <h1 class="hero-tagline">
+          <span class="hero-word" data-i18n="hero.word1">Every</span>
+          <span class="hero-word" data-i18n="hero.word2">action</span>
+          <span class="hero-word" data-i18n="hero.word3">is</span>
+          <span class="hero-word" data-i18n="hero.word4">a</span>
+          <span class="hero-word hero-highlight" data-i18n="hero.word5">vote</span>
+          <span class="hero-word hero-highlight" data-i18n="hero.word6">for</span>
+          <span class="hero-word hero-highlight" data-i18n="hero.word7">who</span>
+          <span class="hero-word" data-i18n="hero.word8">you're becoming.</span>
+        </h1>
+
+        <p class="hero-subtitle" data-i18n="hero.subtitle">
+          Most habit apps fail because they skip the foundation: understanding who you already are. Votive guides you through AI-powered self-discovery before goal-setting.
+        </p>
+
+        <button type="button" class="hero-cta">
+          <span data-i18n="hero.cta">Start Your Discovery</span>
+          <svg class="hero-cta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </button>
+
+        <div class="hero-stroke"></div>
+      </div>
+
+      <div class="hero-aside">
+        <p class="hero-votes-label" data-i18n="hero.votesLabel">Votes Cast</p>
+        <p class="hero-votes-count" id="voteCounter">0</p>
+        <p class="hero-votes-desc" data-i18n="hero.votesDesc">toward better selves</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Philosophy Section -->
+  <section class="philosophy" id="philosophy">
+    <div class="philosophy-inner">
+      <div class="section-marker reveal" data-i18n="philosophy.label">The Problem</div>
+      <h2 class="philosophy-title reveal reveal-delay-1" data-i18n="philosophy.title">Goals fail when they skip the self</h2>
+
+      <div class="philosophy-text reveal reveal-delay-2">
+        <p data-i18n="philosophy.p1">You've tried habit trackers. Morning routines. The 21-day challenges. They work for a while, then dissolve. Not because you lack discipline, but because you started in the wrong place.</p>
+        <p data-i18n="philosophy.p2">Real change doesn't begin with goals. It begins with understanding who you already are: your energy patterns, your hidden motivations, the unconscious behaviors that shape your days.</p>
+      </div>
+
+      <div class="philosophy-quote reveal reveal-delay-3">
+        <blockquote data-i18n="philosophy.quote">
+          "The curious paradox is that when I accept myself just as I am, then I can change."
+        </blockquote>
+        <cite>— <span data-i18n="philosophy.quoteAuthor">Carl Rogers</span></cite>
+      </div>
+    </div>
+  </section>
+
+  <div class="ma-breath"></div>
+
+  <!-- Journey Section -->
+  <section class="journey" id="journey">
+    <div class="journey-header reveal">
+      <div class="section-marker" data-i18n="journey.label">The Journey</div>
+      <h2 class="journey-title" data-i18n="journey.title">Five phases of transformation</h2>
+      <p class="journey-subtitle" data-i18n="journey.subtitle">Votive guides you through a deliberate progression: from understanding who you are to becoming who you aspire to be.</p>
+    </div>
+
+    <div class="journey-stones">
+      <!-- Phase 1 -->
+      <div class="stone reveal">
+        <span class="stone-number">01</span>
+        <p class="stone-name" data-i18n="journey.phases.1.name">State Awareness</p>
+        <h3 class="stone-title" data-i18n="journey.phases.1.title">Know Your Rhythms</h3>
+        <p class="stone-description" data-i18n="journey.phases.1.description">Map your energy cycles, mood triggers, and willpower patterns. Discover what drains you and what restores you.</p>
+        <div class="stone-features">
+          <span class="stone-feature" data-i18n="journey.phases.1.features.0">Peak energy times</span>
+          <span class="stone-feature" data-i18n="journey.phases.1.features.1">Emotional triggers</span>
+          <span class="stone-feature" data-i18n="journey.phases.1.features.2">Willpower patterns</span>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="stone reveal reveal-delay-1">
+        <span class="stone-number">02</span>
+        <p class="stone-name" data-i18n="journey.phases.2.name">Identity Mapping</p>
+        <h3 class="stone-title" data-i18n="journey.phases.2.title">See Yourself Clearly</h3>
+        <p class="stone-description" data-i18n="journey.phases.2.description">Examine your current identity, automatic behaviors, and keystone habits. Surface your core values and natural strengths.</p>
+        <div class="stone-features">
+          <span class="stone-feature" data-i18n="journey.phases.2.features.0">Self-perception gaps</span>
+          <span class="stone-feature" data-i18n="journey.phases.2.features.1">Core values alignment</span>
+          <span class="stone-feature" data-i18n="journey.phases.2.features.2">Keystone behaviors</span>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="stone coming-soon reveal reveal-delay-2">
+        <span class="stone-soon-badge" data-i18n="journey.comingSoon">Coming Soon</span>
+        <span class="stone-number">03</span>
+        <p class="stone-name" data-i18n="journey.phases.3.name">Identity Design</p>
+        <h3 class="stone-title" data-i18n="journey.phases.3.title">Envision Your Future Self</h3>
+        <p class="stone-description" data-i18n="journey.phases.3.description">Define your aspirational identity and create believable stepping-stones to bridge the gap.</p>
+        <div class="stone-features">
+          <span class="stone-feature" data-i18n="journey.phases.3.features.0">Aspirational identity</span>
+          <span class="stone-feature" data-i18n="journey.phases.3.features.1">Identity bridges</span>
+          <span class="stone-feature" data-i18n="journey.phases.3.features.2">Behavior mapping</span>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="stone coming-soon reveal reveal-delay-3">
+        <span class="stone-soon-badge" data-i18n="journey.comingSoon">Coming Soon</span>
+        <span class="stone-number">04</span>
+        <p class="stone-name" data-i18n="journey.phases.4.name">System Design</p>
+        <h3 class="stone-title" data-i18n="journey.phases.4.title">Build Your Architecture</h3>
+        <p class="stone-description" data-i18n="journey.phases.4.description">Design habit loops, optimize your environment, and create accountability structures.</p>
+        <div class="stone-features">
+          <span class="stone-feature" data-i18n="journey.phases.4.features.0">Habit architecture</span>
+          <span class="stone-feature" data-i18n="journey.phases.4.features.1">Environment design</span>
+          <span class="stone-feature" data-i18n="journey.phases.4.features.2">Accountability</span>
+        </div>
+      </div>
+
+      <!-- Phase 5 -->
+      <div class="stone coming-soon reveal reveal-delay-4">
+        <span class="stone-soon-badge" data-i18n="journey.comingSoon">Coming Soon</span>
+        <span class="stone-number">05</span>
+        <p class="stone-name" data-i18n="journey.phases.5.name">Integration</p>
+        <h3 class="stone-title" data-i18n="journey.phases.5.title">Embody the Change</h3>
+        <p class="stone-description" data-i18n="journey.phases.5.description">Track progress, collect behavioral evidence, and reinforce your evolving identity.</p>
+        <div class="stone-features">
+          <span class="stone-feature" data-i18n="journey.phases.5.features.0">Progress tracking</span>
+          <span class="stone-feature" data-i18n="journey.phases.5.features.1">Identity reinforcement</span>
+          <span class="stone-feature" data-i18n="journey.phases.5.features.2">Evidence collection</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ma-vertical"></div>
+
+  <!-- Insights Section -->
+  <section class="insights" id="insights">
+    <div class="insights-inner">
+      <div class="insights-header reveal">
+        <div class="section-marker" data-i18n="insights.label">AI Insights</div>
+        <h2 class="insights-title" data-i18n="insights.title">Intelligence that understands you</h2>
+        <p class="insights-subtitle" data-i18n="insights.subtitle">Claude analyzes your responses to find patterns, contradictions, and leverage points that rule-based systems would miss.</p>
+
+        <div class="insights-features">
+          <div class="insights-feature">
+            <span class="insights-feature-dot"></span>
+            <span class="insights-feature-text" data-i18n="insights.features.0">Hidden behavioral patterns</span>
+          </div>
+          <div class="insights-feature">
+            <span class="insights-feature-dot"></span>
+            <span class="insights-feature-text" data-i18n="insights.features.1">Internal contradictions</span>
+          </div>
+          <div class="insights-feature">
+            <span class="insights-feature-dot"></span>
+            <span class="insights-feature-text" data-i18n="insights.features.2">Blind spots and assumptions</span>
+          </div>
+          <div class="insights-feature">
+            <span class="insights-feature-dot"></span>
+            <span class="insights-feature-text" data-i18n="insights.features.3">High-leverage opportunities</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="insights-card reveal reveal-delay-1">
+        <div class="insights-card-header">
+          <span class="insights-card-label" data-i18n="insights.sampleCard.label">Sample Insight</span>
+          <span class="insights-card-category" data-i18n="insights.sampleCard.category">Identity Synthesis</span>
+        </div>
+        <p class="insights-card-quote">
+          "<span data-i18n="insights.quote.part1">You describe yourself as </span><span class="highlight" data-i18n="insights.quote.highlight1">disciplined</span><span data-i18n="insights.quote.part2">, yet your energy crashes and mood triggers suggest you're running on </span><span class="highlight" data-i18n="insights.quote.highlight2">willpower alone</span><span data-i18n="insights.quote.part3">, a finite resource. Your keystone behavior of morning exercise could be the anchor that replenishes rather than depletes, if you shift from forcing performance to honoring rhythm.</span>"
+        </p>
+        <p class="insights-card-analysis" data-i18n="insights.sampleCard.analysis">
+          This isn't hypocrisy, it's a gap between your aspirational and actual identity. Understanding this tension is the first step to bridging it.
+        </p>
+        <p class="insights-card-footer" data-i18n="insights.sampleCard.poweredBy">Powered by Claude AI</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="cta-inner">
+      <h2 class="cta-title reveal" data-i18n="cta.title">Ready to understand yourself?</h2>
+      <p class="cta-subtitle reveal reveal-delay-1" data-i18n="cta.subtitle">The assessment takes about 15 minutes. No accounts, no tracking, just honest reflection.</p>
+      <button type="button" class="cta-button reveal reveal-delay-2">
+        <span data-i18n="cta.button">Begin Your Discovery</span>
+        <svg class="cta-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </button>
+      <div class="cta-meta reveal reveal-delay-3">
+        <span data-i18n="cta.timeEstimate">~15 minutes of honest reflection</span>
+        <span data-i18n="cta.openSource">Free to use · No account required</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <span class="footer-brand">
+        <span class="footer-seal" aria-hidden="true">V</span>
+        <span data-i18n="footer.brand">Votive</span>
+      </span>
+
+      <div class="footer-links">
+        <a href="https://github.com" class="footer-link" target="_blank" rel="noopener noreferrer">
+          <svg class="footer-link-icon" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          <span data-i18n="footer.github">GitHub</span>
+        </a>
+      </div>
+
+      <span class="footer-meta" data-i18n="footer.author">by Konrad Jagusiak</span>
+    </div>
+  </footer>
+
+  <script>
+    // ========================================
+    // TRANSLATIONS
+    // ========================================
+    const translations = {
+      en: {
+        nav: { brand: "Votive", philosophy: "Philosophy", journey: "The Journey", insights: "AI Insights", beginDiscovery: "Begin Discovery" },
+        hero: { word1: "Every", word2: "action", word3: "is", word4: "a", word5: "vote", word6: "for", word7: "who", word8: "you're becoming.", subtitle: "Most habit apps fail because they skip the foundation: understanding who you already are. Votive guides you through AI-powered self-discovery before goal-setting.", cta: "Start Your Discovery", votesLabel: "Votes Cast", votesDesc: "toward better selves" },
+        philosophy: { label: "The Problem", title: "Goals fail when they skip the self", p1: "You've tried habit trackers. Morning routines. The 21-day challenges. They work for a while, then dissolve. Not because you lack discipline, but because you started in the wrong place.", p2: "Real change doesn't begin with goals. It begins with understanding who you already are: your energy patterns, your hidden motivations, the unconscious behaviors that shape your days.", quote: "\"The curious paradox is that when I accept myself just as I am, then I can change.\"", quoteAuthor: "Carl Rogers" },
+        journey: { label: "The Journey", title: "Five phases of transformation", subtitle: "Votive guides you through a deliberate progression: from understanding who you are to becoming who you aspire to be.", comingSoon: "Coming Soon", phases: { 1: { name: "State Awareness", title: "Know Your Rhythms", description: "Map your energy cycles, mood triggers, and willpower patterns. Discover what drains you and what restores you.", features: ["Peak energy times", "Emotional triggers", "Willpower patterns"] }, 2: { name: "Identity Mapping", title: "See Yourself Clearly", description: "Examine your current identity, automatic behaviors, and keystone habits. Surface your core values and natural strengths.", features: ["Self-perception gaps", "Core values alignment", "Keystone behaviors"] }, 3: { name: "Identity Design", title: "Envision Your Future Self", description: "Define your aspirational identity and create believable stepping-stones to bridge the gap.", features: ["Aspirational identity", "Identity bridges", "Behavior mapping"] }, 4: { name: "System Design", title: "Build Your Architecture", description: "Design habit loops, optimize your environment, and create accountability structures.", features: ["Habit architecture", "Environment design", "Accountability"] }, 5: { name: "Integration", title: "Embody the Change", description: "Track progress, collect behavioral evidence, and reinforce your evolving identity.", features: ["Progress tracking", "Identity reinforcement", "Evidence collection"] } } },
+        insights: { label: "AI Insights", title: "Intelligence that understands you", subtitle: "Claude analyzes your responses to find patterns, contradictions, and leverage points that rule-based systems would miss.", features: ["Hidden behavioral patterns", "Internal contradictions", "Blind spots and assumptions", "High-leverage opportunities"], quote: { part1: "You describe yourself as ", highlight1: "disciplined", part2: ", yet your energy crashes and mood triggers suggest you're running on ", highlight2: "willpower alone", part3: ", a finite resource. Your keystone behavior of morning exercise could be the anchor that replenishes rather than depletes, if you shift from forcing performance to honoring rhythm." }, sampleCard: { label: "Sample Insight", category: "Identity Synthesis", analysis: "This isn't hypocrisy, it's a gap between your aspirational and actual identity. Understanding this tension is the first step to bridging it.", poweredBy: "Powered by Claude AI" } },
+        cta: { title: "Ready to understand yourself?", subtitle: "The assessment takes about 15 minutes. No accounts, no tracking, just honest reflection.", button: "Begin Your Discovery", timeEstimate: "~15 minutes of honest reflection", openSource: "Free to use · No account required" },
+        footer: { brand: "Votive", github: "GitHub", author: "by Konrad Jagusiak" }
+      },
+      pl: {
+        nav: { brand: "Votive", philosophy: "Filozofia", journey: "Podróż", insights: "Analizy AI", beginDiscovery: "Rozpocznij odkrywanie" },
+        hero: { word1: "Każde", word2: "działanie", word3: "to", word4: "", word5: "głos", word6: "za", word7: "tym,", word8: "kim się stajesz.", subtitle: "Większość aplikacji do nawyków zawodzi, bo pomija fundament: zrozumienie kim już jesteś. Votive prowadzi Cię przez samopoznanie wspierane AI, zanim przejdziesz do celów.", cta: "Rozpocznij odkrywanie", votesLabel: "Oddanych głosów", votesDesc: "ku lepszym wersjom siebie" },
+        philosophy: { label: "Problem", title: "Cele zawodzą gdy pomijają jaźń", p1: "Próbowałeś aplikacji do nawyków. Porannych rutyn. 21-dniowych wyzwań. Działają przez chwilę, potem się rozpadają. Nie dlatego, że brakuje Ci dyscypliny, ale dlatego, że zacząłeś w złym miejscu.", p2: "Prawdziwa zmiana nie zaczyna się od celów. Zaczyna się od zrozumienia kim już jesteś: Twoich wzorców energii, ukrytych motywacji, nieświadomych zachowań kształtujących Twoje dni.", quote: "\"Ciekawym paradoksem jest to, że kiedy akceptuję siebie takim, jakim jestem, wtedy mogę się zmienić.\"", quoteAuthor: "Carl Rogers" },
+        journey: { label: "Podróż", title: "Pięć faz transformacji", subtitle: "Votive prowadzi Cię przez świadomą progresję: od zrozumienia kim jesteś do stawania się tym, kim chcesz być.", comingSoon: "Wkrótce", phases: { 1: { name: "Świadomość Stanu", title: "Poznaj swoje rytmy", description: "Zmapuj cykle energii, wyzwalacze nastroju i wzorce siły woli. Odkryj co Cię wyczerpuje i co Cię regeneruje.", features: ["Szczyty energii", "Wyzwalacze emocji", "Wzorce siły woli"] }, 2: { name: "Mapowanie Tożsamości", title: "Zobacz siebie wyraźnie", description: "Zbadaj swoją obecną tożsamość, automatyczne zachowania i kluczowe nawyki. Odkryj swoje wartości i naturalne mocne strony.", features: ["Luki w samopostrzeganiu", "Zgodność z wartościami", "Kluczowe zachowania"] }, 3: { name: "Projektowanie Tożsamości", title: "Wyobraź sobie przyszłego siebie", description: "Zdefiniuj swoją aspiracyjną tożsamość i stwórz wiarygodne kamienie milowe by zbudować most.", features: ["Aspiracyjna tożsamość", "Mosty tożsamości", "Mapowanie zachowań"] }, 4: { name: "Projektowanie Systemu", title: "Zbuduj swoją architekturę", description: "Zaprojektuj pętle nawyków, zoptymalizuj środowisko i stwórz struktury odpowiedzialności.", features: ["Architektura nawyków", "Projektowanie środowiska", "Odpowiedzialność"] }, 5: { name: "Integracja", title: "Ucieleśnij zmianę", description: "Śledź postępy, zbieraj dowody behawioralne i wzmacniaj swoją ewoluującą tożsamość.", features: ["Śledzenie postępów", "Wzmacnianie tożsamości", "Zbieranie dowodów"] } } },
+        insights: { label: "Analizy AI", title: "Inteligencja która Cię rozumie", subtitle: "Claude analizuje Twoje odpowiedzi by znaleźć wzorce, sprzeczności i punkty dźwigni, które systemy oparte na regułach by przeoczyły.", features: ["Ukryte wzorce behawioralne", "Wewnętrzne sprzeczności", "Martwe punkty i założenia", "Możliwości wysokiej dźwigni"], quote: { part1: "Opisujesz siebie jako ", highlight1: "zdyscyplinowanego", part2: ", ale spadki energii i wyzwalacze nastroju sugerują, że działasz wyłącznie na ", highlight2: "sile woli", part3: " — ograniczonym zasobie. Twoje kluczowe zachowanie, poranne ćwiczenia, może stać się kotwicą, która regeneruje zamiast wyczerpywać, jeśli przejdziesz od wymuszania wydajności do szanowania rytmu." }, sampleCard: { label: "Przykładowa analiza", category: "Synteza tożsamości", analysis: "To nie hipokryzja, to luka między Twoją aspiracyjną a rzeczywistą tożsamością. Zrozumienie tego napięcia to pierwszy krok do jego pokonania.", poweredBy: "Wspierane przez Claude AI" } },
+        cta: { title: "Gotowy by zrozumieć siebie?", subtitle: "Ocena zajmuje około 15 minut. Bez kont, bez śledzenia, tylko szczera refleksja.", button: "Rozpocznij odkrywanie", timeEstimate: "~15 minut szczerej refleksji", openSource: "Darmowe · Bez rejestracji" },
+        footer: { brand: "Votive", github: "GitHub", author: "Konrad Jagusiak" }
+      }
+    };
+
+    function getNestedValue(obj, path) {
+      return path.split('.').reduce((current, key) => current && current[key], obj);
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    function setTheme(isDark) {
+      if (isDark) { document.documentElement.classList.add('dark'); localStorage.setItem('votive-theme-ink', 'dark'); }
+      else { document.documentElement.classList.remove('dark'); localStorage.setItem('votive-theme-ink', 'light'); }
+    }
+    themeToggle.addEventListener('click', function() { setTheme(!document.documentElement.classList.contains('dark')); });
+
+    // Mobile menu toggle
+    const navMenuToggle = document.getElementById('navMenuToggle');
+    const navMobile = document.getElementById('navMobile');
+    function toggleMobileMenu() {
+      const isOpen = navMobile.classList.toggle('active');
+      navMenuToggle.classList.toggle('active', isOpen);
+      navMenuToggle.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+    navMenuToggle.addEventListener('click', toggleMobileMenu);
+    navMobile.querySelectorAll('a, button').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if (navMobile.classList.contains('active')) {
+          toggleMobileMenu();
+        }
+      });
+    });
+
+    const langButtons = document.querySelectorAll('.lang-toggle button');
+    let currentLang = localStorage.getItem('votive-lang-ink') || 'en';
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      localStorage.setItem('votive-lang-ink', lang);
+      langButtons.forEach(function(btn) { btn.classList.toggle('active', btn.dataset.lang === lang); });
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        const key = el.getAttribute('data-i18n');
+        const value = getNestedValue(translations[lang], key);
+        if (value && typeof value === 'string') { el.textContent = value; }
+      });
+    }
+    langButtons.forEach(function(btn) { btn.addEventListener('click', function() { setLanguage(btn.dataset.lang); }); });
+    setLanguage(currentLang);
+
+    const revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+    const voteCounter = document.getElementById('voteCounter');
+    const targetVotes = 47832;
+    const duration = 2500;
+    let startTime = null;
+    let hasAnimated = false;
+    function animateCounter(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 4);
+      voteCounter.textContent = Math.floor(easeOut * targetVotes).toLocaleString();
+      if (progress < 1) { requestAnimationFrame(animateCounter); }
+    }
+    new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !hasAnimated) {
+          hasAnimated = true;
+          setTimeout(function() { requestAnimationFrame(animateCounter); }, 1000);
+        }
+      });
+    }, { threshold: 0.5 }).observe(document.querySelector('.hero'));
+  </script>
+</body>
+</html>
