@@ -273,13 +273,13 @@ If you didn't create a Votive account, you can safely ignore this email.
 
     try {
       const transporter = this.getTransporter();
-      const info = await transporter.sendMail({
+      const info = (await transporter.sendMail({
         from: this.config.from,
         to: options.to,
         subject: options.subject,
         text: options.text,
         html: options.html,
-      });
+      })) as unknown as { messageId: string };
 
       return {
         success: true,
@@ -300,7 +300,7 @@ If you didn't create a Votive account, you can safely ignore this email.
   /**
    * Close the transporter connection
    */
-  async close(): Promise<void> {
+  close(): void {
     if (this.transporter) {
       this.transporter.close();
       this.transporter = null;

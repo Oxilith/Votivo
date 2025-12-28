@@ -11,7 +11,7 @@
  * - jsonwebtoken for JWT operations
  */
 
-import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, TokenExpiredError, type SignOptions } from 'jsonwebtoken';
 
 /**
  * Payload included in access tokens
@@ -63,7 +63,7 @@ export function generateAccessToken(userId: string, config: JwtConfig): string {
   };
 
   return jwt.sign(payload, config.accessSecret, {
-    expiresIn: config.accessExpiresIn,
+    expiresIn: config.accessExpiresIn as SignOptions['expiresIn'],
   });
 }
 
@@ -87,7 +87,7 @@ export function generateRefreshToken(
   };
 
   return jwt.sign(payload, config.refreshSecret, {
-    expiresIn: config.refreshExpiresIn,
+    expiresIn: config.refreshExpiresIn as SignOptions['expiresIn'],
   });
 }
 
@@ -103,10 +103,10 @@ export function verifyAccessToken(
   config: JwtConfig
 ): TokenVerificationResult<AccessTokenPayload> {
   try {
-    const decoded = jwt.verify(token, config.accessSecret) as AccessTokenPayload;
+    const decoded = jwt.verify(token, config.accessSecret) as { type?: string; userId?: string };
 
     // Validate token type to prevent using refresh token as access token
-    if (decoded.type !== 'access') {
+    if (decoded.type !== 'access' || !decoded.userId) {
       return {
         success: false,
         payload: null,
@@ -116,7 +116,7 @@ export function verifyAccessToken(
 
     return {
       success: true,
-      payload: decoded,
+      payload: { type: 'access', userId: decoded.userId },
       error: null,
     };
   } catch (error) {
@@ -153,10 +153,10 @@ export function verifyRefreshToken(
   config: JwtConfig
 ): TokenVerificationResult<RefreshTokenPayload> {
   try {
-    const decoded = jwt.verify(token, config.refreshSecret) as RefreshTokenPayload;
+    const decoded = jwt.verify(token, config.refreshSecret) as { type?: string; userId?: string; tokenId?: string };
 
     // Validate token type to prevent using access token as refresh token
-    if (decoded.type !== 'refresh') {
+    if (decoded.type !== 'refresh' || !decoded.userId || !decoded.tokenId) {
       return {
         success: false,
         payload: null,
@@ -166,7 +166,7 @@ export function verifyRefreshToken(
 
     return {
       success: true,
-      payload: decoded,
+      payload: { type: 'refresh', userId: decoded.userId, tokenId: decoded.tokenId },
       error: null,
     };
   } catch (error) {

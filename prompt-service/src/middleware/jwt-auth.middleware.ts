@@ -155,7 +155,9 @@ export function jwtAuthMiddleware(
   }
 
   // Token is valid - attach user payload to request
-  (req as AuthenticatedRequest).user = verificationResult.payload!;
+  if (verificationResult.payload) {
+    (req as AuthenticatedRequest).user = verificationResult.payload;
+  }
   next();
 }
 
@@ -173,7 +175,7 @@ export function jwtAuthMiddleware(
  */
 export function optionalJwtAuthMiddleware(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void {
   // Get JWT configuration

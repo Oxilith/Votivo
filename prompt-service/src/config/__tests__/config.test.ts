@@ -187,6 +187,8 @@ describe('config validation', () => {
     it('should not throw an error when SESSION_SECRET is set in production', async () => {
       // Arrange
       process.env['SESSION_SECRET'] = 'production-secret-at-least-32-characters-long';
+      process.env['JWT_ACCESS_SECRET'] = 'jwt-access-secret-at-least-32-chars-here';
+      process.env['JWT_REFRESH_SECRET'] = 'jwt-refresh-secret-at-least-32-chars-here';
 
       // Act
       const { config } = await import('../index.js');

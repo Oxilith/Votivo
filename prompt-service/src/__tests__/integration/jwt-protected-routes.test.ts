@@ -16,7 +16,7 @@
  * - POST /api/user-auth/resend-verification (requires authentication)
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 /**
  * JWT Protected Routes Verification

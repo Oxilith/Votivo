@@ -18,6 +18,13 @@
  */
 
 import type { Request, Response } from 'express';
+
+/**
+ * Type for request cookies containing refresh token
+ */
+interface AuthCookies {
+  refreshToken?: string;
+}
 import { StatusCodes } from 'http-status-codes';
 import {
   userService,
@@ -117,7 +124,8 @@ export class UserAuthController {
    */
   async refresh(req: Request, res: Response): Promise<void> {
     // Get refresh token from cookie
-    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE];
+    const cookies = req.cookies as AuthCookies;
+    const refreshToken = cookies.refreshToken;
 
     if (!refreshToken) {
       res.status(StatusCodes.UNAUTHORIZED).json({
@@ -167,7 +175,7 @@ export class UserAuthController {
       res.json({
         message: 'If an account with that email exists, a password reset link has been sent.',
       });
-    } catch (error) {
+    } catch {
       // Email service errors should not leak to client
       // Log internally and return generic success message
       res.json({
@@ -239,7 +247,7 @@ export class UserAuthController {
    */
   async resendVerification(req: Request, res: Response): Promise<void> {
     const authenticatedReq = req as AuthenticatedRequest;
-    const userId = authenticatedReq.user?.userId;
+    const userId = authenticatedReq.user.userId;
 
     if (!userId) {
       res.status(StatusCodes.UNAUTHORIZED).json({
@@ -276,7 +284,8 @@ export class UserAuthController {
    */
   async logout(req: Request, res: Response): Promise<void> {
     // Get refresh token from cookie
-    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE];
+    const cookies = req.cookies as AuthCookies;
+    const refreshToken = cookies.refreshToken;
 
     if (refreshToken) {
       // Invalidate the refresh token in database
@@ -297,7 +306,7 @@ export class UserAuthController {
    */
   async logoutAll(req: Request, res: Response): Promise<void> {
     const authenticatedReq = req as AuthenticatedRequest;
-    const userId = authenticatedReq.user?.userId;
+    const userId = authenticatedReq.user.userId;
 
     if (!userId) {
       res.status(StatusCodes.UNAUTHORIZED).json({
@@ -323,7 +332,7 @@ export class UserAuthController {
    */
   async getCurrentUser(req: Request, res: Response): Promise<void> {
     const authenticatedReq = req as AuthenticatedRequest;
-    const userId = authenticatedReq.user?.userId;
+    const userId = authenticatedReq.user.userId;
 
     if (!userId) {
       res.status(StatusCodes.UNAUTHORIZED).json({
