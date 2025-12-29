@@ -38,6 +38,22 @@ import { apiClient } from './ApiClient';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 /**
+ * Safely parse JSON with error handling
+ * @param json - JSON string to parse
+ * @param context - Context for error message (e.g., "assessment abc123")
+ * @returns Parsed object
+ * @throws Error with descriptive message if parsing fails
+ */
+function safeJsonParse<T>(json: string, context: string): T {
+  try {
+    return JSON.parse(json) as T;
+  } catch (parseError) {
+    console.error(`Failed to parse ${context}:`, parseError);
+    throw new Error(`Data is corrupted (${context})`);
+  }
+}
+
+/**
  * Base path for user auth API endpoints
  */
 const AUTH_BASE_PATH = '/api/user-auth';
@@ -232,10 +248,13 @@ export class AuthService implements IAuthService {
       { responses: AssessmentResponses }
     >(`${AUTH_BASE_PATH}/assessment`, { responses }, this.getAuthConfig());
 
-    // Parse responses from JSON string
+    // Parse responses from JSON string with error handling
     return {
       ...response.data,
-      responses: JSON.parse(response.data.responses) as AssessmentResponses,
+      responses: safeJsonParse<AssessmentResponses>(
+        response.data.responses,
+        `assessment ${response.data.id}`
+      ),
     };
   }
 
@@ -248,10 +267,13 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse responses from JSON strings
+    // Parse responses from JSON strings with error handling
     return response.data.map((assessment) => ({
       ...assessment,
-      responses: JSON.parse(assessment.responses) as AssessmentResponses,
+      responses: safeJsonParse<AssessmentResponses>(
+        assessment.responses,
+        `assessment ${assessment.id}`
+      ),
     }));
   }
 
@@ -264,10 +286,13 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse responses from JSON string
+    // Parse responses from JSON string with error handling
     return {
       ...response.data,
-      responses: JSON.parse(response.data.responses) as AssessmentResponses,
+      responses: safeJsonParse<AssessmentResponses>(
+        response.data.responses,
+        `assessment ${response.data.id}`
+      ),
     };
   }
 
@@ -287,10 +312,13 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse result from JSON string
+    // Parse result from JSON string with error handling
     return {
       ...response.data,
-      result: JSON.parse(response.data.result) as AIAnalysisResult,
+      result: safeJsonParse<AIAnalysisResult>(
+        response.data.result,
+        `analysis ${response.data.id}`
+      ),
     };
   }
 
@@ -303,10 +331,13 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse results from JSON strings
+    // Parse results from JSON strings with error handling
     return response.data.map((analysis) => ({
       ...analysis,
-      result: JSON.parse(analysis.result) as AIAnalysisResult,
+      result: safeJsonParse<AIAnalysisResult>(
+        analysis.result,
+        `analysis ${analysis.id}`
+      ),
     }));
   }
 
@@ -319,10 +350,13 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse result from JSON string
+    // Parse result from JSON string with error handling
     return {
       ...response.data,
-      result: JSON.parse(response.data.result) as AIAnalysisResult,
+      result: safeJsonParse<AIAnalysisResult>(
+        response.data.result,
+        `analysis ${response.data.id}`
+      ),
     };
   }
 }

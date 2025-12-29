@@ -42,6 +42,11 @@ interface FormErrors {
 }
 
 /**
+ * Password strength regex: at least 1 uppercase, 1 lowercase, 1 number
+ */
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+/**
  * PasswordResetConfirmForm - Set new password after email reset
  */
 const PasswordResetConfirmForm: React.FC<PasswordResetConfirmFormProps> = ({
@@ -65,6 +70,8 @@ const PasswordResetConfirmForm: React.FC<PasswordResetConfirmFormProps> = ({
       newErrors.password = t('validation.passwordTooShort');
     } else if (password.length > 128) {
       newErrors.password = t('validation.passwordTooLong');
+    } else if (!PASSWORD_REGEX.test(password)) {
+      newErrors.password = t('validation.passwordWeak');
     }
 
     if (password !== confirmPassword) {

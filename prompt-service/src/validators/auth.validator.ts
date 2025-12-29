@@ -28,6 +28,18 @@ export const MIN_PASSWORD_LENGTH = 8;
 export const MAX_PASSWORD_LENGTH = 128;
 
 /**
+ * Password strength regex: at least 1 uppercase, 1 lowercase, 1 number
+ * Special characters are NOT required for moderate security level
+ */
+export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+/**
+ * Human-readable password requirements message
+ */
+export const PASSWORD_REQUIREMENTS_MESSAGE =
+  'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+
+/**
  * Maximum email length to prevent abuse
  */
 export const MAX_EMAIL_LENGTH = 254;
@@ -62,7 +74,8 @@ export const registerSchema = z.object({
   password: z
     .string()
     .min(MIN_PASSWORD_LENGTH, `Password must be at least ${MIN_PASSWORD_LENGTH} characters`)
-    .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters`),
+    .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters`)
+    .regex(PASSWORD_REGEX, PASSWORD_REQUIREMENTS_MESSAGE),
   name: z
     .string()
     .min(1, 'Name is required')
@@ -116,7 +129,8 @@ export const passwordResetConfirmSchema = z.object({
   newPassword: z
     .string()
     .min(MIN_PASSWORD_LENGTH, `Password must be at least ${MIN_PASSWORD_LENGTH} characters`)
-    .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters`),
+    .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters`)
+    .regex(PASSWORD_REGEX, PASSWORD_REQUIREMENTS_MESSAGE),
 });
 
 /**
@@ -176,7 +190,8 @@ export const passwordChangeSchema = z.object({
   newPassword: z
     .string()
     .min(MIN_PASSWORD_LENGTH, `Password must be at least ${MIN_PASSWORD_LENGTH} characters`)
-    .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters`),
+    .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters`)
+    .regex(PASSWORD_REGEX, PASSWORD_REQUIREMENTS_MESSAGE),
 });
 
 // Type exports for type-safe request handling

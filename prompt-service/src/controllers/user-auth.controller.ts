@@ -7,19 +7,22 @@
  * - Handles token refresh for session continuity
  * - Handles password reset flow (request and confirm)
  * - Handles email verification
- * - Handles user logout
+ * - Handles user logout with CSRF token cleanup
  * - Handles assessment CRUD (save, list, get by ID)
  * - Handles analysis CRUD (save, list, get by ID)
+ * - Sets CSRF token on successful authentication
  * - Returns appropriate HTTP status codes
  * @dependencies
  * - express for request/response handling
  * - @/services/user.service for authentication business logic
  * - @/validators/auth.validator for input validation
  * - @/middleware/jwt-auth.middleware for authenticated request type
+ * - @/middleware/csrf.middleware for CSRF token management
  * - @/errors for custom error types
  */
 
 import type { Request, Response } from 'express';
+import { logger } from '@/index.js';
 
 /**
  * Type for request cookies containing refresh token
@@ -28,11 +31,7 @@ interface AuthCookies {
   refreshToken?: string;
 }
 import { StatusCodes } from 'http-status-codes';
-import {
-  userService,
-  AuthenticationError,
-  TokenError,
-} from '@/services/user.service.js';
+import { userService } from '@/services/user.service.js';
 import {
   registerSchema,
   loginSchema,
@@ -42,8 +41,13 @@ import {
   profileUpdateSchema,
   passwordChangeSchema,
 } from '@/validators/auth.validator.js';
-import { isAppError } from '@/errors/index.js';
+import {
+  isAppError,
+  AuthenticationError,
+  TokenError,
+} from '@/errors/index.js';
 import type { AuthenticatedRequest } from '@/middleware/jwt-auth.middleware.js';
+import { setCsrfToken, clearCsrfToken } from '@/middleware/csrf.middleware.js';
 
 /**
  * Cookie name for refresh token
@@ -82,9 +86,13 @@ export class UserAuthController {
       // Set refresh token in httpOnly cookie
       res.cookie(REFRESH_TOKEN_COOKIE, result.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
+      // Set CSRF token for subsequent requests
+      const csrfToken = setCsrfToken(res);
+
       res.status(StatusCodes.CREATED).json({
         user: result.user,
         accessToken: result.accessToken,
+        csrfToken, // Include in response for immediate use
       });
     } catch (error) {
       if (isAppError(error)) {
@@ -111,9 +119,13 @@ export class UserAuthController {
       // Set refresh token in httpOnly cookie
       res.cookie(REFRESH_TOKEN_COOKIE, result.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
+      // Set CSRF token for subsequent requests
+      const csrfToken = setCsrfToken(res);
+
       res.json({
         user: result.user,
         accessToken: result.accessToken,
+        csrfToken, // Include in response for immediate use
       });
     } catch (error) {
       if (error instanceof AuthenticationError) {
@@ -183,9 +195,18 @@ export class UserAuthController {
       res.json({
         message: 'If an account with that email exists, a password reset link has been sent.',
       });
-    } catch {
-      // Email service errors should not leak to client
-      // Log internally and return generic success message
+    } catch (error) {
+      // Log the error for monitoring but don't leak to client
+      // This could be SMTP failure, database error, etc.
+      logger.error(
+        {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+        },
+        'Password reset request failed'
+      );
+
+      // Return generic success message to prevent user enumeration
       res.json({
         message: 'If an account with that email exists, a password reset link has been sent.',
       });
@@ -300,8 +321,9 @@ export class UserAuthController {
       await userService.logout(refreshToken);
     }
 
-    // Clear the cookie
+    // Clear the cookies
     res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });
+    clearCsrfToken(res);
 
     res.json({
       message: 'Logged out successfully.',
@@ -326,8 +348,9 @@ export class UserAuthController {
 
     const count = await userService.logoutAll(userId);
 
-    // Clear the current cookie
+    // Clear the cookies
     res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });
+    clearCsrfToken(res);
 
     res.json({
       message: `Logged out from ${count} session(s).`,

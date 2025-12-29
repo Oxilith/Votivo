@@ -55,6 +55,11 @@ const minYear = 1900;
 const maxYear = currentYear - 13; // Must be at least 13 years old
 
 /**
+ * Password strength regex: at least 1 uppercase, 1 lowercase, 1 number
+ */
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+/**
  * RegisterForm - User registration form with profile fields
  */
 const RegisterForm: React.FC<RegisterFormProps> = ({
@@ -107,6 +112,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       newErrors.password = t('validation.passwordTooShort');
     } else if (password.length > 128) {
       newErrors.password = t('validation.passwordTooLong');
+    } else if (!PASSWORD_REGEX.test(password)) {
+      newErrors.password = t('validation.passwordWeak');
     }
 
     // Confirm password

@@ -152,6 +152,37 @@ For deployments behind a load balancer with multiple instances, see [GitHub Issu
   - `signed: true` (tamper detection)
 - API key fallback uses timing-safe comparison
 
+### CSRF Protection
+
+User authentication endpoints use double-submit cookie pattern:
+- CSRF token set on login/register (cookie + response body)
+- Token validated for state-changing requests (POST/PUT/DELETE)
+- Cookie: `csrf-token` with `sameSite: 'strict'`, `secure: true` in production
+- Header: `x-csrf-token` (sent by frontend)
+- Timing-safe comparison prevents timing attacks
+
+Protected endpoints:
+- `/logout`, `/logout-all`
+- `/profile`, `/password`, `/account`
+- `/resend-verification`
+- `/assessment`, `/analysis` (save operations)
+
+### Password Requirements
+
+User passwords must meet:
+- Minimum 8 characters
+- At least one uppercase letter (A-Z)
+- At least one lowercase letter (a-z)
+- At least one number (0-9)
+
+### Distributed Tracing
+
+W3C Trace Context headers (OpenTelemetry compatible):
+- `traceparent` header propagated through all services
+- Format: `00-{traceId}-{spanId}-01`
+- TraceId/SpanId included in all Pino log entries
+- Worker jobs include trace context for correlation
+
 ### Database Encryption
 
 - SQLite database is encrypted using SQLCipher via libsql

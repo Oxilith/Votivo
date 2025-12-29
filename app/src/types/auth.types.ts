@@ -2,36 +2,24 @@
  * @file src/types/auth.types.ts
  * @purpose Define TypeScript interfaces for user authentication and profile management
  * @functionality
- * - Defines SafeUser interface for authenticated user data
+ * - Re-exports Gender and SafeUserResponse from shared
+ * - Defines SafeUser as alias for SafeUserResponse
  * - Defines request/response types for auth API operations
  * - Defines types for assessments and analyses storage
- * - Re-exports from shared types where applicable
  * @dependencies
- * - shared/index for AIAnalysisResult type
- * - @/types/assessment.types for AssessmentResponses
+ * - shared/index for AIAnalysisResult, AssessmentResponses, Gender, SafeUserResponse
  */
 
-import type { AIAnalysisResult, AssessmentResponses } from 'shared/index';
+import type { AIAnalysisResult, AssessmentResponses, Gender, SafeUserResponse } from 'shared/index';
 
-/**
- * Gender options for user profile
- */
-export type Gender = 'male' | 'female' | 'other' | 'prefer-not-to-say';
+// Re-export shared types for convenience
+export type { Gender };
 
 /**
  * User data without sensitive fields (returned from API)
+ * Alias for SafeUserResponse from shared
  */
-export interface SafeUser {
-  id: string;
-  email: string;
-  emailVerified: boolean;
-  emailVerifiedAt: string | null;
-  name: string;
-  gender: Gender | null;
-  birthYear: number;
-  createdAt: string;
-  updatedAt: string;
-}
+export type SafeUser = SafeUserResponse;
 
 /**
  * Request for user login

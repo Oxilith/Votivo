@@ -21,7 +21,13 @@ import express from 'express';
 import helmet from 'helmet';
 import compression from 'compression';
 import pinoHttp from 'pino-http';
-import { corsMiddleware, rateLimiter, errorHandler, notFoundHandler } from './middleware/index.js';
+import {
+  corsMiddleware,
+  rateLimiter,
+  errorHandler,
+  notFoundHandler,
+  tracingMiddleware,
+} from './middleware/index.js';
 import routes from './routes/index.js';
 import { logger } from './utils/logger.js';
 import {
@@ -47,7 +53,10 @@ app.use(corsMiddleware);
 // Compression
 app.use(compression());
 
-// Request logging
+// W3C Trace Context (before pino-http for logging integration)
+app.use(tracingMiddleware);
+
+// Request logging with trace context
 app.use(
   // @ts-expect-error - pino-http types have ESM interop issues
   pinoHttp({
@@ -55,6 +64,11 @@ app.use(
     autoLogging: {
       ignore: (req: { url?: string }) => req.url === '/health' || req.url === '/health/ready',
     },
+    // Include trace context in all log entries
+    customProps: (req: express.Request) => ({
+      traceId: req.traceContext?.traceId,
+      spanId: req.traceContext?.spanId,
+    }),
   })
 );
 

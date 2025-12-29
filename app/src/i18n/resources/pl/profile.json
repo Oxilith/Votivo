@@ -28,7 +28,7 @@
     "title": "Zmień hasło",
     "currentPassword": "Aktualne hasło",
     "newPassword": "Nowe hasło",
-    "newPasswordPlaceholder": "Minimum 8 znaków",
+    "newPasswordPlaceholder": "Min 8 znaków, wielka i mała litera, cyfra",
     "confirmPassword": "Potwierdź nowe hasło",
     "changePassword": "Zmień hasło",
     "changed": "Hasło zmienione pomyślnie"

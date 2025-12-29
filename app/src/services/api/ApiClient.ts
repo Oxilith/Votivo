@@ -7,6 +7,7 @@
  * - Handles request timeouts
  * - Transforms errors into consistent format
  * - Supports request/response interceptors pattern
+ * - Automatically includes CSRF token for state-changing requests
  * @dependencies
  * - @/services/interfaces (IApiClient, RequestConfig, ApiResponse, ApiError)
  */
@@ -16,6 +17,31 @@ import type { IApiClient, RequestConfig, ApiResponse, ApiError } from '../interf
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 const DEFAULT_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1000; // 1 second
+
+/**
+ * CSRF token header name
+ */
+const CSRF_HEADER = 'x-csrf-token';
+
+/**
+ * CSRF cookie name
+ */
+const CSRF_COOKIE = 'csrf-token';
+
+/**
+ * HTTP methods that require CSRF protection
+ */
+const CSRF_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH'];
+
+/**
+ * Read CSRF token from cookie
+ *
+ * @returns CSRF token or null if not found
+ */
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(new RegExp(`(^|;\\s*)${CSRF_COOKIE}=([^;]+)`));
+  return match ? decodeURIComponent(match[2]) : null;
+}
 
 export class ApiClientError extends Error implements ApiError {
   code: string;
@@ -77,10 +103,18 @@ export class ApiClient implements IApiClient {
     const maxRetries = config?.retries ?? DEFAULT_RETRIES;
     const retryDelay = config?.retryDelay ?? DEFAULT_RETRY_DELAY;
 
-    const headers = {
+    const headers: Record<string, string> = {
       ...this.defaultHeaders,
       ...config?.headers,
     };
+
+    // Add CSRF token for state-changing methods
+    if (CSRF_METHODS.includes(method)) {
+      const csrfToken = getCsrfToken();
+      if (csrfToken) {
+        headers[CSRF_HEADER] = csrfToken;
+      }
+    }
 
     const options: RequestInit = {
       method,

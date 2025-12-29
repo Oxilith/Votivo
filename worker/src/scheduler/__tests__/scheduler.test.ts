@@ -238,12 +238,18 @@ describe('Scheduler', () => {
 
       expect(job.run).toHaveBeenCalled();
       expect(mockLoggerChild.info).toHaveBeenCalledWith(
-        { job: 'test-job' },
+        expect.objectContaining({
+          job: 'test-job',
+          traceId: expect.any(String) as unknown,
+          spanId: expect.any(String) as unknown,
+        }),
         'Job started'
       );
       expect(mockLoggerChild.info).toHaveBeenCalledWith(
         expect.objectContaining({
           job: 'test-job',
+          traceId: expect.any(String) as unknown,
+          spanId: expect.any(String) as unknown,
           duration: expect.any(Number) as unknown,
           deleted: 5,
         }),
@@ -267,6 +273,8 @@ describe('Scheduler', () => {
       expect(mockLoggerChild.error).toHaveBeenCalledWith(
         expect.objectContaining({
           job: 'test-job',
+          traceId: expect.any(String) as unknown,
+          spanId: expect.any(String) as unknown,
           duration: expect.any(Number) as unknown,
           deleted: 0,
         }),
@@ -287,6 +295,8 @@ describe('Scheduler', () => {
       expect(mockLoggerChild.error).toHaveBeenCalledWith(
         expect.objectContaining({
           job: 'test-job',
+          traceId: expect.any(String) as unknown,
+          spanId: expect.any(String) as unknown,
           duration: expect.any(Number) as unknown,
           error: 'Database connection failed',
         }),

@@ -5,6 +5,9 @@
  * - Provides AppError base class with status code and error code
  * - Provides NotFoundError for 404 responses
  * - Provides ValidationError for 400 responses
+ * - Provides ConflictError for 409 responses
+ * - Provides AuthenticationError for 401 authentication failures
+ * - Provides TokenError for 401 token-related failures
  * - Provides type guard for error handling in controllers
  * @dependencies
  * - None (pure TypeScript)
@@ -66,6 +69,36 @@ export class ValidationError extends AppError {
 export class ConflictError extends AppError {
   readonly statusCode = 409;
   readonly code = 'CONFLICT';
+}
+
+/**
+ * Token error codes for type-safe error handling
+ */
+export type TokenErrorCode = 'INVALID_TOKEN' | 'TOKEN_EXPIRED' | 'TOKEN_REVOKED';
+
+/**
+ * Error thrown when authentication fails (invalid credentials)
+ */
+export class AuthenticationError extends AppError {
+  readonly statusCode = 401;
+  readonly code = 'AUTHENTICATION_FAILED';
+
+  constructor(message: string = 'Invalid email or password') {
+    super(message);
+  }
+}
+
+/**
+ * Error thrown when a token is invalid, expired, or revoked
+ */
+export class TokenError extends AppError {
+  readonly statusCode = 401;
+  readonly code: TokenErrorCode;
+
+  constructor(message: string, code: TokenErrorCode = 'INVALID_TOKEN') {
+    super(message);
+    this.code = code;
+  }
 }
 
 /**

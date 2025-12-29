@@ -10,17 +10,20 @@
  * - Routes for analysis CRUD (save, list, get by ID)
  * - Wraps controller methods with async error handling
  * - Applies JWT authentication middleware to protected routes
+ * - Applies CSRF protection to state-changing endpoints
  * - Applies per-route rate limiting with env-configurable limits
  * @dependencies
  * - express Router
  * - @/controllers/user-auth.controller for request handling
  * - @/middleware/jwt-auth.middleware for protected routes
+ * - @/middleware/csrf.middleware for CSRF protection
  * - @/middleware/rate-limit.middleware for per-route rate limiting
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { userAuthController } from '@/controllers/user-auth.controller.js';
 import { jwtAuthMiddleware } from '@/middleware/jwt-auth.middleware.js';
+import { csrfMiddleware } from '@/middleware/csrf.middleware.js';
 import {
   loginLimiter,
   registerLimiter,
@@ -84,26 +87,29 @@ router.get(
   asyncHandler(userAuthController.verifyEmail.bind(userAuthController))
 );
 
-// Logout (uses profile limiter - 15 req/min)
+// Logout (uses profile limiter - 15 req/min, CSRF protected)
 router.post(
   '/logout',
+  csrfMiddleware,
   profileLimiter,
   asyncHandler(userAuthController.logout.bind(userAuthController))
 );
 
 // Protected routes - require JWT authentication
 
-// Resend verification email (3 req/min - email abuse prevention)
+// Resend verification email (3 req/min - email abuse prevention, CSRF protected)
 router.post(
   '/resend-verification',
+  csrfMiddleware,
   passwordResetLimiter,
   jwtAuthMiddleware,
   asyncHandler(userAuthController.resendVerification.bind(userAuthController))
 );
 
-// Logout from all sessions (15 req/min)
+// Logout from all sessions (15 req/min, CSRF protected)
 router.post(
   '/logout-all',
+  csrfMiddleware,
   profileLimiter,
   jwtAuthMiddleware,
   asyncHandler(userAuthController.logoutAll.bind(userAuthController))
@@ -117,33 +123,37 @@ router.get(
   asyncHandler(userAuthController.getCurrentUser.bind(userAuthController))
 );
 
-// Update user profile (15 req/min)
+// Update user profile (15 req/min, CSRF protected)
 router.put(
   '/profile',
+  csrfMiddleware,
   profileLimiter,
   jwtAuthMiddleware,
   asyncHandler(userAuthController.updateProfile.bind(userAuthController))
 );
 
-// Change password (5 req/min - sensitive operation)
+// Change password (5 req/min - sensitive operation, CSRF protected)
 router.put(
   '/password',
+  csrfMiddleware,
   loginLimiter,
   jwtAuthMiddleware,
   asyncHandler(userAuthController.changePassword.bind(userAuthController))
 );
 
-// Delete account (5 req/min - sensitive operation)
+// Delete account (5 req/min - sensitive operation, CSRF protected)
 router.delete(
   '/account',
+  csrfMiddleware,
   loginLimiter,
   jwtAuthMiddleware,
   asyncHandler(userAuthController.deleteAccount.bind(userAuthController))
 );
 
-// Save assessment (30 req/min - user data)
+// Save assessment (30 req/min - user data, CSRF protected)
 router.post(
   '/assessment',
+  csrfMiddleware,
   userDataLimiter,
   jwtAuthMiddleware,
   asyncHandler(userAuthController.saveAssessment.bind(userAuthController))
@@ -165,9 +175,10 @@ router.get(
   asyncHandler(userAuthController.getAssessmentById.bind(userAuthController))
 );
 
-// Save analysis (30 req/min - user data)
+// Save analysis (30 req/min - user data, CSRF protected)
 router.post(
   '/analysis',
+  csrfMiddleware,
   userDataLimiter,
   jwtAuthMiddleware,
   asyncHandler(userAuthController.saveAnalysis.bind(userAuthController))

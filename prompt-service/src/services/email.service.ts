@@ -33,6 +33,8 @@ export interface EmailResult {
   success: boolean;
   messageId?: string;
   error?: string;
+  /** True if email was skipped (e.g., SMTP not configured in development) */
+  skipped?: boolean;
 }
 
 /**
@@ -126,7 +128,11 @@ export class EmailService {
       const transporter = this.getTransporter();
       await transporter.verify();
       return true;
-    } catch {
+    } catch (error) {
+      console.error(
+        '[EmailService] SMTP verification failed:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
       return false;
     }
   }
@@ -254,15 +260,17 @@ If you didn't create a Votive account, you can safely ignore this email.
     // Check if email service is configured
     if (!this.isConfigured()) {
       const errorMessage = 'Email service is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD environment variables.';
-      // Log warning in development, error in production
+      // Log warning in development, return skipped result
       if (process.env['NODE_ENV'] === 'development') {
         console.warn(`[EmailService] ${errorMessage}`);
         console.warn(`[EmailService] Would have sent email to: ${options.to}`);
         console.warn(`[EmailService] Subject: ${options.subject}`);
-        // Return success in development to allow testing without SMTP
+        // Return with skipped flag to indicate email was not actually sent
         return {
-          success: true,
+          success: false,
+          skipped: true,
           messageId: 'dev-mode-no-smtp',
+          error: 'Email not sent - SMTP not configured in development',
         };
       }
       return {

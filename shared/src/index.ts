@@ -76,3 +76,18 @@ export type {
 
 // Response Formatter
 export { formatResponsesForPrompt } from './responseFormatter.js';
+
+// Auth Types
+export type { Gender, SafeUserResponse } from './auth.types.js';
+
+// Tracing (W3C Trace Context)
+export {
+  TRACEPARENT_HEADER,
+  TRACESTATE_HEADER,
+  generateTraceId,
+  generateSpanId,
+  createTraceparent,
+  parseTraceparent,
+  extractOrCreateTrace,
+} from './tracing.js';
+export type { TraceContext, TraceInfo } from './tracing.js';

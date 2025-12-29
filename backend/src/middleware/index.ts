@@ -11,3 +11,4 @@
 export { corsMiddleware } from './cors.middleware.js';
 export { rateLimiter, claudeRateLimiter } from './rate-limiter.middleware.js';
 export { errorHandler, notFoundHandler, createAppError, type AppError } from './error.middleware.js';
+export { tracingMiddleware } from './tracing.middleware.js';

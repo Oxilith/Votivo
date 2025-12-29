@@ -28,7 +28,7 @@
     "title": "Change Password",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
-    "newPasswordPlaceholder": "At least 8 characters",
+    "newPasswordPlaceholder": "Min 8 chars, uppercase, lowercase, number",
     "confirmPassword": "Confirm New Password",
     "changePassword": "Change Password",
     "changed": "Password changed successfully"

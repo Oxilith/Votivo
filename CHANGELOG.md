@@ -1,3 +1,25 @@
+## [1.0.7] - 2025-12-29
+
+### Added
+- CSRF protection using double-submit cookie pattern for all state-changing auth endpoints
+- W3C Trace Context (OpenTelemetry-compatible) distributed tracing across backend, prompt-service, and worker
+- Password strength validation requiring uppercase, lowercase, and number (8+ chars)
+- Email rate limiting (5 verification emails per hour per user)
+- CSRF middleware tests (15 tests)
+- Tracing utilities in shared package (`shared/src/tracing.ts`)
+
+### Changed
+- Frontend ApiClient now automatically includes CSRF token for POST/PUT/DELETE requests
+- TokenVerificationResult refactored to discriminated union for better type safety
+- Worker scheduler logs now include traceId and spanId for distributed tracing
+- Login/register responses now include CSRF token for immediate client use
+
+### Security
+- CSRF tokens validated with timing-safe comparison
+- CSRF cookie uses `sameSite: 'strict'` and `secure: true` in production
+- Password requirements enforced on registration, password reset, and password change
+- Refresh token race condition fixed by moving database lookup inside transaction
+
 ## [1.0.6] - 2025-12-29
 
 ### Added

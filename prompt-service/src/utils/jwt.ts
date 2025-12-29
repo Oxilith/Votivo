@@ -35,13 +35,13 @@ export interface RefreshTokenPayload {
 }
 
 /**
- * Result of token verification
+ * Result of token verification - discriminated union for type-safe handling
+ * When success is true, payload is guaranteed to be defined
+ * When success is false, error is guaranteed to be defined
  */
-export interface TokenVerificationResult<T> {
-  success: boolean;
-  payload: T | null;
-  error: 'invalid' | 'expired' | null;
-}
+export type TokenVerificationResult<T> =
+  | { success: true; payload: T; error: null }
+  | { success: false; payload: null; error: 'invalid' | 'expired' };
 
 /**
  * Configuration for JWT operations

@@ -4,15 +4,17 @@
  * @functionality
  * - Registers jobs with cron schedules
  * - Manages job lifecycle (start, stop)
- * - Provides structured logging for job execution
+ * - Provides structured logging for job execution with W3C trace context
  * - Handles graceful shutdown
  * @dependencies
  * - node-cron for cron scheduling
+ * - shared/index for W3C tracing utilities
  * - @/jobs for Job interface
  * - @/utils/logger for structured logging
  */
 
 import cron from 'node-cron';
+import { generateTraceId, generateSpanId } from 'shared/index';
 import type { Job } from '@/jobs/index.js';
 import { logger } from '@/utils/logger.js';
 
@@ -48,8 +50,12 @@ export class Scheduler {
       job.schedule,
       () => {
         void (async () => {
+          // Each job execution gets its own trace context
+          const traceId = generateTraceId();
+          const spanId = generateSpanId();
           const startTime = Date.now();
-          this.log.info({ job: job.name }, 'Job started');
+
+          this.log.info({ job: job.name, traceId, spanId }, 'Job started');
 
           try {
             const result = await job.run();
@@ -59,6 +65,8 @@ export class Scheduler {
               this.log.info(
                 {
                   job: job.name,
+                  traceId,
+                  spanId,
                   duration,
                   ...result.metrics,
                 },
@@ -68,6 +76,8 @@ export class Scheduler {
               this.log.error(
                 {
                   job: job.name,
+                  traceId,
+                  spanId,
                   duration,
                   ...result.metrics,
                 },
@@ -79,6 +89,8 @@ export class Scheduler {
             this.log.error(
               {
                 job: job.name,
+                traceId,
+                spanId,
                 duration,
                 error: error instanceof Error ? error.message : 'Unknown error',
               },

@@ -249,7 +249,7 @@ describe('EmailService', () => {
       consoleSpy.mockRestore();
     });
 
-    it('should return success in development mode without SMTP config', async () => {
+    it('should return skipped result in development mode without SMTP config', async () => {
       process.env['NODE_ENV'] = 'development';
       const unconfiguredService = new EmailService({
         ...validSmtpConfig,
@@ -259,8 +259,10 @@ describe('EmailService', () => {
 
       const result = await unconfiguredService.sendPasswordResetEmail(resetEmailInput);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
+      expect(result.skipped).toBe(true);
       expect(result.messageId).toBe('dev-mode-no-smtp');
+      expect(result.error).toBe('Email not sent - SMTP not configured in development');
       expect(consoleWarnSpy).toHaveBeenCalled();
       consoleWarnSpy.mockRestore();
     });

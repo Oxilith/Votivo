@@ -75,6 +75,7 @@ const mockPrismaObj = vi.hoisted(() => ({
     findUnique: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    count: vi.fn(),
   },
   assessment: {
     findMany: vi.fn(),
@@ -113,16 +114,36 @@ vi.mock('@/config/index.js', () => ({
   },
 }));
 
+// Mock @/index.js to provide logger without loading entire app
+vi.mock('@/index.js', () => ({
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    child: vi.fn(() => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    })),
+  },
+}));
+
 import {
   UserService,
-  AuthenticationError,
-  TokenError,
   type RegisterInput,
   type LoginInput,
   type ProfileUpdateInput,
   type PasswordChangeInput,
 } from '@/services/user.service.js';
-import { NotFoundError, ConflictError } from '@/errors/index.js';
+import {
+  NotFoundError,
+  ConflictError,
+  AuthenticationError,
+  TokenError,
+  ValidationError,
+} from '@/errors/index.js';
 
 // Use the hoisted mocks directly
 const mockPrisma = mockPrismaObj;
@@ -334,7 +355,17 @@ describe('UserService', () => {
         payload: { userId: 'user-123', tokenId: 'token-123', type: 'refresh' },
         error: null,
       });
-      mockPrisma.refreshToken.findUnique.mockResolvedValue(null);
+      // Mock $transaction to execute callback with tx mock
+      mockPrisma.$transaction.mockImplementation(async (callback) => {
+        const txMock = {
+          refreshToken: {
+            findUnique: vi.fn().mockResolvedValue(null),
+            delete: vi.fn(),
+            create: vi.fn(),
+          },
+        };
+        return (callback as (tx: typeof txMock) => Promise<unknown>)(txMock);
+      });
 
       await expect(userService.refreshTokens('valid_jwt')).rejects.toThrow(TokenError);
     });
@@ -345,7 +376,17 @@ describe('UserService', () => {
         payload: { userId: 'different-user', tokenId: 'token-123', type: 'refresh' },
         error: null,
       });
-      mockPrisma.refreshToken.findUnique.mockResolvedValue(sampleRefreshToken);
+      // Mock $transaction to execute callback with tx mock
+      mockPrisma.$transaction.mockImplementation(async (callback) => {
+        const txMock = {
+          refreshToken: {
+            findUnique: vi.fn().mockResolvedValue(sampleRefreshToken),
+            delete: vi.fn(),
+            create: vi.fn(),
+          },
+        };
+        return (callback as (tx: typeof txMock) => Promise<unknown>)(txMock);
+      });
 
       await expect(userService.refreshTokens('valid_jwt')).rejects.toThrow(TokenError);
     });
@@ -357,13 +398,23 @@ describe('UserService', () => {
         error: null,
       });
       const expiredToken = { ...sampleRefreshToken, expiresAt: new Date(Date.now() - 1000) };
-      mockPrisma.refreshToken.findUnique.mockResolvedValue(expiredToken);
-      mockPrisma.refreshToken.delete.mockResolvedValue(expiredToken);
+      const deleteMock = vi.fn().mockResolvedValue(expiredToken);
+      // Mock $transaction to execute callback with tx mock
+      mockPrisma.$transaction.mockImplementation(async (callback) => {
+        const txMock = {
+          refreshToken: {
+            findUnique: vi.fn().mockResolvedValue(expiredToken),
+            delete: deleteMock,
+            create: vi.fn(),
+          },
+        };
+        return (callback as (tx: typeof txMock) => Promise<unknown>)(txMock);
+      });
 
       const error = await userService.refreshTokens('valid_jwt').catch((e: unknown) => e);
       expect(error).toBeInstanceOf(TokenError);
       expect((error as TokenError).code).toBe('TOKEN_EXPIRED');
-      expect(mockPrisma.refreshToken.delete).toHaveBeenCalled();
+      expect(deleteMock).toHaveBeenCalled();
     });
   });
 
@@ -502,6 +553,7 @@ describe('UserService', () => {
   describe('resendEmailVerification', () => {
     it('should resend verification email successfully', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(sampleUser);
+      mockPrisma.emailVerifyToken.count.mockResolvedValue(0);
       mockPrisma.emailVerifyToken.create.mockResolvedValue({
         id: 'verify-id',
         userId: 'user-123',
@@ -531,6 +583,42 @@ describe('UserService', () => {
 
       expect(result).toBe(false);
       expect(mockEmailService.sendEmailVerificationEmail).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError when rate limit exceeded (5 requests per hour)', async () => {
+      mockPrisma.user.findUnique.mockResolvedValue(sampleUser);
+      mockPrisma.emailVerifyToken.count.mockResolvedValue(5); // At limit
+
+      await expect(userService.resendEmailVerification('user-123')).rejects.toThrow(
+        ValidationError
+      );
+      await expect(userService.resendEmailVerification('user-123')).rejects.toThrow(
+        'Too many verification email requests'
+      );
+      expect(mockEmailService.sendEmailVerificationEmail).not.toHaveBeenCalled();
+    });
+
+    it('should allow resend when under rate limit', async () => {
+      mockPrisma.user.findUnique.mockResolvedValue(sampleUser);
+      mockPrisma.emailVerifyToken.count.mockResolvedValue(4); // Under limit
+      mockPrisma.emailVerifyToken.create.mockResolvedValue({
+        id: 'verify-id',
+        userId: 'user-123',
+        token: 'email_verify_token',
+        expiresAt: new Date(),
+        usedAt: null,
+        createdAt: new Date(),
+      });
+
+      const result = await userService.resendEmailVerification('user-123');
+
+      expect(result).toBe(true);
+      expect(mockPrisma.emailVerifyToken.count).toHaveBeenCalledWith({
+        where: {
+          userId: 'user-123',
+          createdAt: { gte: expect.any(Date) as unknown as Date },
+        },
+      });
     });
   });
 

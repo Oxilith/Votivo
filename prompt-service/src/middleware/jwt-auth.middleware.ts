@@ -155,9 +155,8 @@ export function jwtAuthMiddleware(
   }
 
   // Token is valid - attach user payload to request
-  if (verificationResult.payload) {
-    (req as AuthenticatedRequest).user = verificationResult.payload;
-  }
+  // After success check above, TypeScript knows payload is non-null due to discriminated union
+  (req as AuthenticatedRequest).user = verificationResult.payload;
   next();
 }
 
@@ -200,8 +199,9 @@ export function optionalJwtAuthMiddleware(
   // Verify the access token
   const verificationResult = verifyAccessToken(token, jwtConfig);
 
-  if (verificationResult.success && verificationResult.payload) {
+  if (verificationResult.success) {
     // Token is valid - attach user payload to request
+    // When success is true, TypeScript knows payload is non-null due to discriminated union
     (req as AuthenticatedRequest).user = verificationResult.payload;
   }
 

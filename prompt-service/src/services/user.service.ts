@@ -17,12 +17,20 @@
  * - @/services/email.service for email delivery
  * - @/config for application configuration
  * - @/errors for custom error types
+ * - shared/auth.types for Gender type
  */
 
 import { prisma } from '@/prisma/client.js';
 import type { User } from '@prisma/client';
 import { config } from '@/config/index.js';
-import { NotFoundError, ConflictError } from '@/errors/index.js';
+import { logger } from '@/index.js';
+import {
+  NotFoundError,
+  ConflictError,
+  AuthenticationError,
+  TokenError,
+  ValidationError,
+} from '@/errors/index.js';
 import { hashPassword, comparePassword } from '@/utils/password.js';
 import {
   generateAccessToken,
@@ -36,6 +44,10 @@ import {
   generateEmailVerificationToken,
 } from '@/utils/token.js';
 import { emailService } from '@/services/email.service.js';
+import type { Gender } from 'shared/auth.types.js';
+
+// Re-export Gender for backward compatibility
+export type { Gender };
 
 /**
  * Token expiry constants in milliseconds
@@ -45,24 +57,10 @@ const PASSWORD_RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 const EMAIL_VERIFY_TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
- * Gender options for user profile
- */
-export type Gender = 'male' | 'female' | 'other' | 'prefer-not-to-say';
-
-/**
  * User data without sensitive fields
+ * Uses Omit to structurally enforce password exclusion
  */
-export interface SafeUser {
-  id: string;
-  email: string;
-  emailVerified: boolean;
-  emailVerifiedAt: Date | null;
-  name: string;
-  gender: Gender | null;
-  birthYear: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export type SafeUser = Omit<User, 'password'>;
 
 /**
  * Input for user registration
@@ -124,11 +122,17 @@ export interface SavedAnalysis {
 
 /**
  * Result of successful authentication
+ *
+ * Note: emailVerificationSent is optional because email verification is not required.
+ * The system works without SMTP configured - this is intentional for deployments
+ * that don't need email verification.
  */
 export interface AuthResult {
   user: SafeUser;
   accessToken: string;
   refreshToken: string;
+  /** Whether verification email was sent (false if SMTP not configured) */
+  emailVerificationSent?: boolean;
 }
 
 /**
@@ -148,32 +152,6 @@ export interface RegistrationResult {
   message: string;
 }
 
-/**
- * Custom error for authentication failures
- */
-export class AuthenticationError extends Error {
-  readonly statusCode = 401;
-  readonly code = 'AUTHENTICATION_FAILED';
-
-  constructor(message: string = 'Invalid email or password') {
-    super(message);
-    this.name = 'AuthenticationError';
-  }
-}
-
-/**
- * Custom error for invalid/expired tokens
- */
-export class TokenError extends Error {
-  readonly statusCode = 401;
-  readonly code: string;
-
-  constructor(message: string, code: string = 'INVALID_TOKEN') {
-    super(message);
-    this.name = 'TokenError';
-    this.code = code;
-  }
-}
 
 /**
  * Strips sensitive fields from user object
@@ -278,11 +256,26 @@ export class UserService {
     });
 
     // Send verification email (don't fail registration if email fails)
-    // This is optional - works without SMTP configured
-    await emailService.sendEmailVerificationEmail({
+    // This is optional - the system works without SMTP configured
+    const emailResult = await emailService.sendEmailVerificationEmail({
       to: user.email,
       verificationToken: emailVerifyToken.token,
     });
+
+    // Log email result but don't fail registration
+    if (!emailResult.success) {
+      logger.warn(
+        {
+          userId: user.id,
+          email: user.email,
+          error: emailResult.error,
+          skipped: emailResult.skipped,
+        },
+        emailResult.skipped
+          ? 'Verification email skipped (SMTP not configured in development)'
+          : 'Verification email not sent (SMTP may not be configured)'
+      );
+    }
 
     // Generate access token
     const accessToken = generateAccessToken(user.id, this.jwtConfig);
@@ -291,6 +284,7 @@ export class UserService {
       user: toSafeUser(user),
       accessToken,
       refreshToken: refreshTokenRecord.tokenValue,
+      emailVerificationSent: emailResult.success,
     };
   }
 
@@ -347,49 +341,56 @@ export class UserService {
   /**
    * Refresh access token using a valid refresh token
    *
+   * Security: Uses database transaction to prevent race conditions where
+   * concurrent refresh requests with the same token could both succeed.
+   * The lookup, validation, and rotation all happen atomically.
+   *
    * @param refreshTokenJwt - The JWT refresh token
    * @returns New access and refresh tokens
    * @throws TokenError if refresh token is invalid or expired
    */
   async refreshTokens(refreshTokenJwt: string): Promise<RefreshResult> {
-    // Verify the refresh token JWT
+    // Verify the refresh token JWT (cryptographic verification before DB lookup)
     const verifyResult = verifyRefreshToken(refreshTokenJwt, this.jwtConfig);
 
-    if (!verifyResult.success || !verifyResult.payload) {
+    if (!verifyResult.success) {
       const errorMessage = verifyResult.error === 'expired'
         ? 'Refresh token expired'
         : 'Invalid refresh token';
       throw new TokenError(errorMessage, verifyResult.error === 'expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN');
     }
 
+    // After success check, TypeScript knows payload is non-null due to discriminated union
     const { userId, tokenId } = verifyResult.payload;
 
-    // Find the refresh token in database
-    const storedToken = await prisma.refreshToken.findUnique({
-      where: { token: tokenId },
-    });
-
-    // Validate stored token
-    if (!storedToken || storedToken.userId !== userId) {
-      throw new TokenError('Invalid refresh token');
-    }
-
-    // Check if token is expired in database
-    if (storedToken.expiresAt < new Date()) {
-      // Clean up expired token
-      await prisma.refreshToken.delete({
-        where: { id: storedToken.id },
-      });
-      throw new TokenError('Refresh token expired', 'TOKEN_EXPIRED');
-    }
-
-    // Rotate refresh token for security
+    // Prepare new token values before transaction
     const newTokenId = generateTokenId();
     const newExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_MS);
     const newRefreshTokenValue = generateRefreshToken(userId, newTokenId, this.jwtConfig);
 
-    // Delete old token and create new one in transaction
+    // Atomic transaction: lookup, validate, and rotate in one operation
+    // This prevents race conditions where concurrent requests could both succeed
     await prisma.$transaction(async (tx) => {
+      // Find the refresh token in database (inside transaction for atomicity)
+      const storedToken = await tx.refreshToken.findUnique({
+        where: { token: tokenId },
+      });
+
+      // Validate stored token
+      if (!storedToken || storedToken.userId !== userId) {
+        throw new TokenError('Invalid refresh token');
+      }
+
+      // Check if token is expired in database
+      if (storedToken.expiresAt < new Date()) {
+        // Clean up expired token
+        await tx.refreshToken.delete({
+          where: { id: storedToken.id },
+        });
+        throw new TokenError('Refresh token expired', 'TOKEN_EXPIRED');
+      }
+
+      // Delete old token and create new one atomically
       await tx.refreshToken.delete({
         where: { id: storedToken.id },
       });
@@ -434,7 +435,7 @@ export class UserService {
     const expiresAt = new Date(Date.now() + PASSWORD_RESET_TOKEN_EXPIRY_MS);
 
     // Store token in database
-    await prisma.passwordResetToken.create({
+    const tokenRecord = await prisma.passwordResetToken.create({
       data: {
         userId: user.id,
         token: resetToken,
@@ -443,10 +444,30 @@ export class UserService {
     });
 
     // Send reset email
-    await emailService.sendPasswordResetEmail({
+    const emailResult = await emailService.sendPasswordResetEmail({
       to: user.email,
       resetToken,
     });
+
+    // Handle email failure (still return true to prevent enumeration)
+    if (!emailResult.success) {
+      // In development mode with no SMTP, just log warning
+      if (emailResult.skipped) {
+        logger.warn(
+          { userId: user.id, skipped: true },
+          'Password reset email skipped (SMTP not configured in development)'
+        );
+      } else {
+        // Real email failure - clean up token
+        await prisma.passwordResetToken.delete({
+          where: { id: tokenRecord.id },
+        });
+        logger.error(
+          { userId: user.id, error: emailResult.error },
+          'Password reset email failed, token cleaned up'
+        );
+      }
+    }
 
     return true;
   }
@@ -561,11 +582,24 @@ export class UserService {
       return false; // Already verified
     }
 
+    // Rate limit: max 5 verification email requests per hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const recentTokenCount = await prisma.emailVerifyToken.count({
+      where: {
+        userId,
+        createdAt: { gte: oneHourAgo },
+      },
+    });
+
+    if (recentTokenCount >= 5) {
+      throw new ValidationError('Too many verification email requests. Please try again later.');
+    }
+
     // Generate new verification token
     const verificationToken = generateEmailVerificationToken();
     const expiresAt = new Date(Date.now() + EMAIL_VERIFY_TOKEN_EXPIRY_MS);
 
-    await prisma.emailVerifyToken.create({
+    const tokenRecord = await prisma.emailVerifyToken.create({
       data: {
         userId: user.id,
         token: verificationToken,
@@ -573,11 +607,32 @@ export class UserService {
       },
     });
 
-    // Send verification email
-    await emailService.sendEmailVerificationEmail({
+    // Send verification email and check result
+    const result = await emailService.sendEmailVerificationEmail({
       to: user.email,
       verificationToken,
     });
+
+    if (!result.success) {
+      // In development mode with no SMTP, log warning but don't fail
+      if (result.skipped) {
+        logger.warn(
+          { userId, skipped: true },
+          'Verification email skipped (SMTP not configured in development)'
+        );
+        return true;
+      }
+
+      // Real email failure - clean up unused token and throw error
+      await prisma.emailVerifyToken.delete({
+        where: { id: tokenRecord.id },
+      });
+      logger.error(
+        { userId, error: result.error },
+        'Failed to send verification email'
+      );
+      throw new Error('Failed to send verification email. Please try again later.');
+    }
 
     return true;
   }
@@ -592,10 +647,11 @@ export class UserService {
     // Verify the refresh token JWT to get the token ID
     const verifyResult = verifyRefreshToken(refreshTokenJwt, this.jwtConfig);
 
-    if (!verifyResult.success || !verifyResult.payload) {
+    if (!verifyResult.success) {
       return false; // Invalid token, nothing to do
     }
 
+    // After success check, TypeScript knows payload is non-null due to discriminated union
     const { tokenId } = verifyResult.payload;
 
     // Delete the refresh token from database

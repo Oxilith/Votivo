@@ -152,16 +152,28 @@ The backend calls the prompt-service `/api/resolve` endpoint to get prompt confi
 - Password hashing with bcrypt and timing-safe comparisons
 - Email verification and password reset flows
 - Rate limiting per endpoint (login: 5/min, register: 5/min, password reset: 3/min)
+- Email rate limiting (5 verification emails per hour per user)
 
-**Rate Limiting** (`/prompt-service/src/middleware/rate-limit.middleware.ts`):
-- Factory pattern for per-route rate limiters
-- Environment-configurable limits with sensible defaults
-- Brute force protection for authentication endpoints
+**Security Middleware**:
+- `src/middleware/rate-limit.middleware.ts` - Factory pattern for per-route rate limiters with env-configurable limits
+- `src/middleware/csrf.middleware.ts` - CSRF protection using double-submit cookie pattern
+- `src/middleware/tracing.middleware.ts` - W3C Trace Context (OpenTelemetry compatible)
+
+**CSRF Protection** (`/prompt-service/src/middleware/csrf.middleware.ts`):
+- Double-submit cookie pattern for state-changing requests
+- Token validation with timing-safe comparison
+- Applied to: logout, profile update, password change, account deletion, save assessment/analysis
+- Token set on login/register, cleared on logout
+
+**Password Validation**:
+- Minimum 8 characters
+- Requires: uppercase, lowercase, and number
+- Regex: `/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/`
 
 ### Worker (`/worker`)
 
 Background job scheduler for maintenance tasks:
-- `src/scheduler/index.ts` - Generic job scheduler using node-cron
+- `src/scheduler/index.ts` - Generic job scheduler using node-cron with W3C trace context
 - `src/jobs/token-cleanup.job.ts` - Cleans expired refresh, password reset, and email verification tokens
 - `src/config/index.ts` - Environment-configurable job schedules
 - Shares database with prompt-service via libsql
@@ -169,6 +181,14 @@ Background job scheduler for maintenance tasks:
 **Worker Configuration**:
 - `JOB_TOKEN_CLEANUP_ENABLED` - Enable/disable token cleanup (default: true)
 - `JOB_TOKEN_CLEANUP_SCHEDULE` - Cron schedule (default: `0 * * * *` = hourly)
+
+### Distributed Tracing (`/shared/src/tracing.ts`)
+
+W3C Trace Context implementation (OpenTelemetry compatible):
+- `generateTraceId()` / `generateSpanId()` - Cryptographic ID generation
+- `createTraceparent()` / `parseTraceparent()` - Header serialization
+- `extractOrCreateTrace()` - Extract from headers or create new trace
+- Applied in: backend, prompt-service, worker (via tracing middleware)
 
 ### Frontend (`/app/src`)
 

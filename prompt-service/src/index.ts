@@ -34,6 +34,7 @@ import { config } from '@/config/index.js';
 import { apiRouter } from '@/routes/index.js';
 import { prisma } from '@/prisma/client.js';
 import { adminAuthMiddleware } from '@/middleware/admin-auth.middleware.js';
+import { tracingMiddleware } from '@/middleware/tracing.middleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -89,7 +90,10 @@ app.use(
 // Compression
 app.use(compression());
 
-// Request logging
+// W3C Trace Context (before pino-http for logging integration)
+app.use(tracingMiddleware);
+
+// Request logging with trace context
 app.use(
   // @ts-expect-error - pino-http types have ESM interop issues
   pinoHttp({
@@ -97,6 +101,11 @@ app.use(
     autoLogging: {
       ignore: (req: { url?: string }) => req.url === '/health',
     },
+    // Include trace context in all log entries
+    customProps: (req: express.Request) => ({
+      traceId: req.traceContext?.traceId,
+      spanId: req.traceContext?.spanId,
+    }),
   })
 );
 

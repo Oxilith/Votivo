@@ -48,6 +48,11 @@ const minYear = 1900;
 const maxYear = currentYear - 13;
 
 /**
+ * Password strength regex: at least 1 uppercase, 1 lowercase, 1 number
+ */
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+/**
  * ProfilePage props
  */
 interface ProfilePageProps {
@@ -62,7 +67,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   onNavigateToAssessmentById,
   onNavigateToInsightsById,
 }) => {
-  const { t, i18n } = useTranslation('profile');
+  const { t, i18n } = useTranslation(['profile', 'auth']);
   const user = useCurrentUser();
   const { clearAuth, setUser } = useAuthStore();
   const { setView } = useUIStore();
@@ -219,12 +224,17 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     setPasswordSuccess(false);
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
+      setPasswordError(t('auth:validation.passwordMismatch'));
       return;
     }
 
     if (newPassword.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+      setPasswordError(t('auth:validation.passwordTooShort'));
+      return;
+    }
+
+    if (!PASSWORD_REGEX.test(newPassword)) {
+      setPasswordError(t('auth:validation.passwordWeak'));
       return;
     }
 
