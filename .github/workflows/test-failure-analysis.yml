@@ -32,7 +32,7 @@ jobs:
           echo "head_branch=${HEAD_BRANCH}" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ steps.validate.outputs.head_branch }}
           persist-credentials: false
