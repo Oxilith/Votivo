@@ -9,6 +9,7 @@ This guide covers Docker Hub deployment and publishing for Votive. For container
 | `oxilith/votive-backend` | Express API proxy (multi-arch) |
 | `oxilith/votive-frontend` | Nginx + React SPA (multi-arch) |
 | `oxilith/votive-prompt-service` | Prompt management microservice (multi-arch) |
+| `oxilith/votive-worker` | Background job scheduler (multi-arch) |
 | `oxilith/votive-oci` | OCI compose artifact for single-command deployment |
 
 All images support `linux/amd64` and `linux/arm64` platforms.
@@ -46,6 +47,7 @@ This starts:
 - **Frontend**: https://localhost (port 443)
 - **Backend**: http://localhost:3001 (proxied through nginx)
 - **Prompt Service**: http://localhost:3002 (internal)
+- **Worker**: Background job scheduler (no exposed port)
 
 ### Required Environment Variables
 
@@ -68,6 +70,8 @@ This starts:
 | `SMTP_USER` | - | SMTP authentication username |
 | `SMTP_PASSWORD` | - | SMTP authentication password |
 | `SMTP_FROM` | - | Default sender email address |
+| `JOB_TOKEN_CLEANUP_ENABLED` | true | Enable/disable token cleanup job |
+| `JOB_TOKEN_CLEANUP_SCHEDULE` | `0 * * * *` | Cron schedule for token cleanup (hourly) |
 
 Generate secure secrets with:
 ```bash
@@ -152,13 +156,14 @@ For security architecture details, see [Architecture > Security](architecture.md
 docker rmi oxilith/votive-frontend:latest 2>/dev/null
 docker rmi oxilith/votive-backend:latest 2>/dev/null
 docker rmi oxilith/votive-prompt-service:latest 2>/dev/null
+docker rmi oxilith/votive-worker:latest 2>/dev/null
 docker buildx prune -f
 
 # Build and push all images (linux/amd64 + linux/arm64)
 docker buildx bake --push --no-cache
 ```
 
-The `docker-bake.hcl` file defines build targets for all three services.
+The `docker-bake.hcl` file defines build targets for all four services.
 
 ### Publish OCI Compose Artifact
 
@@ -235,13 +240,15 @@ docker exec votive-backend node -e "fetch('http://localhost:3001/health').then(r
 
 Containers start in order with health check dependencies:
 1. `prompt-service` starts first
-2. `backend` waits for prompt-service to be healthy
-3. `frontend` waits for backend to be healthy
+2. `worker` waits for prompt-service to be healthy (shares database)
+3. `backend` waits for prompt-service to be healthy
+4. `frontend` waits for backend to be healthy
 
 If startup fails, check logs:
 
 ```bash
 docker compose logs prompt-service
+docker compose logs worker
 docker compose logs backend
 docker compose logs frontend
 ```
@@ -254,6 +261,7 @@ docker compose logs frontend
 | Permission denied | Run Docker Desktop as admin, or add user to docker group |
 | Image not found | Clear OCI cache and retry |
 | Health check failing | Verify env vars are set, check container logs |
+| Worker not running | Check `JOB_TOKEN_CLEANUP_ENABLED` env var, review worker logs |
 
 ## Related Documentation
 

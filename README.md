@@ -30,6 +30,8 @@ A 5-phase identity-based approach to sustainable change:
 - **Frontend**: React 19 + TypeScript + Vite + Zustand
 - **Backend**: Node.js + Express + TypeScript
 - **Prompt Service**: Express + Prisma + SQLite (encrypted with libsql)
+- **Worker**: Background job scheduler (node-cron)
+- **Build**: tsup (server packages) + Vite (frontend)
 - **Styling**: Tailwind CSS v4
 - **Internationalization**: i18next (English & Polish)
 - **AI Analysis**: Claude API via backend proxy
@@ -118,6 +120,10 @@ See [Production Deployment > Environment Variables](docs/production-deployment.m
 │       ├── admin/          # React admin UI
 │       ├── routes/         # REST API endpoints
 │       └── services/       # Prompt CRUD, A/B testing, resolver
+├── worker/                 # Background job scheduler
+│   └── src/
+│       ├── jobs/           # Job implementations (token cleanup)
+│       └── scheduler/      # Generic cron scheduler
 ├── shared/                 # Shared TypeScript types
 │   └── src/                # Types, validation, utilities
 ├── docs/                   # Documentation
@@ -133,7 +139,7 @@ This repository uses **npm workspaces** for unified dependency management. Run c
 npm install              # Install all workspaces
 npm run lint             # Lint all projects
 npm run type-check       # Type-check all projects
-npm run build            # Build all projects
+npm run build            # Build all projects (shared first)
 npm run test:run         # Run all tests (once)
 npm run test:coverage    # Run all tests with coverage
 
@@ -142,10 +148,12 @@ npm run dev:app                  # Start frontend (https://localhost:3000)
 npm run dev:backend              # Start backend (https://localhost:3001)
 npm run dev:prompt-service       # Start prompt-service API (http://localhost:3002)
 npm run dev:prompt-service:all   # Start prompt-service API + admin UI
+npm run dev:worker               # Start background worker
 
 # Production
 npm run start:backend            # Run compiled backend
 npm run start:prompt-service     # Run compiled prompt-service
+npm run start:worker             # Run compiled worker
 npm run preview:app              # Preview frontend build
 
 # Database (prompt-service)
@@ -207,6 +215,7 @@ See [Docker Hub Workflow](docs/docker-hub.md) for complete documentation includi
 | Document | Description |
 |----------|-------------|
 | [Architecture](docs/architecture.md) | System design, diagrams, and technical decisions |
+| [AI Agent Codebase Instructions](docs/AI-Agent-Codebase-Instructions.md) | Module system, imports, build, and coding conventions |
 | [Ink & Stone Design System](docs/votive-ink-design-system.md) | Visual language, component patterns, and animation guidelines |
 | [Production Deployment](docs/production-deployment.md) | Environment variables, security, and deployment best practices |
 | [Docker Hub Workflow](docs/docker-hub.md) | Container deployment, publishing, and troubleshooting |

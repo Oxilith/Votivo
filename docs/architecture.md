@@ -2,7 +2,7 @@
 
 ## Overview
 
-Votive is a behavioral psychology assessment application with AI-powered analysis. The system follows a microservices architecture with clear separation of concerns between frontend, backend API proxy, and prompt management.
+Votive is a behavioral psychology assessment application with AI-powered analysis. The system follows a microservices architecture with clear separation of concerns between frontend, backend API proxy, prompt management, and background job processing.
 
 ## Architecture Diagram
 
@@ -33,6 +33,12 @@ flowchart TB
         RateLimiter["Rate Limiter"]
     end
 
+    subgraph Worker["Worker Container"]
+        Scheduler["Job Scheduler<br/>(node-cron)"]
+        TokenCleanup["Token Cleanup Job"]
+        TracingMiddleware["W3C Trace Context"]
+    end
+
     subgraph Database["Data Layer"]
         SQLite["SQLite<br/>(libsql encrypted)"]
     end
@@ -59,6 +65,9 @@ flowchart TB
     AdminAuth --> PromptResolver
     PromptResolver --> ABTestEngine
     ABTestEngine --> SQLite
+
+    Scheduler --> TokenCleanup
+    TokenCleanup --> SQLite
 ```
 
 ## Component Architecture
@@ -69,6 +78,7 @@ flowchart LR
         Types["Types<br/>assessment.types.ts<br/>analysis.types.ts<br/>prompt.types.ts"]
         Validation["Validation<br/>validation.ts"]
         Formatter["Response Formatter<br/>responseFormatter.ts"]
+        Tracing["Tracing<br/>tracing.ts"]
     end
 
     subgraph App["app/ (Frontend)"]
@@ -91,9 +101,16 @@ flowchart LR
         Admin["Admin UI"]
     end
 
+    subgraph WorkerPkg["worker/"]
+        JobScheduler["Scheduler"]
+        Jobs["Jobs"]
+        WorkerConfig["Config"]
+    end
+
     Shared --> App
     Shared --> BackendPkg
     Shared --> PromptSvc
+    Shared --> WorkerPkg
 ```
 
 ## Request Flow
@@ -129,6 +146,26 @@ sequenceDiagram
     Frontend-->>User: Display insights
 ```
 
+### Background Job Flow
+
+```mermaid
+sequenceDiagram
+    participant Cron as Node-Cron
+    participant Scheduler
+    participant TokenJob as Token Cleanup Job
+    participant DB as SQLite
+
+    Note over Cron: Every hour (0 * * * *)
+    Cron->>Scheduler: Trigger scheduled job
+    Scheduler->>Scheduler: Generate trace context
+    Scheduler->>TokenJob: Execute with traceId
+    TokenJob->>DB: Delete expired refresh tokens
+    TokenJob->>DB: Delete expired password reset tokens
+    TokenJob->>DB: Delete expired email verification tokens
+    TokenJob-->>Scheduler: Job complete
+    Scheduler->>Scheduler: Log result with traceId
+```
+
 ### Circuit Breaker States
 
 ```mermaid
@@ -160,7 +197,23 @@ stateDiagram-v2
 - **A/B Testing**: Centralized prompt management enables experimentation without code changes
 - **Hot Updates**: Prompts can be modified via admin UI without redeployment
 
-### 2. Circuit Breaker Pattern
+### 2. Background Worker Service
+
+**Decision**: Separate background job processing into a dedicated worker microservice.
+
+**Rationale**:
+- **Separation of Concerns**: Background jobs don't affect API response latency
+- **Independent Scaling**: Worker can be scaled or disabled without affecting the main services
+- **Database Coordination**: Worker shares database with prompt-service for token cleanup
+- **Extensibility**: Generic scheduler pattern supports adding new job types easily
+
+**Configuration**:
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| JOB_TOKEN_CLEANUP_ENABLED | true | Enable/disable token cleanup |
+| JOB_TOKEN_CLEANUP_SCHEDULE | `0 * * * *` | Cron schedule (hourly) |
+
+### 3. Circuit Breaker Pattern
 
 **Decision**: Use opossum circuit breaker for prompt-service calls.
 
@@ -178,7 +231,7 @@ stateDiagram-v2
 | resetTimeout | 30000ms | Time before retry attempt |
 | volumeThreshold | 5 | Min requests before calculating error rate |
 
-### 3. In-Memory Caching with Stale-While-Revalidate
+### 4. In-Memory Caching with Stale-While-Revalidate
 
 **Decision**: Cache prompt configs in memory with TTL-based freshness.
 
@@ -202,7 +255,7 @@ stateDiagram-v2
 
 **Note**: Cache is per-process. In multi-instance deployments, each instance maintains its own cache.
 
-### 4. Timing-Safe Authentication with HttpOnly Cookies
+### 5. Timing-Safe Authentication with HttpOnly Cookies
 
 **Decision**: Use HttpOnly session cookies as primary authentication with `crypto.timingSafeEqual` for API key validation.
 
@@ -218,7 +271,7 @@ stateDiagram-v2
 4. Subsequent requests authenticated via cookie
 5. X-Admin-Key header supported for backward compatibility
 
-### 5. Rate Limiting
+### 6. Rate Limiting
 
 **Decision**: Apply rate limiting to admin endpoints only.
 
@@ -227,7 +280,7 @@ stateDiagram-v2
 - **Backend Unaffected**: `/api/resolve` endpoint used by backend is not rate-limited
 - **Reasonable Limits**: 100 requests per 15 minutes is sufficient for admin operations
 
-### 6. SQLite with libsql Encryption
+### 7. SQLite with libsql Encryption
 
 **Decision**: Use SQLite with libsql adapter for database encryption.
 
@@ -237,7 +290,7 @@ stateDiagram-v2
 - **Security**: AES encryption at rest protects prompt content
 - **Performance**: SQLite is fast for read-heavy workloads
 
-### 7. Health Check Architecture
+### 8. Health Check Architecture
 
 **Decision**: Non-critical health check for prompt-service.
 
@@ -245,6 +298,20 @@ stateDiagram-v2
 - **Graceful Degradation**: Backend can start even if prompt-service is temporarily unavailable
 - **Circuit Breaker Integration**: Health check reflects circuit breaker state
 - **Dependency Visibility**: Operators can see prompt-service status in health endpoint
+
+### 9. Distributed Tracing
+
+**Decision**: Implement W3C Trace Context across all services.
+
+**Rationale**:
+- **Observability**: Trace requests across backend, prompt-service, and worker
+- **OpenTelemetry Compatible**: Standard format for future integration with observability platforms
+- **Debugging**: Correlate logs across services using traceId
+
+**Implementation**:
+- `shared/src/tracing.ts` provides utilities for all packages
+- Middleware extracts or creates trace context for each request
+- Worker jobs include traceId in all log entries
 
 ## Container Architecture
 
@@ -261,8 +328,13 @@ flowchart TB
 
         subgraph PS["prompt-service"]
             PSNode["Node.js :3002"]
-            PSData[("Volume:<br/>prompt-data")]
         end
+
+        subgraph WK["worker"]
+            WKNode["Node.js (no port)"]
+        end
+
+        PSData[("Volume:<br/>prompt-data")]
     end
 
     subgraph External["External"]
@@ -272,9 +344,11 @@ flowchart TB
 
     FE -->|"depends_on: healthy"| BE
     BE -->|"depends_on: healthy"| PS
+    WK -->|"depends_on: healthy"| PS
 
     FE -.->|"mount"| Certs
     PS -.->|"mount"| PSData
+    WK -.->|"mount"| PSData
 
     BE -->|"HTTPS"| Anthropic
 ```
@@ -307,6 +381,7 @@ flowchart TB
     subgraph InternalZone["Internal Network"]
         Backend["Backend<br/>HTTP only"]
         PromptService["Prompt Service<br/>HTTP only"]
+        Worker["Worker<br/>No network"]
     end
 
     subgraph SecureStorage["Secure Storage"]
@@ -318,9 +393,11 @@ flowchart TB
     Nginx -->|"HTTP"| Backend
     Backend -->|"HTTP"| PromptService
     PromptService --> DB
+    Worker --> DB
 
     Secrets -.->|"env vars"| Backend
     Secrets -.->|"env vars"| PromptService
+    Secrets -.->|"env vars"| Worker
 ```
 
 ### Security Measures
@@ -363,6 +440,21 @@ For complete environment variable reference, see [Production Deployment Guide](p
 }
 ```
 
+### Worker Observability
+
+The worker service logs all job executions with W3C trace context:
+
+```json
+{
+  "level": "info",
+  "msg": "Job completed: token-cleanup",
+  "traceId": "abc123...",
+  "spanId": "def456...",
+  "duration": 45,
+  "result": { "deletedTokens": 12 }
+}
+```
+
 ## Future Considerations
 
 ### Planned Enhancements
@@ -379,6 +471,7 @@ flowchart LR
     subgraph Current["Current (Single Instance)"]
         BE1["Backend"]
         PS1["Prompt Service"]
+        WK1["Worker"]
         SQLite["SQLite"]
     end
 
@@ -388,6 +481,7 @@ flowchart LR
         BE3["Backend 2"]
         PS2["Prompt Service 1"]
         PS3["Prompt Service 2"]
+        WK2["Worker (single)"]
         Redis["Redis Cache"]
         Postgres["PostgreSQL"]
     end

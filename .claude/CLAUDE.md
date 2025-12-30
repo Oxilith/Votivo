@@ -25,6 +25,7 @@ npm run dev:app                  # Frontend (https://localhost:3000)
 npm run dev:backend              # Backend (https://localhost:3001)
 npm run dev:prompt-service       # Prompt service API (http://localhost:3002)
 npm run dev:prompt-service:all   # Prompt service API + admin UI
+npm run dev:worker               # Background worker
 
 # Quality
 npm run lint                     # Lint all projects
@@ -33,9 +34,10 @@ npm run test:run                 # Run all tests (once)
 npm run test:coverage            # Run all tests with coverage
 
 # Build & Production
-npm run build                    # Build all projects
+npm run build                    # Build all projects (shared first)
 npm run start:backend            # Run compiled backend
 npm run start:prompt-service     # Run compiled prompt-service
+npm run start:worker             # Run compiled worker
 
 # Database (prompt-service)
 npm run db:migrate               # Run migrations
@@ -44,7 +46,9 @@ npm run db:seed                  # Seed initial data
 npm run db:studio                # Open Prisma Studio
 
 # Per-workspace
+npm run build -w shared          # Build specific workspace
 npm run test -w backend          # Run tests in specific workspace
+npm run lint:fix -w app          # Fix lint issues in specific workspace
 ```
 
 ## Contribution
@@ -67,7 +71,7 @@ JWT_ACCESS_SECRET=<32+chars> JWT_REFRESH_SECRET=<32+chars> \
   docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
-See [docs/docker-hub.md](../docker-hub.md) for complete workflow documentation.
+See [docs/docker-hub.md](../docs/docker-hub.md) for complete workflow documentation.
 
 ### HTTPS Setup (Local Development)
 ```bash
@@ -77,25 +81,47 @@ mkdir -p certs && cd certs && mkcert localhost 127.0.0.1 ::1
 
 ## Code Standards
 
+**Full coding conventions**: See [docs/AI-Agent-Codebase-Instructions.md](../docs/AI-Agent-Codebase-Instructions.md) for comprehensive module system, import, and build documentation.
+
 ### Environment Files
 - **NEVER read or edit `.env` files** - these contain secrets and should not be accessed
 - **Exception**: `.env.example` files may be read and edited to document required configuration
 - When setting up a new environment, populate `.env.example` with all required variable names and placeholder/example values
-- **docker-compose.yml**: Use `${VARIABLE}` syntax for sensitive values so they're injected at runtime, not hardcoded:
-  ```yaml
-  environment:
-    - NODE_ENV=production          # Safe: non-sensitive
-    - DATABASE_KEY=${DATABASE_KEY} # Required: injected from environment
-    - ADMIN_API_KEY=${ADMIN_API_KEY}
-  ```
+- **docker-compose.yml**: Use `${VARIABLE}` syntax for sensitive values so they're injected at runtime, not hardcoded
 
-### TypeScript
+### TypeScript & Module System
 - **No `any` types** - use specific types or `unknown`
 - **Path aliases** - always use `@/` imports, never relative paths
-- **Shared types** - use `shared/` for types shared between frontend/backend (not `@shared/`)
+- **Shared types** - import from `shared` package directly (e.g., `import { ... } from 'shared'`)
+- **Barrel exports** - import from directories via `index.ts`, not individual files
+- **No `.js` extensions** - uses `moduleResolution: "Bundler"`, not NodeNext
 - **Strict mode** - `noUnusedLocals`, `noUnusedParameters` enforced
 - Use `React.ComponentRef` (not deprecated `React.ElementRef`)
-- **Anthropic SDK types** - use `ThinkingConfigParam` from `@anthropic-ai/sdk/resources/messages` (not custom types)
+- **Anthropic SDK types** - use `ThinkingConfigParam` from `@anthropic-ai/sdk/resources/messages`
+
+```typescript
+// ✅ Correct imports
+import { config } from '@/config';
+import { ClaudeService } from '@/services';
+import { ApiResponse } from 'shared';
+
+// ❌ Wrong imports
+import { config } from '../config/index.js';
+import { ClaudeService } from '@/services/claude.service';
+import { ApiResponse } from 'shared/index.js';
+```
+
+### Build System
+
+| Package | Build Tool | Command | Output |
+|---------|-----------|---------|--------|
+| shared | tsup | `npm run build -w shared` | `shared/dist/` |
+| backend | tsup | `npm run build -w backend` | `backend/dist/` |
+| worker | tsup | `npm run build -w worker` | `worker/dist/` |
+| prompt-service | tsup + vite | `npm run build -w prompt-service` | `prompt-service/dist/` |
+| app | tsc + vite | `npm run build -w app` | `app/dist/` |
+
+**Build order**: `shared` must build first - other packages depend on it.
 
 ### Documentation Headers
 Every component/service requires JSDoc header:
@@ -127,9 +153,10 @@ Single source of truth for types, validation, and utilities used by frontend, ba
 - `validation.ts` - Enum value arrays for Zod schemas, REQUIRED_FIELDS, field categorization (ARRAY_FIELDS, NUMBER_FIELDS, STRING_FIELDS)
 - `responseFormatter.ts` - Shared `formatResponsesForPrompt()` function for AI analysis
 - `prompt.types.ts` - Prompt config types (ClaudeModel, PromptConfig, ThinkingVariant, PromptConfigDefinition)
+- `tracing.ts` - W3C Trace Context utilities (OpenTelemetry compatible)
 - `index.ts` - Barrel exports
 
-Import via `shared/index` in packages (e.g., `import { ... } from 'shared/index'`).
+Import via `shared` in packages (e.g., `import { ... } from 'shared'`).
 
 ### Prompt Service (`/prompt-service`)
 
@@ -256,7 +283,7 @@ Frontend (Zustand) → ApiClient → Backend (Express) → Claude API
 
 ## Environment Variables
 
-See [docs/production-deployment.md](../production-deployment.md#environment-variables) for complete reference.
+See [docs/production-deployment.md](../docs/production-deployment.md#environment-variables) for complete reference.
 
 Key variables:
 - `VITE_API_URL` - Frontend build-time (leave empty for Docker, set to `https://localhost:3001` for local dev)
@@ -295,8 +322,9 @@ Browser → nginx (HTTPS :443) → backend (HTTP :3001)
 ```
 
 - Multi-arch images: `linux/amd64` + `linux/arm64`
-- Shared package compiled to `dist/shared/src/`, copied to `node_modules/shared/` at runtime
-- Backend uses non-root user (expressjs) for security
+- npm workspaces with shared package via symlinks
+- Backend uses non-root user for security
+- `tsconfig.base.json` required in Docker context for builds
 
 ### Design System
 
