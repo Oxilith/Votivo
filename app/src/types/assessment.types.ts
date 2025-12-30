@@ -23,10 +23,10 @@ export type {
   AnalysisRisk,
   IdentitySynthesis,
   AIAnalysisResult,
-} from 'shared/index';
+} from 'shared';
 
 // Re-import for use in local interfaces
-import type { AssessmentResponses, AIAnalysisResult } from 'shared/index';
+import type { AssessmentResponses, AIAnalysisResult } from 'shared';
 
 /**
  * View-only assessment data (for /assessment/:id routes)

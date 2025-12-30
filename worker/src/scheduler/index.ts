@@ -14,7 +14,7 @@
  */
 
 import cron from 'node-cron';
-import { generateTraceId, generateSpanId } from 'shared/index';
+import { generateTraceId, generateSpanId } from 'shared';
 import type { Job } from '@/jobs';
 import { logger } from '@/utils';
 

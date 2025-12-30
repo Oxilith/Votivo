@@ -12,7 +12,7 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { TRACEPARENT_HEADER, extractOrCreateTrace, type TraceInfo } from 'shared/index';
+import { TRACEPARENT_HEADER, extractOrCreateTrace, type TraceInfo } from 'shared';
 
 /**
  * Extend Express Request to include trace context

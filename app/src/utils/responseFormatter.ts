@@ -10,7 +10,7 @@
  */
 
 // Re-export labels for components that import from this file
-export { valueLabels, timeLabels, triggerLabels, willpowerLabels } from 'shared/index';
+export { valueLabels, timeLabels, triggerLabels, willpowerLabels } from 'shared';
 
 // Re-export formatter from shared (now with language parameter)
-export { formatResponsesForPrompt } from 'shared/index';
+export { formatResponsesForPrompt } from 'shared';

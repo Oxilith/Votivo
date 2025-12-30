@@ -10,7 +10,7 @@
  * - shared/index for AIAnalysisResult, AssessmentResponses, Gender, SafeUserResponse
  */
 
-import type { AIAnalysisResult, AssessmentResponses, Gender, SafeUserResponse } from 'shared/index';
+import type { AIAnalysisResult, AssessmentResponses, Gender, SafeUserResponse } from 'shared';
 
 // Re-export shared types for convenience
 export type { Gender };

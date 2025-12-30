@@ -20,7 +20,7 @@ import {
   PASSWORD_MAX_LENGTH,
   PASSWORD_REGEX,
   PASSWORD_REQUIREMENTS_MESSAGE,
-} from 'shared/index';
+} from 'shared';
 
 /**
  * Maximum email length to prevent abuse

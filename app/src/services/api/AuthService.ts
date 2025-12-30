@@ -34,7 +34,7 @@ import type {
   SavedAnalysis,
   SavedAnalysisRaw,
 } from '@/types/auth.types';
-import type { AssessmentResponses, AIAnalysisResult } from 'shared/index';
+import type { AssessmentResponses, AIAnalysisResult } from 'shared';
 import { apiClient } from './ApiClient';
 import { useAuthStore } from '@/stores/useAuthStore';
 

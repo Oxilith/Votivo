@@ -17,7 +17,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { IApiClient, ApiResponse } from '../interfaces';
 import { AuthService } from '../api/AuthService';
-import type { AssessmentResponses, AIAnalysisResult } from 'shared/index';
+import type { AssessmentResponses, AIAnalysisResult } from 'shared';
 
 // Mock useAuthStore
 vi.mock('@/stores/useAuthStore', () => ({
