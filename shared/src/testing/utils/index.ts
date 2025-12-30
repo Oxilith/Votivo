@@ -24,3 +24,5 @@ export {
   type MockResponse,
   type MockNextFunction,
 } from './express.utils';
+
+export { RequestBuilder, requestBuilder } from './request-builder';

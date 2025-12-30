@@ -37,6 +37,7 @@ export {
   CLEANUP_TABLE_ORDER,
   type PrismaLikeClient,
   type TableName,
+  type CleanupOptions,
 } from './db';
 
 // Custom matchers - must be imported for side effects (extends vitest)

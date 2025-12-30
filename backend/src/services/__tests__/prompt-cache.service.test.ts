@@ -15,7 +15,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { PromptCacheService } from '@/services';
-import type { PromptConfig } from 'shared';
+import { createMockPromptConfig } from 'shared/testing';
 
 // Mock config with test values
 vi.mock('@/config', () => ({
@@ -38,12 +38,12 @@ vi.mock('@/utils/logger', () => ({
 describe('PromptCacheService', () => {
   let cacheService: PromptCacheService;
 
-  const mockPromptConfig: PromptConfig = {
+  const mockPromptConfig = createMockPromptConfig({
     prompt: 'Test prompt content',
     model: 'claude-sonnet-4-0',
     max_tokens: 1000,
     temperature: 0.7,
-  };
+  });
 
   beforeEach(() => {
     vi.useFakeTimers();

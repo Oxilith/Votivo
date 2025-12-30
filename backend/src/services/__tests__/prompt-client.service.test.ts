@@ -18,7 +18,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
 import { PromptClientService, PromptServiceUnavailableError, promptCacheService } from '@/services';
-import type { PromptConfig } from 'shared';
+import { createMockPromptConfig } from 'shared/testing';
 
 // Cast to mocked type for type safety
 const mockCacheService = vi.mocked(promptCacheService);
@@ -95,12 +95,12 @@ describe('PromptClientService', () => {
   let service: PromptClientService;
   let mockFetch: Mock;
 
-  const mockPromptConfig: PromptConfig = {
+  const mockPromptConfig = createMockPromptConfig({
     prompt: 'Test prompt content',
     model: 'claude-sonnet-4-0',
     max_tokens: 1000,
     temperature: 0.7,
-  };
+  });
 
   const mockResolveResponse = {
     config: mockPromptConfig,
