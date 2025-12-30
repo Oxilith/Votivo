@@ -70,6 +70,7 @@ const mockPrismaObj = vi.hoisted(() => ({
     findUnique: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    delete: vi.fn(),
   },
   emailVerifyToken: {
     findUnique: vi.fn(),
@@ -498,10 +499,16 @@ describe('UserService', () => {
     it('should throw TokenError for expired token', async () => {
       const expiredToken = { ...validResetToken, expiresAt: new Date(Date.now() - 1000) };
       mockPrisma.passwordResetToken.findUnique.mockResolvedValue(expiredToken);
+      // Mock the opportunistic cleanup of expired token
+      mockPrisma.passwordResetToken.delete.mockResolvedValue(expiredToken);
 
       const error = await userService.confirmPasswordReset('expired_token', 'newPass').catch((e: unknown) => e);
       expect(error).toBeInstanceOf(TokenError);
       expect((error as TokenError).code).toBe('TOKEN_EXPIRED');
+      // Verify expired token was cleaned up
+      expect(mockPrisma.passwordResetToken.delete).toHaveBeenCalledWith({
+        where: { id: expiredToken.id },
+      });
     });
   });
 

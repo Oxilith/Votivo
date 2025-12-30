@@ -579,8 +579,9 @@ export class UserService {
       throw new TokenError('Invalid or expired password reset token');
     }
 
-    // Check if token is expired
+    // Check if token is expired - cleanup opportunistically to reduce worker load
     if (resetToken.expiresAt < new Date()) {
+      await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
       throw new TokenError('Password reset token expired', 'TOKEN_EXPIRED');
     }
 

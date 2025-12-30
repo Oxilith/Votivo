@@ -22,6 +22,8 @@ import { CSRF_COOKIE, CSRF_HEADER, generateCsrfToken, validateCsrfToken } from '
  */
 const CSRF_COOKIE_OPTIONS = {
   httpOnly: false, // Must be readable by JavaScript to send in header
+  // In local development (NODE_ENV !== 'production'), secure is false to allow
+  // HTTP without HTTPS. In production, requires HTTPS for cookie transmission.
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'strict' as const,
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days

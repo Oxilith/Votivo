@@ -15,7 +15,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { config } from '@/config';
-import { verifyAccessToken, type AccessTokenPayload, type JwtConfig } from '@/utils';
+import { verifyAccessToken, logger, type AccessTokenPayload, type JwtConfig } from '@/utils';
 
 /**
  * Extended Express Request with authenticated user payload
@@ -95,6 +95,7 @@ export function jwtAuthMiddleware(
 
     // In development, only bypass if explicitly enabled
     if (config.devAuthBypass) {
+      logger.debug({ path: req.path, method: req.method }, 'DEV_AUTH_BYPASS: Skipping JWT validation (no JWT config)');
       // Set a mock user for development bypass
       (req as AuthenticatedRequest).user = {
         userId: 'dev-bypass-user',
@@ -113,6 +114,7 @@ export function jwtAuthMiddleware(
 
   // Development bypass enabled - skip token verification
   if (config.devAuthBypass && config.nodeEnv !== 'production') {
+    logger.debug({ path: req.path, method: req.method }, 'DEV_AUTH_BYPASS: Skipping JWT validation');
     (req as AuthenticatedRequest).user = {
       userId: 'dev-bypass-user',
       type: 'access',
