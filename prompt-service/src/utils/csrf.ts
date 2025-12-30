@@ -12,7 +12,7 @@
 import crypto from 'crypto';
 
 /**
- * CSRF cookie name (readable by JavaScript, not httpOnly)
+ * CSRF cookie name
  */
 export const CSRF_COOKIE = 'csrf-token';
 
