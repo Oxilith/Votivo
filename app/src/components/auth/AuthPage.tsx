@@ -23,7 +23,7 @@ import AuthLayout from './AuthLayout';
 import { LoginForm, RegisterForm, FormInput, FormButton } from './forms';
 import { useRouting } from '@/hooks';
 import { MailIcon } from '@/components';
-import { authService } from '@/services';
+import { authService } from '@/services/api/AuthService';
 
 /**
  * Authentication mode

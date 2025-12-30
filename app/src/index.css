@@ -504,6 +504,16 @@ body::before {
   }
 }
 
+/* Staggered pulse - synchronized wave effect for loading dots */
+@keyframes staggered-pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* --- Animation Utility Classes --- */
 .animate-rise {
   animation: rise 0.8s var(--ease-out) forwards;
@@ -523,6 +533,10 @@ body::before {
 
 .animate-word-rise {
   animation: word-rise 0.8s var(--ease-out) forwards;
+}
+
+.animate-staggered-pulse {
+  animation: staggered-pulse 1.2s ease-in-out infinite;
 }
 
 /* Animation Delays */

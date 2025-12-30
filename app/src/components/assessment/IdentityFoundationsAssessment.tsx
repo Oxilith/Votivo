@@ -31,8 +31,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AssessmentResponses, AssessmentProps } from '@/types';
-import { useUIStore, useIsAuthenticated } from '@/stores';
-import { authService } from '@/services';
+import { useUIStore } from '@/stores/useUIStore';
+import { useIsAuthenticated } from '@/stores/useAuthStore';
+import { authService } from '@/services/api/AuthService';
 import {
   IntroStep,
   MultiSelectStep,

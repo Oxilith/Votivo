@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
 
+const isAnalyze = process.env.ANALYZE === 'true';
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    ...(isAnalyze ? [visualizer({ open: true, filename: 'dist/src/admin/stats.html', gzipSize: true })] : []),
+  ],
   root: 'src/admin',
   base: '/admin/',
   build: {

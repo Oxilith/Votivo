@@ -92,3 +92,58 @@ The backend uses the Opossum circuit breaker library to protect against cascadin
 |----------|--------|--------------|---------|
 | General | 1 minute | 10 | Default protection |
 | Claude API | 1 minute | 5 | Expensive operations |
+
+## Frontend Bundle Size
+
+### Current Implementation
+
+The frontend uses React.lazy() for route-based code splitting. Major page components are lazy-loaded:
+
+- `LandingPage`
+- `IdentityFoundationsAssessment`
+- `IdentityInsightsAI`
+- `AuthPage`
+- `ProfilePage`
+- `EmailVerificationPage`
+- `PasswordResetPage`
+
+Each route loads only when navigated to, reducing initial bundle size.
+
+### Future Optimization Options
+
+If further bundle size reduction is needed, consider these additional strategies:
+
+#### 1. i18n Namespace Splitting
+
+**Estimated savings: 20-30 kB**
+
+Currently all translation files (EN + PL, 14 namespaces) are loaded eagerly in `app/src/i18n/config.ts`.
+
+Optimization approach:
+- Detect user language early
+- Load only the detected language initially
+- Lazy-load secondary language on demand
+- Split translations by route (assessment, insights, landing, auth, profile)
+
+#### 2. Vendor Chunk Separation
+
+**Benefit: Better caching**
+
+Configure Vite to separate large vendor libraries into their own chunks:
+
+```typescript
+// vite.config.ts
+build: {
+  rollupOptions: {
+    output: {
+      manualChunks: {
+        'vendor-react': ['react', 'react-dom'],
+        'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+        'vendor-ui': ['lucide-react'],
+      }
+    }
+  }
+}
+```
+
+This improves cache hit rates when only application code changes.

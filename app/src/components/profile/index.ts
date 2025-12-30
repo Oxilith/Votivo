@@ -2,9 +2,11 @@
  * @file src/components/profile/index.ts
  * @purpose Barrel exports for profile components
  * @functionality
- * - Exports ProfilePage component
+ * - ProfilePage is NOT exported here to enable code-splitting via React.lazy
+ * - App.tsx imports ProfilePage directly via lazy(() => import('@/components/profile/ProfilePage'))
  * @dependencies
- * - ./ProfilePage
+ * - None (ProfilePage imported directly where needed)
  */
 
-export { default as ProfilePage } from './ProfilePage';
+// ProfilePage intentionally not exported here - it's lazy-loaded in App.tsx
+// See: app/src/App.tsx for the lazy import

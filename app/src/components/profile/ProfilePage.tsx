@@ -33,8 +33,12 @@ import {
   RefreshIcon,
   InkBrushDecoration,
 } from '@/components';
-import { useAuthStore, useCurrentUser, useUIStore, useAssessmentStore, useAnalysisStore } from '@/stores';
-import { authService } from '@/services';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useCurrentUser } from '@/stores/useAuthStore';
+import { useUIStore } from '@/stores/useUIStore';
+import { useAssessmentStore } from '@/stores/useAssessmentStore';
+import { useAnalysisStore } from '@/stores/useAnalysisStore';
+import { authService } from '@/services/api/AuthService';
 import type { Gender, ProfileUpdateRequest, PasswordChangeRequest } from '@/types';
 import { logger } from '@/utils';
 import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH } from 'shared';

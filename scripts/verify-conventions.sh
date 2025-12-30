@@ -217,7 +217,6 @@ done
 # ============================================================================
 # CHECK 8: Barrel exports exist in directories with 2+ files
 # Rule: Every directory with 2+ related exports gets a barrel (index.ts)
-# Exception: Entry point directories (app/src, backend/src, etc.) don't need barrels
 # ============================================================================
 echo ""
 echo -e "${BLUE}[8/13] Checking for barrel exports (index.ts) in directories with 2+ files...${NC}"
@@ -276,7 +275,11 @@ fi
 # ============================================================================
 # CHECK 9: No deep imports bypassing barrels
 # Rule: Import from barrels, not files — '@/components' not '@/components/Button'
-# Exception: JSON resource imports (e.g., i18n) are allowed
+# Exceptions:
+#   - JSON resource imports (e.g., i18n)
+#   - // @allow-deep-import (line-level)
+#   - // @barrel-exceptions (file-level, place at top of file)
+#   - Code-splitting sensitive paths: @/stores/*, @/services/api/* (Vite chunking)
 # ============================================================================
 echo ""
 echo -e "${BLUE}[9/13] Checking for deep imports bypassing barrels...${NC}"
@@ -291,17 +294,26 @@ DEEP_IMPORTS=$(grep -rn "from ['\"]@/[^'\"]*/[^'\"]*['\"]" --include="*.ts" --in
     | grep -v "/index['\"]" \
     | grep -v "\.json['\"]" \
     | grep -v "// @allow-deep-import" \
+    | grep -v "@/stores/use" \
+    | grep -v "@/services/api/" \
     || true)
 
 if [ -n "$DEEP_IMPORTS" ]; then
     # Check if the parent directory has a barrel
     ACTUAL_VIOLATIONS=""
     while IFS= read -r line; do
+        # Extract file path
+        FILE_PATH=$(echo "$line" | cut -d':' -f1)
+        
+        # Check for file-level exception (// @barrel-exceptions in first 10 lines)
+        if head -10 "$FILE_PATH" 2>/dev/null | grep -q "// @barrel-exceptions"; then
+            continue
+        fi
+        
         # Extract the import path using sed (POSIX compatible)
         IMPORT_PATH=$(echo "$line" | sed -n "s/.*from ['\"]@\/\([^'\"]*\)['\"].*/\1/p")
         # Get the first directory level
         FIRST_DIR=$(echo "$IMPORT_PATH" | cut -d'/' -f1)
-        FILE_PATH=$(echo "$line" | cut -d':' -f1)
         PKG_DIR=$(echo "$FILE_PATH" | cut -d'/' -f1)
         
         # Check if barrel exists at first level
@@ -401,8 +413,9 @@ rm -f /tmp/deep_barrels.txt
 # Exceptions: 
 #   - index.ts files (barrels must import from files)
 #   - JSON/resource files
-#   - dynamic imports (code splitting)
 #   - type-only imports
+#   - // @allow-deep-import (line-level)
+#   - // @barrel-exceptions (file-level, place at top of file)
 # ============================================================================
 echo ""
 echo -e "${BLUE}[12/13] Checking for relative deep imports (./subdir/file)...${NC}"
@@ -422,8 +435,14 @@ if [ -n "$RELATIVE_DEEP_IMPORTS" ]; then
     # Check if the subdirectory has a barrel (making this a violation)
     ACTUAL_VIOLATIONS=""
     while IFS= read -r line; do
-        # Extract file path and import path
+        # Extract file path
         FILE_PATH=$(echo "$line" | cut -d':' -f1)
+        
+        # Check for file-level exception (// @barrel-exceptions in first 10 lines)
+        if head -10 "$FILE_PATH" 2>/dev/null | grep -q "// @barrel-exceptions"; then
+            continue
+        fi
+        
         FILE_DIR=$(dirname "$FILE_PATH")
         IMPORT_PATH=$(echo "$line" | sed -n "s/.*from ['\"]\.\/\([^'\"]*\)['\"].*/\1/p")
         SUBDIR=$(echo "$IMPORT_PATH" | cut -d'/' -f1)
@@ -504,9 +523,14 @@ echo ""
 
 echo -e "${BLUE}Escape Hatches:${NC}"
 echo -e "  • // @allow-relative      → Allow ../ imports"
-echo -e "  • // @allow-deep-import   → Allow deep path imports"
+echo -e "  • // @allow-deep-import   → Allow deep path imports (line-level)"
+echo -e "  • // @barrel-exceptions   → Allow deep imports in file (file-level, top of file)"
 echo -e "  • // @allow-wildcard      → Allow export * from"
 echo -e "  • // @allow-require       → Allow require()"
+echo -e ""
+echo -e "${BLUE}Auto-Excluded Patterns (code-splitting):${NC}"
+echo -e "  • @/stores/use*           → Store direct imports"
+echo -e "  • @/services/api/*        → API service direct imports"
 echo ""
 
 if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then

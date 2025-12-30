@@ -3,5 +3,13 @@
     "stepOf": "{{current}} / {{total}}"
   },
   "createdAt": "Created",
-  "viewOnly": "View Only"
+  "viewOnly": "View Only",
+  "chunkError": {
+    "title": "Failed to load",
+    "description": "There was a problem loading this page. Please check your connection and try again.",
+    "unexpectedTitle": "Something went wrong",
+    "unexpectedDescription": "An unexpected error occurred. Please try again.",
+    "retry": "Try again",
+    "reload": "Reload page"
+  }
 }

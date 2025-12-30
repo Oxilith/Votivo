@@ -73,6 +73,59 @@ import { ApiResponse } from '../../../shared/src/index';
 - 4+ levels of nested barrels
 - Re-exporting internal/private utilities
 
+### Code Splitting & Lazy-Loaded Components
+
+Route-level code splitting is implemented using React.lazy() for optimal bundle sizes.
+
+#### Key Rule
+**Lazy-loaded page components are NOT exported from barrel files.**
+
+This prevents Vite/Rollup from bundling them into the main chunk when other exports from the barrel are statically imported.
+
+#### Pattern
+```typescript
+// ✅ Correct - App.tsx imports lazy components directly from source
+const LandingPage = lazy(() => import('@/components/landing/LandingPage'));
+const AuthPage = lazy(() => import('@/components/auth/AuthPage'));
+const ProfilePage = lazy(() => import('@/components/profile/ProfilePage'));
+
+// Barrel imports for non-lazy components are fine
+import { AuthGuard, LoadingFallback } from '@/components';
+```
+
+```typescript
+// ✅ Correct - Barrel excludes lazy-loaded page component
+// components/landing/index.ts
+export { HeroSection } from './sections/HeroSection';
+export { PhilosophySection } from './sections/PhilosophySection';
+// LandingPage is NOT exported - it's lazy-loaded in App.tsx
+
+// ❌ Wrong - Barrel includes lazy-loaded component
+export { LandingPage } from './LandingPage';  // Breaks code splitting!
+```
+
+#### Lazy-Loaded Components (Not in Barrels)
+These page components are lazy-loaded in `App.tsx` and excluded from their barrel exports:
+- `LandingPage` (landing/)
+- `AuthPage`, `EmailVerificationPage`, `PasswordResetPage` (auth/)
+- `IdentityFoundationsAssessment` (assessment/)
+- `IdentityInsightsAI` (insights/)
+- `ProfilePage` (profile/)
+
+#### Direct Imports in Lazy Components
+Lazy-loaded components use direct imports for stores and services to avoid circular chunk dependencies:
+```typescript
+// Inside a lazy-loaded component like ProfilePage.tsx
+import { useAuthStore } from '@/stores/useAuthStore';
+import { authService } from '@/services/api/AuthService';
+
+// NOT from barrels (would cause circular dependencies)
+// import { useAuthStore } from '@/stores';
+// import { authService } from '@/services';
+```
+
+These patterns are auto-excluded from `verify-conventions.sh` linting.
+
 ---
 
 ## Build System
