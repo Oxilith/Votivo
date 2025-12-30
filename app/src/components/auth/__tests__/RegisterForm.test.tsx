@@ -300,13 +300,15 @@ describe('RegisterForm', () => {
       });
     });
 
-    it('should call setAuth with user and token on successful registration', async () => {
+    it('should call setAuth with user, token, and csrfToken on successful registration', async () => {
       const user = userEvent.setup();
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
       const mockToken = 'test-access-token';
+      const mockCsrfToken = 'test-csrf-token';
       mockRegister.mockResolvedValue({
         user: mockUser,
         accessToken: mockToken,
+        csrfToken: mockCsrfToken,
       });
 
       render(<RegisterForm {...defaultProps} />);
@@ -314,7 +316,7 @@ describe('RegisterForm', () => {
       await user.click(screen.getByRole('button', { name: 'Create Account' }));
 
       await waitFor(() => {
-        expect(mockSetAuth).toHaveBeenCalledWith(mockUser, mockToken);
+        expect(mockSetAuth).toHaveBeenCalledWith(mockUser, mockToken, mockCsrfToken);
       });
     });
 

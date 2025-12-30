@@ -172,13 +172,15 @@ describe('LoginForm', () => {
       });
     });
 
-    it('should call setAuth with user and token on successful login', async () => {
+    it('should call setAuth with user, token, and csrfToken on successful login', async () => {
       const user = userEvent.setup();
       const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
       const mockToken = 'test-access-token';
+      const mockCsrfToken = 'test-csrf-token';
       mockLogin.mockResolvedValue({
         user: mockUser,
         accessToken: mockToken,
+        csrfToken: mockCsrfToken,
       });
 
       render(<LoginForm {...defaultProps} />);
@@ -188,7 +190,7 @@ describe('LoginForm', () => {
       await user.click(screen.getByRole('button', { name: 'Sign In' }));
 
       await waitFor(() => {
-        expect(mockSetAuth).toHaveBeenCalledWith(mockUser, mockToken);
+        expect(mockSetAuth).toHaveBeenCalledWith(mockUser, mockToken, mockCsrfToken);
       });
     });
 

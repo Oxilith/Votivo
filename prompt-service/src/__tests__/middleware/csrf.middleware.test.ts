@@ -135,7 +135,7 @@ describe('CSRF Middleware', () => {
         CSRF_COOKIE,
         token,
         expect.objectContaining({
-          httpOnly: false,
+          httpOnly: true, // Defense-in-depth: token comes from response body, not cookie
           sameSite: 'strict',
           path: '/',
           signed: false,
