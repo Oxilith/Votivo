@@ -8,15 +8,15 @@
  * - Shows loading state while auth is initializing
  * @dependencies
  * - React (useEffect, useRef)
- * - @/stores/useAuthStore
- * - @/hooks/useRouting
- * - @/components/shared/icons
+ * - @/stores (useIsAuthenticated, useAuthInitialized)
+ * - @/hooks (useRouting)
+ * - @/components (LoadingSpinnerIcon)
  */
 
-import { useEffect, useRef, type ReactNode } from 'react';
-import { useIsAuthenticated, useAuthInitialized } from '@/stores/useAuthStore';
-import { useRouting } from '@/hooks/useRouting';
-import { LoadingSpinnerIcon } from '@/components/shared/icons';
+import React, { useEffect, useRef, type ReactNode } from 'react';
+import { useIsAuthenticated, useAuthInitialized } from '@/stores';
+import { useRouting } from '@/hooks';
+import { LoadingSpinnerIcon } from '@/components';
 
 /**
  * Props for AuthGuard component

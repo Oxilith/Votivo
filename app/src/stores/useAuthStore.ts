@@ -18,8 +18,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { SafeUser, SavedAssessment, SavedAnalysis } from '@/types/auth.types';
-import { AUTH_CACHE_STALE_THRESHOLD_MS } from '@/config/auth.config';
+import type { SafeUser, SavedAssessment, SavedAnalysis } from '@/types';
+import { AUTH_CACHE_STALE_THRESHOLD_MS } from '@/config';
 
 /**
  * Authentication state interface

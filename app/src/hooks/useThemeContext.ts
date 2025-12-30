@@ -6,12 +6,12 @@
  * - Throws helpful error if used outside ThemeProvider
  * @dependencies
  * - React (useContext)
- * - @/contexts/ThemeContext (ThemeContext)
+ * - @/contexts (ThemeContext, ThemeContextValue)
  */
 
 import { useContext } from 'react';
-import { ThemeContext } from '@/contexts/ThemeContext';
-import type { ThemeContextValue } from '@/contexts/ThemeContext';
+import { ThemeContext } from '@/contexts';
+import type { ThemeContextValue } from '@/contexts';
 
 export const useThemeContext = (): ThemeContextValue => {
   const context = useContext(ThemeContext);

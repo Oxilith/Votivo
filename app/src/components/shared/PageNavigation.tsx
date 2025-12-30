@@ -12,24 +12,24 @@
  * @dependencies
  * - React (FC)
  * - react-i18next (useTranslation)
- * - @/components/landing/shared/VotiveLogo
- * - @/components/shared/LanguageToggle
- * - @/components/shared/ThemeToggle
- * - @/components/shared/ExportDropdown
- * - @/components/shared/UserAvatarDropdown
- * - @/components/shared/icons (UploadIcon)
- * - @/stores/useAuthStore
+ * - @/components (VotiveLogo)
+ * - ./LanguageToggle
+ * - ./ThemeToggle
+ * - ./ExportDropdown
+ * - ./UserAvatarDropdown
+ * - ./icons (UploadIcon)
+ * - @/stores (useCurrentUser)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import VotiveLogo from '@/components/landing/shared/VotiveLogo';
-import LanguageToggle from '@/components/shared/LanguageToggle';
-import ThemeToggle from '@/components/shared/ThemeToggle';
-import ExportDropdown from '@/components/shared/ExportDropdown';
-import UserAvatarDropdown from '@/components/shared/UserAvatarDropdown';
-import { UploadIcon } from '@/components/shared/icons';
-import { useCurrentUser } from '@/stores/useAuthStore';
+import { VotiveLogo } from '@/components';
+import LanguageToggle from './LanguageToggle';
+import ThemeToggle from './ThemeToggle';
+import ExportDropdown from './ExportDropdown';
+import UserAvatarDropdown from './UserAvatarDropdown';
+import { UploadIcon } from './icons';
+import { useCurrentUser } from '@/stores';
 
 interface PageNavigationProps {
   /** Current page for highlighting active link */

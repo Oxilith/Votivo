@@ -8,10 +8,11 @@
  * - Supports option descriptions
  * @dependencies
  * - React
- * - @/components/assessment/types (SingleSelectStep, SelectOption)
+ * - @/components (SingleSelectStep, SelectOption)
  */
 
-import type { SingleSelectStep as SingleSelectStepType, SelectOption } from '@/components/assessment/types';
+import type { SingleSelectStep as SingleSelectStepType, SelectOption } from '@/components';
+import React from "react";
 
 interface SingleSelectStepProps {
   step: SingleSelectStepType;

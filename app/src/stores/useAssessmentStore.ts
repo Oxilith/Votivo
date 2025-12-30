@@ -17,9 +17,9 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AssessmentResponses } from '@/types/assessment.types';
+import type { AssessmentResponses } from '@/types';
 import { REQUIRED_FIELDS } from 'shared';
-import { useAnalysisStore } from '@/stores/useAnalysisStore';
+import { useAnalysisStore } from '@/stores';
 
 interface AssessmentState {
   // State
@@ -79,7 +79,7 @@ export const useAssessmentStore = create<AssessmentState>()(
       // Computed
       isComplete: () => {
         const { responses } = get();
-        return REQUIRED_FIELDS.every((field) => {
+        return REQUIRED_FIELDS.every((field: keyof AssessmentResponses) => {
           const value = responses[field];
           if (value === undefined || value === null) return false;
           if (Array.isArray(value)) return value.length > 0;
@@ -90,7 +90,7 @@ export const useAssessmentStore = create<AssessmentState>()(
 
       getCompletionPercentage: () => {
         const { responses } = get();
-        const completedFields = REQUIRED_FIELDS.filter((field) => {
+        const completedFields = REQUIRED_FIELDS.filter((field: keyof AssessmentResponses) => {
           const value = responses[field];
           if (value === undefined || value === null) return false;
           if (Array.isArray(value)) return value.length > 0;

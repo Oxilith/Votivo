@@ -8,18 +8,17 @@
  * - Configures automatic 401 handling with token refresh
  * - Handles password reset and email verification flows
  * - Manages user profile operations
- * - Handles assessment CRUD (save, list, get by ID)
- * - Handles analysis CRUD (save, list, get by ID)
+ * - Handles assessment CRUD with Zod-validated parsing
+ * - Handles analysis CRUD with Zod-validated parsing
  * - Automatically injects Authorization header from auth store
  * @dependencies
- * - @/services/interfaces (IAuthService, IApiClient, RequestConfig)
- * - @/types/auth.types for request/response types
- * - shared/index for AssessmentResponses, AIAnalysisResult
- * - @/stores/useAuthStore for access token
+ * - @/services (IAuthService, IApiClient, RequestConfig)
+ * - @/types for request/response types
+ * - shared for types and Zod validators (parseAssessmentResponses, parseAIAnalysisResult)
+ * - @/stores for access token
  */
 
-import type { IApiClient, RequestConfig } from '@/services/interfaces';
-import type { IAuthService } from '@/services/interfaces/IAuthService';
+import type { IApiClient, RequestConfig, IAuthService } from '@/services';
 import type {
   SafeUser,
   LoginRequest,
@@ -34,26 +33,12 @@ import type {
   SavedAssessmentRaw,
   SavedAnalysis,
   SavedAnalysisRaw,
-} from '@/types/auth.types';
+} from '@/types';
 import type { AssessmentResponses, AIAnalysisResult } from 'shared';
+import { parseAssessmentResponses, parseAIAnalysisResult } from 'shared';
 import { apiClient, setCsrfTokenGetter } from './ApiClient';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuthStore } from '@/stores';
 
-/**
- * Safely parse JSON with error handling
- * @param json - JSON string to parse
- * @param context - Context for error message (e.g., "assessment abc123")
- * @returns Parsed object
- * @throws Error with descriptive message if parsing fails
- */
-function safeJsonParse<T>(json: string, context: string): T {
-  try {
-    return JSON.parse(json) as T;
-  } catch (parseError) {
-    console.error(`Failed to parse ${context}:`, parseError);
-    throw new Error(`Data is corrupted (${context})`);
-  }
-}
 
 /**
  * Base path for user auth API endpoints
@@ -274,10 +259,10 @@ export class AuthService implements IAuthService {
       { responses: AssessmentResponses }
     >(`${AUTH_BASE_PATH}/assessment`, { responses }, this.getAuthConfig());
 
-    // Parse responses from JSON string with error handling
+    // Parse and validate responses from JSON string
     return {
       ...response.data,
-      responses: safeJsonParse<AssessmentResponses>(
+      responses: parseAssessmentResponses(
         response.data.responses,
         `assessment ${response.data.id}`
       ),
@@ -293,10 +278,10 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse responses from JSON strings with error handling
+    // Parse and validate responses from JSON strings
     return response.data.map((assessment) => ({
       ...assessment,
-      responses: safeJsonParse<AssessmentResponses>(
+      responses: parseAssessmentResponses(
         assessment.responses,
         `assessment ${assessment.id}`
       ),
@@ -312,10 +297,10 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse responses from JSON string with error handling
+    // Parse and validate responses from JSON string
     return {
       ...response.data,
-      responses: safeJsonParse<AssessmentResponses>(
+      responses: parseAssessmentResponses(
         response.data.responses,
         `assessment ${response.data.id}`
       ),
@@ -338,10 +323,10 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse result from JSON string with error handling
+    // Parse and validate result from JSON string
     return {
       ...response.data,
-      result: safeJsonParse<AIAnalysisResult>(
+      result: parseAIAnalysisResult(
         response.data.result,
         `analysis ${response.data.id}`
       ),
@@ -357,10 +342,10 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse results from JSON strings with error handling
+    // Parse and validate results from JSON strings
     return response.data.map((analysis) => ({
       ...analysis,
-      result: safeJsonParse<AIAnalysisResult>(
+      result: parseAIAnalysisResult(
         analysis.result,
         `analysis ${analysis.id}`
       ),
@@ -376,10 +361,10 @@ export class AuthService implements IAuthService {
       this.getAuthConfig()
     );
 
-    // Parse result from JSON string with error handling
+    // Parse and validate result from JSON string
     return {
       ...response.data,
-      result: safeJsonParse<AIAnalysisResult>(
+      result: parseAIAnalysisResult(
         response.data.result,
         `analysis ${response.data.id}`
       ),

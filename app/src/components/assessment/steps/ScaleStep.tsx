@@ -8,10 +8,11 @@
  * - Highlights selected value with vermilion background
  * @dependencies
  * - React
- * - @/components/assessment/types (ScaleStep)
+ * - @/components (ScaleStep)
  */
 
-import type { ScaleStep as ScaleStepType } from '@/components/assessment/types';
+import type { ScaleStep as ScaleStepType } from '@/components';
+import React from "react";
 
 interface ScaleStepProps {
   step: ScaleStepType;

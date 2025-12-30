@@ -16,28 +16,23 @@
  * @dependencies
  * - React (useState, useEffect, useRef)
  * - react-i18next (useTranslation)
- * - @/types/assessment.types (AssessmentResponses, AssessmentProps)
- * - @/stores (useUIStore)
- * - @/stores/useAuthStore
- * - @/services/api/AuthService (authService)
- * - @/components/assessment/steps (IntroStep, MultiSelectStep, etc.)
- * - @/components/assessment/navigation (AssessmentProgress, NavigationControls)
- * - @/components/assessment/hooks (useAssessmentNavigation)
- * - @/components/assessment/types (Phase, Step)
- * - @/components/landing/sections/FooterSection
- * - @/components/shared/PageNavigation
- * - @/components/assessment/AssessmentPageHeader
- * - @/components/shared/InkBrushDecoration
- * - @/utils/fileUtils (importFromJson)
- * - @/components/shared/icons (ErrorCircleIcon)
+ * - @/types (AssessmentResponses, AssessmentProps)
+ * - @/stores (useUIStore, useIsAuthenticated)
+ * - @/services (authService)
+ * - ./steps (IntroStep, MultiSelectStep, etc.)
+ * - ./navigation (AssessmentProgress, NavigationControls)
+ * - ./hooks (useAssessmentNavigation)
+ * - ./types (Phase)
+ * - @/components (FooterSection, PageNavigation, InkBrushDecoration, ErrorCircleIcon)
+ * - ./AssessmentPageHeader
+ * - @/utils (importFromJson)
  */
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AssessmentResponses, AssessmentProps } from '@/types/assessment.types';
-import { useUIStore } from '@/stores';
-import { useIsAuthenticated } from '@/stores/useAuthStore';
-import { authService } from '@/services/api/AuthService';
+import type { AssessmentResponses, AssessmentProps } from '@/types';
+import { useUIStore, useIsAuthenticated } from '@/stores';
+import { authService } from '@/services';
 import {
   IntroStep,
   MultiSelectStep,
@@ -49,12 +44,14 @@ import {
 import { AssessmentProgress, NavigationControls } from './navigation';
 import { useAssessmentNavigation } from './hooks';
 import type { Phase } from './types';
-import FooterSection from '@/components/landing/sections/FooterSection';
-import PageNavigation from '@/components/shared/PageNavigation';
-import AssessmentPageHeader from '@/components/assessment/AssessmentPageHeader';
-import { importFromJson } from '@/utils/fileUtils';
-import { ErrorCircleIcon } from '@/components/shared/icons';
-import InkBrushDecoration from '@/components/shared/InkBrushDecoration';
+import {
+  FooterSection,
+  PageNavigation,
+  ErrorCircleIcon,
+  InkBrushDecoration,
+} from '@/components';
+import AssessmentPageHeader from './AssessmentPageHeader';
+import { importFromJson } from '@/utils';
 
 const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   initialResponses,
@@ -306,7 +303,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
 
   // Update response handler
   const updateResponse = (key: string, value: string | number | string[]) => {
-    setResponses((prev) => ({ ...prev, [key]: value }));
+    setResponses((prev: Partial<AssessmentResponses>) => ({ ...prev, [key]: value }));
   };
 
   // Complete handler - saves assessment to database for authenticated users

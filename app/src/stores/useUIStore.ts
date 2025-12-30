@@ -13,7 +13,7 @@
  */
 
 import { create } from 'zustand';
-import type { AppView } from '@/types/assessment.types';
+import type { AppView } from '@/types';
 
 interface UIState {
   // Navigation state

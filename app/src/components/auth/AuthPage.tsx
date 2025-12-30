@@ -17,13 +17,13 @@
  * - @/services/api/AuthService (authService)
  */
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import AuthLayout from '@/components/auth/AuthLayout';
-import { LoginForm, RegisterForm, FormInput, FormButton } from '@/components/auth/forms';
-import { useRouting } from '@/hooks/useRouting';
-import { MailIcon } from '@/components/shared/icons';
-import { authService } from '@/services/api/AuthService';
+import AuthLayout from './AuthLayout';
+import { LoginForm, RegisterForm, FormInput, FormButton } from './forms';
+import { useRouting } from '@/hooks';
+import { MailIcon } from '@/components';
+import { authService } from '@/services';
 
 /**
  * Authentication mode

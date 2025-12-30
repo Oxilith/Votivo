@@ -16,8 +16,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '@/admin/api/auth';
-import { colors, fonts, shadows } from '@/admin/styles/theme';
+import { login, colors, fonts, shadows } from '@/admin';
 
 export function LoginPage() {
   const [apiKey, setApiKey] = useState('');

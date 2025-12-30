@@ -7,13 +7,13 @@
  * - Enables theme access without prop drilling
  * @dependencies
  * - React (ReactNode)
- * - @/contexts/ThemeContext (ThemeContext)
- * - @/hooks/useTheme (useTheme)
+ * - @/contexts (ThemeContext)
+ * - @/hooks (useTheme)
  */
 
-import type { ReactNode } from 'react';
-import { ThemeContext } from '@/contexts/ThemeContext';
-import { useTheme } from '@/hooks/useTheme';
+import React, { ReactNode } from 'react';
+import { ThemeContext } from '@/contexts';
+import { useTheme } from '@/hooks';
 
 interface ThemeProviderProps {
   children: ReactNode;

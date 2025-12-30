@@ -9,14 +9,12 @@
  * @dependencies
  * - React (FC)
  * - react-i18next (useTranslation)
- * - @/components/shared/DateBadge
- * - @/components/shared/icons (DownloadIcon)
+ * - @/components (DateBadge, DownloadIcon)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import DateBadge from '@/components/shared/DateBadge';
-import { DownloadIcon } from '@/components/shared/icons';
+import { DateBadge, DownloadIcon } from '@/components';
 
 interface AssessmentPageHeaderProps {
   /** ISO date string when the assessment was created */

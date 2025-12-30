@@ -14,10 +14,8 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { promptApi } from '@/admin/api/promptApi';
-import { colors, shadows, fonts } from '@/admin/styles/theme';
-import { CLAUDE_MODELS } from '@/admin/types';
-import type { CreatePromptInput } from '@/admin/types';
+import { promptApi, colors, shadows, fonts, CLAUDE_MODELS } from '@/admin';
+import type { CreatePromptInput } from '@/admin';
 
 export function PromptCreatePage() {
   const navigate = useNavigate();

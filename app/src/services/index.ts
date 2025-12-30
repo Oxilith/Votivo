@@ -20,6 +20,7 @@ export type {
   AnalysisLanguage,
   AnalysisRequest,
   AnalysisResponse,
+  IAuthService,
 } from './interfaces';
 
 // Implementations
@@ -29,4 +30,6 @@ export {
   apiClient,
   ClaudeService,
   claudeService,
+  AuthService,
+  authService,
 } from './api';

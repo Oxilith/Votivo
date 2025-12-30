@@ -18,13 +18,13 @@
  * - @/stores/useAuthStore
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import FormInput from '@/components/auth/forms/FormInput';
-import FormButton from '@/components/auth/forms/FormButton';
-import { authService } from '@/services/api/AuthService';
-import { useAuthStore } from '@/stores/useAuthStore';
+import FormInput from './FormInput';
+import FormButton from './FormButton';
+import { authService } from '@/services';
+import { useAuthStore } from '@/stores';
 
 /**
  * Props for LoginForm component

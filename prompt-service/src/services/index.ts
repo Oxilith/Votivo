@@ -7,12 +7,14 @@
  * - Exports prompt resolver service and types
  * - Exports user service and types
  * - Exports email service and types
+ * - Exports audit service and types
  * @dependencies
  * - prompt.service.ts
  * - ab-test.service.ts
  * - prompt-resolver.service.ts
  * - user.service.ts
  * - email.service.ts
+ * - audit.service.ts
  */
 
 export {
@@ -59,3 +61,9 @@ export {
   type PasswordResetEmailInput,
   type EmailVerificationInput,
 } from './email.service';
+export {
+  auditLog,
+  type AuditEventType,
+  type AuditLogEntry,
+  type RequestContext,
+} from './audit.service';

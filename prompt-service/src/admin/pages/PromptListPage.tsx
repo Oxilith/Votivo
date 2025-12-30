@@ -14,9 +14,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { usePrompts } from '@/admin/hooks/usePrompts';
-import { colors, shadows, fonts } from '@/admin/styles/theme';
-import type { PromptDTO } from '@/admin/types';
+import { usePrompts, colors, shadows, fonts } from '@/admin';
+import type { PromptDTO } from '@/admin';
 
 export function PromptListPage() {
   const { prompts, loading, error, refetch } = usePrompts();

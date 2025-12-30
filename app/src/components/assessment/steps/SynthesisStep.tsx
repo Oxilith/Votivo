@@ -10,15 +10,16 @@
  * @dependencies
  * - React
  * - react-i18next (useTranslation)
- * - @/types/assessment.types (AssessmentResponses)
- * - @/styles/theme (cardStyles, textStyles, phaseBadge)
- * - @/components/assessment/types (Phase, MultiSelectStep, SingleSelectStep, SelectOption)
+ * - @/types (AssessmentResponses)
+ * - @/styles (cardStyles, textStyles, phaseBadge)
+ * - @/components (Phase, MultiSelectStep, SingleSelectStep, SelectOption)
  */
 
 import { useTranslation } from 'react-i18next';
-import type { AssessmentResponses } from '@/types/assessment.types';
-import { cardStyles, textStyles, phaseBadge } from '@/styles/theme';
-import type { Phase, MultiSelectStep, SingleSelectStep, SelectOption } from '@/components/assessment/types';
+import type { AssessmentResponses } from '@/types';
+import { cardStyles, textStyles, phaseBadge } from '@/styles';
+import type { Phase, MultiSelectStep, SingleSelectStep, SelectOption } from '@/components';
+import React from "react";
 
 interface SynthesisStepProps {
   responses: Partial<AssessmentResponses>;

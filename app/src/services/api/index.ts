@@ -11,3 +11,4 @@
 
 export { ApiClient, ApiClientError, apiClient } from './ApiClient';
 export { ClaudeService, claudeService } from './ClaudeService';
+export { AuthService, authService } from './AuthService';

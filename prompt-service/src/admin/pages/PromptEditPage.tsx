@@ -16,11 +16,16 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { usePrompt, usePromptVersions } from '@/admin/hooks/usePrompts';
-import { promptApi } from '@/admin/api/promptApi';
-import { colors, shadows, fonts } from '@/admin/styles/theme';
-import { CLAUDE_MODELS } from '@/admin/types';
-import type { UpdatePromptInput, PromptVariantDTO, PromptVersionDTO } from '@/admin/types';
+import {
+  usePrompt,
+  usePromptVersions,
+  promptApi,
+  colors,
+  shadows,
+  fonts,
+  CLAUDE_MODELS,
+} from '@/admin';
+import type { UpdatePromptInput, PromptVariantDTO, PromptVersionDTO } from '@/admin';
 
 export function PromptEditPage() {
   const { id } = useParams<{ id: string }>();

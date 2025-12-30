@@ -7,11 +7,11 @@
  * - Enables dependency injection for testing
  * - Facilitates mocking in unit tests
  * @dependencies
- * - @/types/assessment.types (AssessmentResponses, AIAnalysisResult)
+ * - @/types (AssessmentResponses, AIAnalysisResult)
  * - shared (AnalysisLanguage, UserProfileForAnalysis)
  */
 
-import type { AssessmentResponses, AIAnalysisResult } from '@/types/assessment.types';
+import type { AssessmentResponses, AIAnalysisResult } from '@/types';
 import type { AnalysisLanguage, UserProfileForAnalysis } from 'shared';
 
 // Re-export for backward compatibility

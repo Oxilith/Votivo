@@ -15,12 +15,12 @@
  * - @/hooks/useRouting
  */
 
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import AuthLayout from '@/components/auth/AuthLayout';
-import { PasswordResetConfirmForm } from '@/components/auth/forms';
-import { ErrorCircleIcon } from '@/components/shared/icons';
-import { useRouting } from '@/hooks/useRouting';
+import AuthLayout from './AuthLayout';
+import { PasswordResetConfirmForm } from './forms';
+import { ErrorCircleIcon } from '@/components';
+import { useRouting } from '@/hooks';
 
 /**
  * Props for PasswordResetPage

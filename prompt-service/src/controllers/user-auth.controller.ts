@@ -1,6 +1,6 @@
 /**
  * @file prompt-service/src/controllers/user-auth.controller.ts
- * @purpose Express controller for user authentication API endpoints
+ * @purpose Express controller for user authentication API endpoints with audit logging
  * @functionality
  * - Handles user registration with email/password
  * - Handles user login with JWT token generation
@@ -11,10 +11,12 @@
  * - Handles assessment CRUD (save, list, get by ID)
  * - Handles analysis CRUD (save, list, get by ID)
  * - Sets CSRF token on successful authentication
+ * - Passes request context (IP, userAgent) to service for audit logging
  * - Returns appropriate HTTP status codes
  * @dependencies
  * - express for request/response handling
  * - @/services/user.service for authentication business logic
+ * - @/services/audit.service for RequestContext type
  * - @/validators/auth.validator for input validation
  * - @/middleware/jwt-auth.middleware for authenticated request type
  * - @/middleware/csrf.middleware for CSRF token management
@@ -23,7 +25,7 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { userService } from '@/services';
+import { userService, type RequestContext } from '@/services';
 import {
   registerSchema,
   loginSchema,
@@ -67,6 +69,22 @@ const REFRESH_TOKEN_COOKIE_OPTIONS = {
   signed: true, // Sign cookie for integrity verification
 };
 
+/**
+ * Extract request context for audit logging
+ */
+function getRequestContext(req: Request): RequestContext {
+  // Get IP from x-forwarded-for header (behind proxy) or direct connection
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const ip = typeof forwardedFor === 'string'
+    ? forwardedFor.split(',')[0].trim()
+    : req.ip ?? req.socket.remoteAddress;
+
+  return {
+    ip,
+    userAgent: req.headers['user-agent'],
+  };
+}
+
 export class UserAuthController {
   /**
    * POST /api/user-auth/register - Register new user
@@ -80,7 +98,8 @@ export class UserAuthController {
     }
 
     try {
-      const result = await userService.register(body.data);
+      const ctx = getRequestContext(req);
+      const result = await userService.register(body.data, ctx);
 
       // Set refresh token in httpOnly cookie
       res.cookie(REFRESH_TOKEN_COOKIE, result.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
@@ -113,7 +132,8 @@ export class UserAuthController {
     }
 
     try {
-      const result = await userService.login(body.data);
+      const ctx = getRequestContext(req);
+      const result = await userService.login(body.data, ctx);
 
       // Set refresh token in httpOnly cookie
       res.cookie(REFRESH_TOKEN_COOKIE, result.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
@@ -155,7 +175,8 @@ export class UserAuthController {
     }
 
     try {
-      const result = await userService.refreshTokens(refreshToken);
+      const ctx = getRequestContext(req);
+      const result = await userService.refreshTokens(refreshToken, ctx);
 
       // Set new refresh token in httpOnly cookie (token rotation)
       res.cookie(REFRESH_TOKEN_COOKIE, result.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
@@ -197,7 +218,8 @@ export class UserAuthController {
     }
 
     try {
-      const result = await userService.refreshTokensWithUser(refreshToken);
+      const ctx = getRequestContext(req);
+      const result = await userService.refreshTokensWithUser(refreshToken, ctx);
 
       // Set new refresh token in httpOnly cookie (token rotation)
       res.cookie(REFRESH_TOKEN_COOKIE, result.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
@@ -236,8 +258,9 @@ export class UserAuthController {
     }
 
     try {
+      const ctx = getRequestContext(req);
       // Always returns true to prevent user enumeration
-      await userService.requestPasswordReset(body.data.email);
+      await userService.requestPasswordReset(body.data.email, ctx);
 
       res.json({
         message: 'If an account with that email exists, a password reset link has been sent.',
@@ -271,7 +294,8 @@ export class UserAuthController {
     }
 
     try {
-      await userService.confirmPasswordReset(body.data.token, body.data.newPassword);
+      const ctx = getRequestContext(req);
+      await userService.confirmPasswordReset(body.data.token, body.data.newPassword, ctx);
 
       res.json({
         message: 'Password has been reset successfully. Please login with your new password.',
@@ -299,7 +323,8 @@ export class UserAuthController {
     }
 
     try {
-      const user = await userService.verifyEmail(params.data.token);
+      const ctx = getRequestContext(req);
+      const user = await userService.verifyEmail(params.data.token, ctx);
 
       res.json({
         message: 'Email verified successfully.',
@@ -334,7 +359,8 @@ export class UserAuthController {
     }
 
     try {
-      const sent = await userService.resendEmailVerification(userId);
+      const ctx = getRequestContext(req);
+      const sent = await userService.resendEmailVerification(userId, ctx);
 
       if (!sent) {
         res.json({
@@ -364,8 +390,9 @@ export class UserAuthController {
     const refreshToken = signedCookies.refreshToken;
 
     if (refreshToken) {
+      const ctx = getRequestContext(req);
       // Invalidate the refresh token in database
-      await userService.logout(refreshToken);
+      await userService.logout(refreshToken, ctx);
     }
 
     // Clear the cookies
@@ -393,7 +420,8 @@ export class UserAuthController {
       return;
     }
 
-    const count = await userService.logoutAll(userId);
+    const ctx = getRequestContext(req);
+    const count = await userService.logoutAll(userId, ctx);
 
     // Clear the cookies
     res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });
@@ -504,7 +532,8 @@ export class UserAuthController {
     const { currentPassword, newPassword } = parseResult.data;
 
     try {
-      await userService.changePassword(userId, { currentPassword, newPassword });
+      const ctx = getRequestContext(req);
+      await userService.changePassword(userId, { currentPassword, newPassword }, ctx);
 
       // Clear refresh token cookie after password change
       res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });
@@ -545,7 +574,8 @@ export class UserAuthController {
     }
 
     try {
-      await userService.deleteAccount(userId);
+      const ctx = getRequestContext(req);
+      await userService.deleteAccount(userId, ctx);
 
       // Clear refresh token cookie
       res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });

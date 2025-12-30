@@ -32,4 +32,4 @@ export { default as PasswordResetPage } from './PasswordResetPage';
 export type { PasswordResetPageProps } from './PasswordResetPage';
 
 // Re-export form components
-export * from './forms';
+export * from './forms'; // @allow-wildcard

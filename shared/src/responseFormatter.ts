@@ -14,10 +14,10 @@
  * - ./labels for label mappings
  */
 
-import type { AssessmentResponses } from './assessment.types';
-import type { AnalysisLanguage, UserProfileForAnalysis } from './api.types';
-import type { Gender } from './auth.types';
-import { valueLabels, timeLabels, triggerLabels, willpowerLabels } from './labels';
+import type { AssessmentResponses } from '@/assessment.types';
+import type { AnalysisLanguage, UserProfileForAnalysis } from '@/api.types';
+import type { Gender } from '@/auth.types';
+import { valueLabels, timeLabels, triggerLabels, willpowerLabels } from '@/labels';
 
 /**
  * Formats gender value for display in prompt

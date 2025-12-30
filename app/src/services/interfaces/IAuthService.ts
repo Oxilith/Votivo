@@ -9,8 +9,7 @@
  * - Defines contract for profile management
  * - Defines contract for assessment and analysis data operations
  * @dependencies
- * - @/types/auth.types for auth-related type definitions
- * - @/types/assessment.types for AssessmentResponses
+ * - @/types for auth-related type definitions
  * - shared/index for AIAnalysisResult
  */
 
@@ -25,7 +24,7 @@ import type {
   MessageResponse,
   SavedAssessment,
   SavedAnalysis,
-} from '@/types/auth.types';
+} from '@/types';
 import type { AssessmentResponses, AIAnalysisResult } from 'shared';
 
 /**

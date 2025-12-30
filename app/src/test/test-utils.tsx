@@ -13,9 +13,9 @@
 
 import type { ReactElement, ReactNode } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
-import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { ThemeProvider } from '@/components';
 import { I18nextProvider } from 'react-i18next';
-import i18n from '@/i18n/config';
+import { i18n } from '@/i18n';
 
 interface AllTheProvidersProps {
   children: ReactNode;

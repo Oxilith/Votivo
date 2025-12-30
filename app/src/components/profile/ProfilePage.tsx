@@ -14,29 +14,28 @@
  * @dependencies
  * - React (useState, useEffect, useCallback)
  * - react-i18next (useTranslation)
- * - @/components/auth/forms (FormInput, FormButton)
- * - @/components/shared/PageNavigation
- * - @/components/landing/sections/FooterSection
- * - @/components/shared/InkBrushDecoration
- * - @/components/shared/icons (CheckIcon, LoadingSpinnerIcon)
- * - @/stores/useAuthStore
- * - @/stores (useUIStore, useAssessmentStore, useAnalysisStore)
- * - @/services/api/AuthService
- * - @/types/auth.types
+ * - @/components (FormInput, FormButton, PageNavigation, FooterSection, icons, InkBrushDecoration)
+ * - @/stores (useAuthStore, useCurrentUser, useUIStore, useAssessmentStore, useAnalysisStore)
+ * - @/services (authService)
+ * - @/types (Gender, ProfileUpdateRequest, PasswordChangeRequest)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import FormInput from '@/components/auth/forms/FormInput';
-import FormButton from '@/components/auth/forms/FormButton';
-import PageNavigation from '@/components/shared/PageNavigation';
-import FooterSection from '@/components/landing/sections/FooterSection';
-import { CheckIcon, LoadingSpinnerIcon, ErrorCircleIcon, RefreshIcon } from '@/components/shared/icons';
-import InkBrushDecoration from '@/components/shared/InkBrushDecoration';
-import { useAuthStore, useCurrentUser } from '@/stores/useAuthStore';
-import { useUIStore, useAssessmentStore, useAnalysisStore } from '@/stores';
-import { authService } from '@/services/api/AuthService';
-import type { Gender, ProfileUpdateRequest, PasswordChangeRequest } from '@/types/auth.types';
+import {
+  FormInput,
+  FormButton,
+  PageNavigation,
+  FooterSection,
+  CheckIcon,
+  LoadingSpinnerIcon,
+  ErrorCircleIcon,
+  RefreshIcon,
+  InkBrushDecoration,
+} from '@/components';
+import { useAuthStore, useCurrentUser, useUIStore, useAssessmentStore, useAnalysisStore } from '@/stores';
+import { authService } from '@/services';
+import type { Gender, ProfileUpdateRequest, PasswordChangeRequest } from '@/types';
 import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH } from 'shared/index';
 
 /**

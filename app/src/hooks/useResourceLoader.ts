@@ -9,20 +9,16 @@
  * @dependencies
  * - React (useEffect, useCallback, useState)
  * - @/stores (useAuthStore, useAssessmentStore, useAnalysisStore, useUIStore)
- * - @/services/api/AuthService
- * - @/hooks/useRouting
- * - @/types/assessment.types (AssessmentResponses)
- * - @/types/auth.types (AIAnalysisResult)
+ * - @/services (authService)
+ * - ./useRouting
+ * - @/types (AppView, ViewOnlyAssessment, ViewOnlyAnalysis)
  */
 
 import { useEffect, useCallback, useState, useRef } from 'react';
-import { useAuthStore, useAuthInitialized, useAuthHydrated } from '@/stores/useAuthStore';
-import { useAssessmentStore } from '@/stores/useAssessmentStore';
-import { useAnalysisStore } from '@/stores/useAnalysisStore';
-import { useUIStore } from '@/stores/useUIStore';
-import { authService } from '@/services/api/AuthService';
-import { useRouting } from '@/hooks/useRouting';
-import type { AppView, ViewOnlyAssessment, ViewOnlyAnalysis } from '@/types/assessment.types';
+import { useAuthStore, useAuthInitialized, useAuthHydrated, useAssessmentStore, useAnalysisStore, useUIStore } from '@/stores';
+import { authService } from '@/services';
+import { useRouting } from './useRouting';
+import type { AppView, ViewOnlyAssessment, ViewOnlyAnalysis } from '@/types';
 
 // Re-export types for convenience
 export type { ViewOnlyAssessment, ViewOnlyAnalysis };

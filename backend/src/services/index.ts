@@ -11,7 +11,7 @@
  * - prompt-client.service.ts
  * - prompt-cache.service.ts
  * - circuit-breaker.service.ts
- * - claude/response-parser.ts
+ * - claude/ (barrel)
  */
 
 export { analyzeAssessment } from './claude.service';
@@ -29,4 +29,4 @@ export {
   destroyAllCircuitBreakers,
   type CircuitBreakerConfig,
 } from './circuit-breaker.service';
-export { extractTextFromMessage, parseAnalysisResponse } from './claude/response-parser';
+export { extractTextFromMessage, parseAnalysisResponse } from './claude';

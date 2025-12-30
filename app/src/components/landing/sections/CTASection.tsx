@@ -15,7 +15,7 @@
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRightIcon } from '@/components/shared/icons';
+import { ArrowRightIcon } from '@/components';
 
 interface CTASectionProps {
   onStartDiscovery: () => void;

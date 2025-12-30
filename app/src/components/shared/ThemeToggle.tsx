@@ -8,14 +8,14 @@
  * @dependencies
  * - React
  * - react-i18next (useTranslation)
- * - @/hooks/useThemeContext
- * - @/components/shared/icons (SunIcon, MoonIcon)
+ * - @/hooks (useThemeContext)
+ * - ./icons (SunIcon, MoonIcon)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useThemeContext } from '@/hooks/useThemeContext';
-import { SunIcon, MoonIcon } from '@/components/shared/icons';
+import { useThemeContext } from '@/hooks';
+import { SunIcon, MoonIcon } from './icons';
 
 const ThemeToggle: FC = () => {
   const { t } = useTranslation('header');

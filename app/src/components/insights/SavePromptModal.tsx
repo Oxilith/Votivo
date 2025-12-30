@@ -12,7 +12,7 @@
  */
 
 import type { FC } from 'react';
-import { CheckIcon } from '@/components/shared/icons';
+import { CheckIcon } from '@/components';
 
 /**
  * Props for SavePromptModal

@@ -8,11 +8,11 @@
  * - Determines if on first/last step
  * @dependencies
  * - React (useState, useMemo, useCallback)
- * - @/components/assessment/types (Phase)
+ * - @/components (Phase)
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import type { Phase } from '@/components/assessment/types';
+import type { Phase } from '@/components';
 
 interface UseAssessmentNavigationProps {
   phases: Phase[];

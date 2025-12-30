@@ -11,13 +11,13 @@
  * - Handles auth mode (sign-in, sign-up) via URL path
  * @dependencies
  * - React (useEffect, useCallback)
- * - @/stores/useUIStore
- * - @/types/assessment.types
+ * - @/stores
+ * - @/types
  */
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useUIStore } from '@/stores';
-import type { AppView } from '@/types/assessment.types';
+import type { AppView } from '@/types';
 
 /**
  * Auth mode for the auth page

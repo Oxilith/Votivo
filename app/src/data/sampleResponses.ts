@@ -5,10 +5,10 @@
  * - Provides pre-filled sample data for quick testing
  * - Demonstrates the expected data structure for AssessmentResponses
  * @dependencies
- * - @/types/assessment.types (AssessmentResponses)
+ * - @/types (AssessmentResponses)
  */
 
-import type { AssessmentResponses } from '@/types/assessment.types';
+import type { AssessmentResponses } from '@/types';
 
 const sampleResponses: AssessmentResponses = {
   peak_energy_times: ['mid_morning', 'night', 'late_night'],

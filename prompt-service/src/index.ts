@@ -29,11 +29,11 @@ import cookieParser from 'cookie-parser';
 import pinoHttp from 'pino-http';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { config } from '@/config';
-import { apiRouter } from '@/routes';
-import { prisma } from '@/prisma';
-import { adminAuthMiddleware, tracingMiddleware } from '@/middleware';
-import { logger } from '@/utils';
+import { config } from './config';
+import { apiRouter } from './routes';
+import { prisma } from './prisma';
+import { adminAuthMiddleware, tracingMiddleware } from './middleware';
+import { logger } from './utils';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

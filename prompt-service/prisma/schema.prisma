@@ -160,6 +160,7 @@ model User {
 }
 
 /// Refresh token - enables token refresh without re-login (7 day expiry)
+/// Includes device tracking and token family for rotation detection
 model RefreshToken {
   id        String   @id @default(uuid())
   userId    String
@@ -167,11 +168,22 @@ model RefreshToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
+  // Device tracking fields
+  deviceInfo String?  // User agent string for session visibility
+  ipAddress  String?  // IP address at token creation
+
+  // Token family for rotation detection
+  // All tokens in a refresh chain share the same familyId
+  // If a revoked token is reused, the entire family is revoked (potential theft)
+  familyId  String
+  isRevoked Boolean  @default(false)  // Soft revoke on rotation
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([token])
   @@index([expiresAt])
+  @@index([familyId])
 }
 
 /// Password reset token - enables secure password reset flow (1 hour expiry)

@@ -10,13 +10,13 @@
  * @dependencies
  * - React (FC, useState, useRef, useEffect)
  * - react-i18next (useTranslation)
- * - @/components/shared/icons (ChevronDownIcon, DownloadIcon)
+ * - ./icons (ChevronDownIcon, DownloadIcon)
  */
 
 import type { FC } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDownIcon, DownloadIcon } from '@/components/shared/icons';
+import { ChevronDownIcon, DownloadIcon } from './icons';
 
 interface ExportDropdownProps {
   onExportAssessment?: () => void;

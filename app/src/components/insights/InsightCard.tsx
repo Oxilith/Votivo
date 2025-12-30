@@ -22,8 +22,9 @@ import type {
   AnalysisBlindSpot,
   AnalysisLeveragePoint,
   AnalysisRisk,
-} from '@/types/assessment.types';
-import { cardStyles, textStyles, badgeStyles } from '@/styles/theme';
+} from '@/types';
+import { cardStyles, textStyles, badgeStyles } from '@/styles';
+import React from "react";
 
 /**
  * Extended types for leverage points and risks that may include an icon
@@ -94,7 +95,7 @@ const InsightCard: React.FC<InsightCardProps> = ({ item }) => {
             {t('cards.evidence')}
           </p>
           <ul className={`font-body text-sm ${textStyles.secondary} space-y-1`}>
-            {item.evidence.map((e, i) => (
+            {item.evidence.map((e: string, i: number) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="w-1 h-1 rounded-full bg-[var(--accent)] mt-2 flex-shrink-0" />
                 <span>{e}</span>

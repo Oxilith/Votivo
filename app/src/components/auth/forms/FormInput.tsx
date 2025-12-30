@@ -14,7 +14,7 @@
 
 import { useState, forwardRef } from 'react';
 import type { InputHTMLAttributes } from 'react';
-import { EyeIcon, EyeOffIcon } from '@/components/shared/icons';
+import { EyeIcon, EyeOffIcon } from '@/components';
 
 /**
  * Props for FormInput component

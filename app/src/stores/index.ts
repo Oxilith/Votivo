@@ -8,8 +8,18 @@
  * - ./useAssessmentStore
  * - ./useUIStore
  * - ./useAnalysisStore
+ * - ./useAuthStore
  */
 
 export { useAssessmentStore } from './useAssessmentStore';
 export { useUIStore } from './useUIStore';
 export { useAnalysisStore } from './useAnalysisStore';
+export {
+  useAuthStore,
+  useIsAuthenticated,
+  useCurrentUser,
+  useAuthLoading,
+  useAuthInitialized,
+  useAuthError,
+  useAuthHydrated,
+} from './useAuthStore';

@@ -9,12 +9,12 @@
  * @dependencies
  * - React
  * - react-i18next (useTranslation)
- * - @/components/landing/shared/PhaseCard
+ * - @/components (PhaseCard)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import PhaseCard from '@/components/landing/shared/PhaseCard';
+import { PhaseCard } from '@/components';
 
 const JourneySection: FC = () => {
   const { t } = useTranslation('landing');

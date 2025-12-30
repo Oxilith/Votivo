@@ -20,8 +20,13 @@ import { ApiResponse } from 'shared/index.js';
 ```
 
 ### Barrel Exports
-- Every directory with multiple related files should have an `index.ts` barrel export
-- Import from the directory, not individual files
+
+#### Rules
+1. **Every directory with 2+ related exports gets a barrel** (`index.ts`)
+2. **Import from barrels, not files** — always import from directory
+3. **Max 4 barrel levels** — leaf → mid → feature → root
+4. **Be selective** — only re-export what consumers need
+5. **No circular re-exports** — barrel A must not re-export from barrel B if B imports from A
 ```typescript
 // ✅ Correct - import from barrel
 import { config, logger, validateEnv } from '@/config';
@@ -31,8 +36,19 @@ import { config } from '@/config/env';
 import { logger } from '@/config/logger';
 ```
 
-### Creating Barrel Exports
-When creating a new directory with exports:
+#### Creating Barrel Exports
+```typescript
+// Leaf: icons/index.ts
+export { CheckIcon } from './CheckIcon';
+export { CloseIcon } from './CloseIcon';
+
+// Mid: components/index.ts
+export { Button } from './Button';
+export { CheckIcon, CloseIcon } from './icons';
+
+// Root: feature/index.ts (public API)
+export { Button } from './components';
+```
 ```typescript
 // src/services/index.ts
 export { ClaudeService } from './claude.service';
@@ -40,7 +56,7 @@ export { PromptService } from './prompt.service';
 export type { ServiceConfig } from './types';
 ```
 
-### Cross-Package Imports
+#### Cross-Package Imports
 - Import from `shared` package directly (resolved via node_modules symlink)
 - Never use relative paths to other workspaces
 ```typescript
@@ -50,6 +66,12 @@ import { ApiResponse, ValidationError } from 'shared';
 // ❌ Wrong
 import { ApiResponse } from '../../../shared/src/index';
 ```
+
+#### Anti-patterns
+- `export * from './subdir'` without auditing what it exposes
+- Importing from specific files when barrel exists
+- 4+ levels of nested barrels
+- Re-exporting internal/private utilities
 
 ---
 

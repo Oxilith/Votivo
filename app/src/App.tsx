@@ -28,19 +28,22 @@
  */
 
 import { useCallback, useEffect } from 'react';
-import { LandingPage } from '@/components/landing';
-import IdentityFoundationsAssessment from '@/components/assessment/IdentityFoundationsAssessment';
-import IdentityInsightsAI from '@/components/insights/IdentityInsightsAI';
-import { AuthPage, AuthGuard, EmailVerificationPage, PasswordResetPage } from '@/components/auth';
-import { ProfilePage } from '@/components/profile';
-import type { AssessmentResponses } from '@/types/assessment.types';
-import { exportToJson } from '@/utils/fileUtils';
-import { ThemeProvider } from '@/components/providers/ThemeProvider';
-import { useAssessmentStore, useUIStore, useAnalysisStore } from '@/stores';
-import { useAuthStore, useAuthInitialized, useAuthHydrated } from '@/stores/useAuthStore';
-import { authService } from '@/services/api/AuthService';
-import { useRouting } from '@/hooks/useRouting';
-import { useResourceLoader } from '@/hooks/useResourceLoader';
+import {
+  LandingPage,
+  IdentityFoundationsAssessment,
+  IdentityInsightsAI,
+  AuthPage,
+  AuthGuard,
+  EmailVerificationPage,
+  PasswordResetPage,
+  ProfilePage,
+  ThemeProvider,
+} from '@/components';
+import type { AssessmentResponses } from '@/types';
+import { exportToJson } from '@/utils';
+import { useAssessmentStore, useUIStore, useAnalysisStore, useAuthStore, useAuthInitialized, useAuthHydrated } from '@/stores';
+import { authService } from '@/services';
+import { useRouting, useResourceLoader } from '@/hooks';
 
 function App() {
   // Zustand stores

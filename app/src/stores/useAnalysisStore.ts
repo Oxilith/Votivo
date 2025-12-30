@@ -16,7 +16,7 @@
  */
 
 import { create } from 'zustand';
-import type { AIAnalysisResult, AssessmentResponses } from '@/types/assessment.types';
+import type { AIAnalysisResult, AssessmentResponses } from '@/types';
 import { claudeService, ApiClientError } from '@/services';
 import type { AnalysisLanguage } from '@/services';
 import type { UserProfileForAnalysis } from 'shared';

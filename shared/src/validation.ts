@@ -11,7 +11,7 @@
  * - ./assessment.types for AssessmentResponses type
  */
 
-import type { AssessmentResponses } from './assessment.types';
+import type { AssessmentResponses } from '@/assessment.types';
 
 // Enum value arrays (used by backend Zod schemas)
 export const TIME_OF_DAY_VALUES = [

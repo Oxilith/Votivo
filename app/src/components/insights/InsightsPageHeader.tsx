@@ -15,8 +15,7 @@
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import DateBadge from '@/components/shared/DateBadge';
-import { DownloadIcon } from '@/components/shared/icons';
+import { DateBadge, DownloadIcon } from '@/components';
 
 interface InsightsPageHeaderProps {
   /** ISO date string when the analysis was created */

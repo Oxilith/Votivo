@@ -13,20 +13,16 @@
  * @dependencies
  * - React
  * - react-i18next (useTranslation)
- * - @/components/landing/shared/VotiveLogo
- * - @/components/shared/UserAvatarDropdown
- * - @/hooks/useThemeContext
- * - @/components/shared/icons (SunIcon, MoonIcon)
- * - @/stores/useAuthStore
+ * - @/components (VotiveLogo, UserAvatarDropdown, SunIcon, MoonIcon)
+ * - @/hooks (useThemeContext)
+ * - @/stores (useIsAuthenticated)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import VotiveLogo from '@/components/landing/shared/VotiveLogo';
-import UserAvatarDropdown from '@/components/shared/UserAvatarDropdown';
-import { useThemeContext } from '@/hooks/useThemeContext';
-import { SunIcon, MoonIcon } from '@/components/shared/icons';
-import { useIsAuthenticated } from '@/stores/useAuthStore';
+import { VotiveLogo, UserAvatarDropdown, SunIcon, MoonIcon } from '@/components';
+import { useThemeContext } from '@/hooks';
+import { useIsAuthenticated } from '@/stores';
 
 interface NavSectionProps {
   onStartDiscovery: () => void;

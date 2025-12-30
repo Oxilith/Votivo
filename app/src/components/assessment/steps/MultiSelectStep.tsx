@@ -8,12 +8,12 @@
  * - Supports option descriptions
  * @dependencies
  * - React
- * - @/components/assessment/types (MultiSelectStep, SelectOption)
- * - @/components/shared/icons (CheckIcon)
+ * - @/components (MultiSelectStep, SelectOption, CheckIcon)
  */
 
-import { CheckIcon } from '@/components/shared/icons';
-import type { MultiSelectStep as MultiSelectStepType, SelectOption } from '@/components/assessment/types';
+import { CheckIcon } from '@/components';
+import type { MultiSelectStep as MultiSelectStepType, SelectOption } from '@/components';
+import React from "react";
 
 interface MultiSelectStepProps {
   step: MultiSelectStepType;

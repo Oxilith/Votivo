@@ -11,14 +11,12 @@
  * @dependencies
  * - React
  * - react-i18next (useTranslation)
- * - @/components/landing/shared/VotiveLogo
- * - @/components/shared/icons (GitHubIcon)
+ * - @/components (VotiveLogo, GitHubIcon)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import VotiveLogo from '@/components/landing/shared/VotiveLogo';
-import { GitHubIcon } from '@/components/shared/icons';
+import { VotiveLogo, GitHubIcon } from '@/components';
 
 const FooterSection: FC = () => {
   const { t } = useTranslation('landing');

@@ -21,14 +21,16 @@
  */
 
 import type { FC } from 'react';
-import NavSection from '@/components/landing/sections/NavSection';
-import HeroSection from '@/components/landing/sections/HeroSection';
-import PhilosophySection from '@/components/landing/sections/PhilosophySection';
-import JourneySection from '@/components/landing/sections/JourneySection';
-import InsightsSection from '@/components/landing/sections/InsightsSection';
-import CTASection from '@/components/landing/sections/CTASection';
-import FooterSection from '@/components/landing/sections/FooterSection';
-import useScrollReveal from '@/hooks/useScrollReveal';
+import {
+  NavSection,
+  HeroSection,
+  PhilosophySection,
+  JourneySection,
+  InsightsSection,
+  CTASection,
+  FooterSection,
+} from './sections';
+import { useScrollReveal } from '@/hooks';
 
 interface LandingPageProps {
   onStartDiscovery: () => void;

@@ -5,8 +5,6 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "dev:all": "concurrently \"tsx watch src/index.ts\" \"vite\"",
     "build": "tsup && vite build",
     "build:server": "tsup",
     "build:admin": "vite build",

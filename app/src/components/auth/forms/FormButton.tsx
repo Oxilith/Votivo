@@ -11,8 +11,8 @@
  * - @/components/shared/icons (LoadingSpinnerIcon)
  */
 
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import { LoadingSpinnerIcon } from '@/components/shared/icons';
+import React, { ButtonHTMLAttributes, ReactNode } from 'react';
+import { LoadingSpinnerIcon } from '@/components';
 
 /**
  * Props for FormButton component

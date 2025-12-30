@@ -13,8 +13,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { promptApi } from '@/admin/api/promptApi';
-import type { PromptDTO, PromptVersionDTO } from '@/admin/types';
+import { promptApi } from '@/admin';
+import type { PromptDTO, PromptVersionDTO } from '@/admin';
 
 interface UsePromptsResult {
   prompts: PromptDTO[];

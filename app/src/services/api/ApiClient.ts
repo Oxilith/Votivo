@@ -11,10 +11,10 @@
  * - Handles 401 errors with automatic token refresh using Promise singleton pattern
  * - Auto-retries original request after successful token refresh
  * @dependencies
- * - @/services/interfaces (IApiClient, RequestConfig, ApiResponse, ApiError)
+ * - @/services (IApiClient, RequestConfig, ApiResponse, ApiError)
  */
 
-import type { IApiClient, RequestConfig, ApiResponse, ApiError } from '@/services/interfaces';
+import type { IApiClient, RequestConfig, ApiResponse, ApiError } from '@/services';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 const DEFAULT_RETRIES = 3;

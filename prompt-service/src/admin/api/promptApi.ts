@@ -21,8 +21,8 @@ import type {
   CreatePromptInput,
   UpdatePromptInput,
   ApiError,
-} from '@/admin/types';
-import { getAuthHeaders, getAuthHeadersNoContent, handleUnauthorized } from '@/admin/api/auth';
+} from '@/admin';
+import { getAuthHeaders, getAuthHeadersNoContent, handleUnauthorized } from './auth';
 
 const API_BASE = '/api/prompts';
 

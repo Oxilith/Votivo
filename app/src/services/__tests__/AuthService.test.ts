@@ -350,7 +350,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw error for corrupted assessment JSON', async () => {
+    it('should throw error for malformed assessment JSON', async () => {
       const mockResponse = {
         id: 'assessment-1',
         userId: 'user-1',
@@ -360,7 +360,21 @@ describe('AuthService', () => {
       mockClient.get.mockResolvedValue({ data: mockResponse } as ApiResponse<typeof mockResponse>);
 
       await expect(authService.getAssessmentById('assessment-1')).rejects.toThrow(
-        'Data is corrupted (assessment assessment-1)'
+        'Invalid JSON format (assessment assessment-1)'
+      );
+    });
+
+    it('should throw error for assessment JSON with invalid schema', async () => {
+      const mockResponse = {
+        id: 'assessment-1',
+        userId: 'user-1',
+        responses: JSON.stringify({ invalid: 'schema' }), // Valid JSON but missing required fields
+        createdAt: '2024-01-01T00:00:00Z',
+      };
+      mockClient.get.mockResolvedValue({ data: mockResponse } as ApiResponse<typeof mockResponse>);
+
+      await expect(authService.getAssessmentById('assessment-1')).rejects.toThrow(
+        'Invalid data structure (assessment assessment-1)'
       );
     });
   });
@@ -432,7 +446,7 @@ describe('AuthService', () => {
       expect(result.result).toEqual(sampleAnalysis);
     });
 
-    it('should throw error for corrupted analysis JSON', async () => {
+    it('should throw error for malformed analysis JSON', async () => {
       const mockResponse = {
         id: 'analysis-1',
         userId: 'user-1',
@@ -442,7 +456,21 @@ describe('AuthService', () => {
       mockClient.get.mockResolvedValue({ data: mockResponse } as ApiResponse<typeof mockResponse>);
 
       await expect(authService.getAnalysisById('analysis-1')).rejects.toThrow(
-        'Data is corrupted (analysis analysis-1)'
+        'Invalid JSON format (analysis analysis-1)'
+      );
+    });
+
+    it('should throw error for analysis JSON with invalid schema', async () => {
+      const mockResponse = {
+        id: 'analysis-1',
+        userId: 'user-1',
+        result: JSON.stringify({ patterns: 'not-an-array' }), // Valid JSON but invalid schema
+        createdAt: '2024-01-01T00:00:00Z',
+      };
+      mockClient.get.mockResolvedValue({ data: mockResponse } as ApiResponse<typeof mockResponse>);
+
+      await expect(authService.getAnalysisById('analysis-1')).rejects.toThrow(
+        'Invalid data structure (analysis analysis-1)'
       );
     });
   });

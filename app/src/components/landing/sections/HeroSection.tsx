@@ -12,16 +12,12 @@
  * @dependencies
  * - React
  * - react-i18next (useTranslation)
- * - @/components/landing/shared/VoteCounter
- * - @/components/shared/InkBrushDecoration
- * - @/components/shared/icons (ArrowRightIcon, ArrowDownIcon)
+ * - @/components (VoteCounter, InkBrushDecoration, ArrowRightIcon, ArrowDownIcon)
  */
 
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import VoteCounter from '@/components/landing/shared/VoteCounter';
-import InkBrushDecoration from '@/components/shared/InkBrushDecoration';
-import { ArrowRightIcon, ArrowDownIcon } from '@/components/shared/icons';
+import { VoteCounter, InkBrushDecoration, ArrowRightIcon, ArrowDownIcon } from '@/components';
 
 interface HeroSectionProps {
   onStartDiscovery: () => void;

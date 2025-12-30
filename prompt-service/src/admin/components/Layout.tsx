@@ -17,8 +17,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import { logout } from '@/admin/api/auth';
-import { colors, fonts, toggleTheme, getTheme } from '@/admin/styles/theme';
+import { logout, colors, fonts, toggleTheme, getTheme } from '@/admin';
 
 interface LayoutProps {
   children: ReactNode;

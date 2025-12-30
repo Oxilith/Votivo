@@ -21,10 +21,10 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import app from './app';
-import { config } from '@/config';
-import { logger } from '@/utils';
-import { healthService } from '@/health';
-import { destroyAllCircuitBreakers } from '@/services';
+import { config } from './config';
+import { logger } from './utils';
+import { healthService } from './health';
+import { destroyAllCircuitBreakers } from './services';
 
 async function startServer(): Promise<void> {
   // Run startup health checks

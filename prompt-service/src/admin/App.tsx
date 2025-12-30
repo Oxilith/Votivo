@@ -15,15 +15,17 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Layout } from '@/admin/components/Layout';
-import { ProtectedRoute } from '@/admin/components/ProtectedRoute';
-import { LoginPage } from '@/admin/pages/LoginPage';
-import { PromptListPage } from '@/admin/pages/PromptListPage';
-import { PromptEditPage } from '@/admin/pages/PromptEditPage';
-import { PromptCreatePage } from '@/admin/pages/PromptCreatePage';
-import { ABTestListPage } from '@/admin/pages/ABTestListPage';
-import { ABTestEditPage } from '@/admin/pages/ABTestEditPage';
-import { ABTestCreatePage } from '@/admin/pages/ABTestCreatePage';
+import {
+  Layout,
+  ProtectedRoute,
+  LoginPage,
+  PromptListPage,
+  PromptEditPage,
+  PromptCreatePage,
+  ABTestListPage,
+  ABTestEditPage,
+  ABTestCreatePage,
+} from '@/admin';
 
 export function App() {
   return (

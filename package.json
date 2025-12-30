@@ -20,6 +20,8 @@
     "test:run": "npm run test:run --workspaces --if-present",
     "test:coverage": "npm run test:coverage --workspaces --if-present",
     "verify:conventions": "./scripts/verify-conventions.sh",
+    "verify:workspace": "./scripts/verify-workspace-setup.sh",
+    "clear:packages": "find . -type d -name \"node_modules\" -prune -exec rm -rf {} + && find . -type f -name \"package-lock.json\" -delete",
 
     "db:migrate": "npm run db:migrate -w prompt-service",
     "db:generate": "npm run db:generate --workspaces --if-present",

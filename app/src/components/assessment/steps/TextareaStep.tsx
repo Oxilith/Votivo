@@ -7,10 +7,11 @@
  * - Supports placeholder text and custom row count
  * @dependencies
  * - React
- * - @/components/assessment/types (TextareaStep)
+ * - @/components (TextareaStep)
  */
 
-import type { TextareaStep as TextareaStepType } from '@/components/assessment/types';
+import type { TextareaStep as TextareaStepType } from '@/components';
+import React from "react";
 
 interface TextareaStepProps {
   step: TextareaStepType;

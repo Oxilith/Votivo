@@ -18,17 +18,13 @@
  * - @/hooks/useRouting
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import AuthLayout from '@/components/auth/AuthLayout';
-import {
-  CheckIcon,
-  LoadingSpinnerIcon,
-  ErrorCircleIcon,
-} from '@/components/shared/icons';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { authService } from '@/services/api/AuthService';
-import { useRouting } from '@/hooks/useRouting';
+import AuthLayout from './AuthLayout';
+import { CheckIcon, LoadingSpinnerIcon, ErrorCircleIcon } from '@/components';
+import { useAuthStore } from '@/stores';
+import { authService } from '@/services';
+import { useRouting } from '@/hooks';
 
 /**
  * Props for EmailVerificationPage

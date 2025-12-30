@@ -4,6 +4,8 @@
  * @functionality
  * - Generates cryptographically secure random tokens
  * - Used for password reset and email verification tokens
+ * - Generates token IDs for refresh tokens
+ * - Generates family IDs for token chain tracking
  * - Provides configurable token length for different use cases
  * @dependencies
  * - crypto (Node.js built-in)
@@ -70,5 +72,21 @@ export function generateEmailVerificationToken(): string {
  * // Use as unique identifier for refresh tokens in database
  */
 export function generateTokenId(): string {
+  return generateSecureToken(16);
+}
+
+/**
+ * Generates a unique family ID for refresh token chains.
+ * All tokens in a refresh chain share the same family ID.
+ * Used for token theft detection - if a revoked token is reused,
+ * the entire family is invalidated.
+ *
+ * @returns A 32-character hex-encoded family identifier
+ *
+ * @example
+ * const familyId = generateFamilyId();
+ * // Store with initial token, preserve through refreshes
+ */
+export function generateFamilyId(): string {
   return generateSecureToken(16);
 }

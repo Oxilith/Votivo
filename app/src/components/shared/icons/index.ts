@@ -13,7 +13,7 @@
  *
  * @example
  * // Basic usage
- * import { CheckIcon, SunIcon } from '@/components/shared/icons';
+ * import { CheckIcon, SunIcon } from '@/components';
  * <CheckIcon size="md" />
  * <SunIcon size="lg" className="text-yellow-500" />
  *

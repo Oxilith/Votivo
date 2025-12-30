@@ -10,11 +10,12 @@
  * @dependencies
  * - React
  * - react-i18next (useTranslation)
- * - @/components/assessment/types (IntroContent)
+ * - @/components (IntroContent)
  */
 
 import { useTranslation } from 'react-i18next';
-import type { IntroContent } from '@/components/assessment/types';
+import type { IntroContent } from '@/components';
+import React from "react";
 
 interface IntroStepProps {
   content: IntroContent;

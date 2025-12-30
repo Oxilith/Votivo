@@ -1,6 +1,6 @@
 /**
  * @file prompt-service/src/services/user.service.ts
- * @purpose User authentication operations with JWT token management
+ * @purpose User authentication operations with JWT token management and audit logging
  * @functionality
  * - Registers new users with hashed passwords
  * - Authenticates users and issues JWT access/refresh tokens
@@ -10,12 +10,14 @@
  * - Confirms password reset with token validation
  * - Verifies email addresses with token validation
  * - Invalidates refresh tokens on logout
+ * - Logs security audit events for monitoring and alerting
  * @dependencies
  * - @/prisma/client for database access
  * - @/utils/jwt for token generation/verification
  * - @/utils/password for bcrypt hashing
  * - @/utils/token for secure token generation
  * - @/services/email.service for email delivery
+ * - @/services/audit.service for security audit logging
  * - @/config for application configuration
  * - @/errors for custom error types
  * - shared/auth.types for Gender type
@@ -38,12 +40,14 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
   generateTokenId,
+  generateFamilyId,
   generatePasswordResetToken,
   generateEmailVerificationToken,
   logger,
   type JwtConfig,
 } from '@/utils';
-import { emailService } from '@/services/email.service';
+import { emailService } from './email.service';
+import { auditLog, type RequestContext } from './audit.service';
 import { type Gender } from 'shared';
 
 /**
@@ -199,10 +203,11 @@ export class UserService {
    * Returns tokens immediately - email verification is optional (for SMTP-less deployments).
    *
    * @param input - Registration details (email, password)
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns Authentication result with user and tokens, or throws ConflictError
    * @throws ConflictError if email already exists
    */
-  async register(input: RegisterInput): Promise<AuthResult> {
+  async register(input: RegisterInput, ctx?: RequestContext): Promise<AuthResult> {
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: input.email.toLowerCase() },
@@ -230,8 +235,9 @@ export class UserService {
         },
       });
 
-      // Generate and store refresh token
+      // Generate and store refresh token with device tracking and family
       const tokenId = generateTokenId();
+      const familyId = generateFamilyId();
       const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_MS);
       const refreshTokenValue = generateRefreshToken(newUser.id, tokenId, this.jwtConfig);
 
@@ -240,6 +246,9 @@ export class UserService {
           userId: newUser.id,
           token: tokenId,
           expiresAt,
+          familyId,
+          deviceInfo: ctx?.userAgent,
+          ipAddress: ctx?.ip,
         },
       });
 
@@ -287,6 +296,15 @@ export class UserService {
     // Generate access token
     const accessToken = generateAccessToken(user.id, this.jwtConfig);
 
+    // Audit log registration
+    auditLog({
+      eventType: 'AUTH_REGISTER',
+      userId: user.id,
+      email: user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
+
     return {
       user: toSafeUser(user),
       accessToken,
@@ -304,10 +322,11 @@ export class UserService {
    * - Lockout duration doubles with each successive lockout (15min -> 30min -> 60min...)
    *
    * @param input - Login credentials (email, password)
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns Authentication result with user and tokens
    * @throws AuthenticationError if credentials are invalid or account is locked
    */
-  async login(input: LoginInput): Promise<AuthResult> {
+  async login(input: LoginInput, ctx?: RequestContext): Promise<AuthResult> {
     // Find user by email
     const user = await prisma.user.findUnique({
       where: { email: input.email.toLowerCase() },
@@ -317,6 +336,15 @@ export class UserService {
     if (user?.lockoutUntil && user.lockoutUntil > new Date()) {
       // Use timing-safe hash even in lockout path
       await hashPassword('dummy-password-for-timing');
+      // Audit log lockout attempt
+      auditLog({
+        eventType: 'AUTH_LOGIN_FAILED',
+        userId: user.id,
+        email: user.email,
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: { reason: 'account_locked' },
+      });
       // Use generic message to prevent timing-based account enumeration
       throw new AuthenticationError(
         'Account temporarily locked due to too many failed attempts. Please try again later.'
@@ -328,6 +356,14 @@ export class UserService {
     if (!user) {
       // Hash a dummy password to prevent timing-based user enumeration
       await hashPassword('dummy-password-for-timing');
+      // Audit log failed login (don't reveal if user exists)
+      auditLog({
+        eventType: 'AUTH_LOGIN_FAILED',
+        email: input.email.toLowerCase(),
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: { reason: 'invalid_credentials' },
+      });
       throw new AuthenticationError();
     }
 
@@ -335,7 +371,16 @@ export class UserService {
     const isValidPassword = await comparePassword(input.password, user.password);
     if (!isValidPassword) {
       // Increment failed attempts and potentially lock account
-      await this.handleFailedLogin(user);
+      await this.handleFailedLogin(user, ctx);
+      // Audit log failed login
+      auditLog({
+        eventType: 'AUTH_LOGIN_FAILED',
+        userId: user.id,
+        email: user.email,
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: { reason: 'invalid_password' },
+      });
       throw new AuthenticationError();
     }
 
@@ -351,8 +396,9 @@ export class UserService {
       });
     }
 
-    // Generate and store refresh token
+    // Generate and store refresh token with device tracking and family
     const tokenId = generateTokenId();
+    const familyId = generateFamilyId();
     const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_MS);
     const refreshTokenValue = generateRefreshToken(user.id, tokenId, this.jwtConfig);
 
@@ -361,6 +407,9 @@ export class UserService {
         userId: user.id,
         token: tokenId,
         expiresAt,
+        familyId,
+        deviceInfo: ctx?.userAgent,
+        ipAddress: ctx?.ip,
       },
     });
 
@@ -370,6 +419,15 @@ export class UserService {
     // Get fresh user data with reset lockout fields
     const freshUser = await prisma.user.findUnique({
       where: { id: user.id },
+    });
+
+    // Audit log successful login
+    auditLog({
+      eventType: 'AUTH_LOGIN_SUCCESS',
+      userId: user.id,
+      email: user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
     });
 
     return {
@@ -383,8 +441,9 @@ export class UserService {
    * Handle failed login attempt - increment counter and potentially lock account
    *
    * @param user - The user who failed to login
+   * @param ctx - Optional request context for audit logging
    */
-  private async handleFailedLogin(user: User): Promise<void> {
+  private async handleFailedLogin(user: User, ctx?: RequestContext): Promise<void> {
     const newAttempts = user.failedLoginAttempts + 1;
     const updateData: {
       failedLoginAttempts: number;
@@ -403,6 +462,18 @@ export class UserService {
         { userId: user.id, attempts: newAttempts, lockoutMins: lockoutDuration / 60000 },
         'Account locked due to failed login attempts'
       );
+      // Audit log account lockout
+      auditLog({
+        eventType: 'AUTH_ACCOUNT_LOCKOUT',
+        userId: user.id,
+        email: user.email,
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: {
+          attempts: newAttempts,
+          lockoutMinutes: lockoutDuration / 60000,
+        },
+      });
     }
 
     await prisma.user.update({
@@ -438,10 +509,11 @@ export class UserService {
    * The lookup, validation, and rotation all happen atomically.
    *
    * @param refreshTokenJwt - The JWT refresh token
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns New access and refresh tokens
    * @throws TokenError if refresh token is invalid or expired
    */
-  async refreshTokens(refreshTokenJwt: string): Promise<RefreshResult> {
+  async refreshTokens(refreshTokenJwt: string, ctx?: RequestContext): Promise<RefreshResult> {
     // Verify the refresh token JWT (cryptographic verification before DB lookup)
     const verifyResult = verifyRefreshToken(refreshTokenJwt, this.jwtConfig);
 
@@ -449,6 +521,13 @@ export class UserService {
       const errorMessage = verifyResult.error === 'expired'
         ? 'Refresh token expired'
         : 'Invalid refresh token';
+      // Audit log failed refresh
+      auditLog({
+        eventType: 'AUTH_TOKEN_REFRESH_FAILED',
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: { reason: verifyResult.error },
+      });
       throw new TokenError(errorMessage, verifyResult.error === 'expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN');
     }
 
@@ -460,7 +539,7 @@ export class UserService {
     const newExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_MS);
     const newRefreshTokenValue = generateRefreshToken(userId, newTokenId, this.jwtConfig);
 
-    // Atomic transaction: lookup, validate, and rotate in one operation
+    // Atomic transaction: lookup, validate, detect theft, and rotate in one operation
     // This prevents race conditions where concurrent requests could both succeed
     // Explicit Serializable isolation for future-proofing if migrating to PostgreSQL
     await prisma.$transaction(
@@ -475,6 +554,25 @@ export class UserService {
           throw new TokenError('Invalid refresh token');
         }
 
+        // TOKEN THEFT DETECTION: If token is already revoked, someone reused an old token
+        // This indicates potential token theft - revoke entire family
+        if (storedToken.isRevoked) {
+          // Revoke entire token family for security
+          await tx.refreshToken.updateMany({
+            where: { familyId: storedToken.familyId },
+            data: { isRevoked: true },
+          });
+          // Audit log potential token theft
+          auditLog({
+            eventType: 'AUTH_TOKEN_THEFT_DETECTED',
+            userId,
+            ip: ctx?.ip,
+            userAgent: ctx?.userAgent,
+            metadata: { familyId: storedToken.familyId },
+          });
+          throw new TokenError('Session invalidated for security', 'TOKEN_REVOKED');
+        }
+
         // Check if token is expired in database
         if (storedToken.expiresAt < new Date()) {
           // Clean up expired token
@@ -484,16 +582,21 @@ export class UserService {
           throw new TokenError('Refresh token expired', 'TOKEN_EXPIRED');
         }
 
-        // Delete old token and create new one atomically
-        await tx.refreshToken.delete({
+        // Mark old token as revoked (soft delete for theft detection)
+        await tx.refreshToken.update({
           where: { id: storedToken.id },
+          data: { isRevoked: true },
         });
 
+        // Create new token with same family
         await tx.refreshToken.create({
           data: {
             userId,
             token: newTokenId,
             expiresAt: newExpiresAt,
+            familyId: storedToken.familyId, // Preserve family chain
+            deviceInfo: ctx?.userAgent,
+            ipAddress: ctx?.ip,
           },
         });
       },
@@ -502,6 +605,14 @@ export class UserService {
 
     // Generate new access token
     const accessToken = generateAccessToken(userId, this.jwtConfig);
+
+    // Audit log successful refresh
+    auditLog({
+      eventType: 'AUTH_TOKEN_REFRESH_SUCCESS',
+      userId,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
 
     return {
       accessToken,
@@ -520,10 +631,11 @@ export class UserService {
    * concurrent refresh requests with the same token could both succeed.
    *
    * @param refreshTokenJwt - The JWT refresh token
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns New access/refresh tokens plus user data
    * @throws TokenError if refresh token is invalid or expired
    */
-  async refreshTokensWithUser(refreshTokenJwt: string): Promise<RefreshWithUserResult> {
+  async refreshTokensWithUser(refreshTokenJwt: string, ctx?: RequestContext): Promise<RefreshWithUserResult> {
     // Verify the refresh token JWT (cryptographic verification before DB lookup)
     const verifyResult = verifyRefreshToken(refreshTokenJwt, this.jwtConfig);
 
@@ -531,6 +643,13 @@ export class UserService {
       const errorMessage = verifyResult.error === 'expired'
         ? 'Refresh token expired'
         : 'Invalid refresh token';
+      // Audit log failed refresh
+      auditLog({
+        eventType: 'AUTH_TOKEN_REFRESH_FAILED',
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: { reason: verifyResult.error },
+      });
       throw new TokenError(errorMessage, verifyResult.error === 'expired' ? 'TOKEN_EXPIRED' : 'INVALID_TOKEN');
     }
 
@@ -542,7 +661,7 @@ export class UserService {
     const newExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_MS);
     const newRefreshTokenValue = generateRefreshToken(userId, newTokenId, this.jwtConfig);
 
-    // Atomic transaction: lookup, validate, rotate tokens, and fetch user in one operation
+    // Atomic transaction: lookup, validate, detect theft, rotate tokens, and fetch user
     const user = await prisma.$transaction(
       async (tx) => {
         // Find the refresh token in database (inside transaction for atomicity)
@@ -555,6 +674,25 @@ export class UserService {
           throw new TokenError('Invalid refresh token');
         }
 
+        // TOKEN THEFT DETECTION: If token is already revoked, someone reused an old token
+        // This indicates potential token theft - revoke entire family
+        if (storedToken.isRevoked) {
+          // Revoke entire token family for security
+          await tx.refreshToken.updateMany({
+            where: { familyId: storedToken.familyId },
+            data: { isRevoked: true },
+          });
+          // Audit log potential token theft
+          auditLog({
+            eventType: 'AUTH_TOKEN_THEFT_DETECTED',
+            userId,
+            ip: ctx?.ip,
+            userAgent: ctx?.userAgent,
+            metadata: { familyId: storedToken.familyId },
+          });
+          throw new TokenError('Session invalidated for security', 'TOKEN_REVOKED');
+        }
+
         // Check if token is expired in database
         if (storedToken.expiresAt < new Date()) {
           // Clean up expired token
@@ -564,16 +702,21 @@ export class UserService {
           throw new TokenError('Refresh token expired', 'TOKEN_EXPIRED');
         }
 
-        // Delete old token and create new one atomically
-        await tx.refreshToken.delete({
+        // Mark old token as revoked (soft delete for theft detection)
+        await tx.refreshToken.update({
           where: { id: storedToken.id },
+          data: { isRevoked: true },
         });
 
+        // Create new token with same family
         await tx.refreshToken.create({
           data: {
             userId,
             token: newTokenId,
             expiresAt: newExpiresAt,
+            familyId: storedToken.familyId, // Preserve family chain
+            deviceInfo: ctx?.userAgent,
+            ipAddress: ctx?.ip,
           },
         });
 
@@ -594,6 +737,15 @@ export class UserService {
     // Generate new access token
     const accessToken = generateAccessToken(userId, this.jwtConfig);
 
+    // Audit log successful refresh
+    auditLog({
+      eventType: 'AUTH_TOKEN_REFRESH_SUCCESS',
+      userId,
+      email: user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
+
     return {
       accessToken,
       refreshToken: newRefreshTokenValue,
@@ -606,9 +758,10 @@ export class UserService {
    * Generates reset token and sends email
    *
    * @param email - User's email address
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns True if email was sent (always returns true to prevent enumeration)
    */
-  async requestPasswordReset(email: string): Promise<boolean> {
+  async requestPasswordReset(email: string, ctx?: RequestContext): Promise<boolean> {
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
     });
@@ -657,6 +810,15 @@ export class UserService {
       }
     }
 
+    // Audit log password reset request
+    auditLog({
+      eventType: 'AUTH_PASSWORD_RESET_REQUEST',
+      userId: user.id,
+      email: user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
+
     return true;
   }
 
@@ -665,9 +827,10 @@ export class UserService {
    *
    * @param token - Password reset token from email
    * @param newPassword - New password to set
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @throws TokenError if token is invalid or expired
    */
-  async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
+  async confirmPasswordReset(token: string, newPassword: string, ctx?: RequestContext): Promise<void> {
     // Find the reset token
     const resetToken = await prisma.passwordResetToken.findUnique({
       where: { token },
@@ -705,15 +868,25 @@ export class UserService {
         where: { userId: resetToken.userId },
       });
     });
+
+    // Audit log password reset confirmation
+    auditLog({
+      eventType: 'AUTH_PASSWORD_RESET_CONFIRM',
+      userId: resetToken.userId,
+      email: resetToken.user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
   }
 
   /**
    * Verify user's email address
    *
    * @param token - Email verification token
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @throws TokenError if token is invalid or expired
    */
-  async verifyEmail(token: string): Promise<SafeUser> {
+  async verifyEmail(token: string, ctx?: RequestContext): Promise<SafeUser> {
     // Find the verification token
     const verifyToken = await prisma.emailVerifyToken.findUnique({
       where: { token },
@@ -748,6 +921,15 @@ export class UserService {
       return updatedUser;
     });
 
+    // Audit log email verified
+    auditLog({
+      eventType: 'AUTH_EMAIL_VERIFIED',
+      userId: user.id,
+      email: user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
+
     return toSafeUser(user);
   }
 
@@ -755,10 +937,11 @@ export class UserService {
    * Resend email verification
    *
    * @param userId - User ID to resend verification for
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns True if email was sent
    * @throws NotFoundError if user not found
    */
-  async resendEmailVerification(userId: string): Promise<boolean> {
+  async resendEmailVerification(userId: string, ctx?: RequestContext): Promise<boolean> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -781,6 +964,15 @@ export class UserService {
     });
 
     if (recentTokenCount >= 5) {
+      // Audit log rate limit hit
+      auditLog({
+        eventType: 'AUTH_VERIFICATION_EMAIL_RATE_LIMITED',
+        userId,
+        email: user.email,
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: { recentCount: recentTokenCount },
+      });
       throw new ValidationError('Too many verification email requests. Please try again later.');
     }
 
@@ -823,6 +1015,15 @@ export class UserService {
       throw new Error('Failed to send verification email. Please try again later.');
     }
 
+    // Audit log verification email sent
+    auditLog({
+      eventType: 'AUTH_VERIFICATION_EMAIL_SENT',
+      userId,
+      email: user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
+
     return true;
   }
 
@@ -830,9 +1031,10 @@ export class UserService {
    * Logout user by invalidating refresh token
    *
    * @param refreshTokenJwt - The JWT refresh token to invalidate
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns True if token was invalidated
    */
-  async logout(refreshTokenJwt: string): Promise<boolean> {
+  async logout(refreshTokenJwt: string, ctx?: RequestContext): Promise<boolean> {
     // Verify the refresh token JWT to get the token ID
     const verifyResult = verifyRefreshToken(refreshTokenJwt, this.jwtConfig);
 
@@ -852,6 +1054,16 @@ export class UserService {
       },
     });
 
+    // Audit log logout if token was actually invalidated
+    if (result.count > 0) {
+      auditLog({
+        eventType: 'AUTH_LOGOUT',
+        userId,
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+      });
+    }
+
     return result.count > 0;
   }
 
@@ -859,12 +1071,24 @@ export class UserService {
    * Logout user from all sessions by invalidating all refresh tokens
    *
    * @param userId - User ID to logout from all sessions
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @returns Number of sessions invalidated
    */
-  async logoutAll(userId: string): Promise<number> {
+  async logoutAll(userId: string, ctx?: RequestContext): Promise<number> {
     const result = await prisma.refreshToken.deleteMany({
       where: { userId },
     });
+
+    // Audit log logout all if any tokens were invalidated
+    if (result.count > 0) {
+      auditLog({
+        eventType: 'AUTH_LOGOUT_ALL',
+        userId,
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+        metadata: { sessionsInvalidated: result.count },
+      });
+    }
 
     return result.count;
   }
@@ -931,10 +1155,11 @@ export class UserService {
    *
    * @param userId - User ID
    * @param input - Current and new password
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @throws NotFoundError if user not found
    * @throws AuthenticationError if current password is wrong
    */
-  async changePassword(userId: string, input: PasswordChangeInput): Promise<void> {
+  async changePassword(userId: string, input: PasswordChangeInput, ctx?: RequestContext): Promise<void> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -960,15 +1185,25 @@ export class UserService {
     await prisma.refreshToken.deleteMany({
       where: { userId },
     });
+
+    // Audit log password change
+    auditLog({
+      eventType: 'AUTH_PASSWORD_CHANGE',
+      userId,
+      email: user.email,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
+    });
   }
 
   /**
    * Delete user account and all related data
    *
    * @param userId - User ID
+   * @param ctx - Optional request context for audit logging (IP, userAgent)
    * @throws NotFoundError if user not found
    */
-  async deleteAccount(userId: string): Promise<void> {
+  async deleteAccount(userId: string, ctx?: RequestContext): Promise<void> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -977,9 +1212,21 @@ export class UserService {
       throw new NotFoundError('User', userId);
     }
 
+    // Store email before deletion for audit log
+    const userEmail = user.email;
+
     // Cascade delete will handle related records
     await prisma.user.delete({
       where: { id: userId },
+    });
+
+    // Audit log account deletion
+    auditLog({
+      eventType: 'AUTH_ACCOUNT_DELETED',
+      userId,
+      email: userEmail,
+      ip: ctx?.ip,
+      userAgent: ctx?.userAgent,
     });
   }
 

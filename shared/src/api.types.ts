@@ -10,7 +10,7 @@
  * - ./auth.types for Gender type
  */
 
-import type { Gender } from './auth.types';
+import type { Gender } from '@/auth.types';
 
 // Supported languages for AI analysis
 export const SUPPORTED_LANGUAGES = ['english', 'polish'] as const;

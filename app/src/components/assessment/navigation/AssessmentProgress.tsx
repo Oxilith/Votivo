@@ -13,6 +13,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import React from "react";
 
 interface AssessmentProgressProps {
   phaseTitle: string;

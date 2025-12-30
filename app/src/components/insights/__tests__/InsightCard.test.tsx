@@ -20,7 +20,7 @@ import type {
   AnalysisBlindSpot,
   AnalysisLeveragePoint,
   AnalysisRisk,
-} from '@/types/assessment.types';
+} from '@/types';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({

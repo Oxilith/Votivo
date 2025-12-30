@@ -35,21 +35,26 @@
  * - ./SavePromptModal
  */
 
-import { useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
+import React, { useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { InsightsProps } from '@/types/assessment.types';
-import { useAnalysisStore } from '@/stores';
-import { useIsAuthenticated, useCurrentUser } from '@/stores/useAuthStore';
+import type {
+  InsightsProps,
+  AnalysisPattern,
+  AnalysisContradiction,
+  AnalysisBlindSpot,
+  AnalysisLeveragePoint,
+  AnalysisRisk,
+} from '@/types';
+import { useAnalysisStore, useIsAuthenticated, useCurrentUser } from '@/stores';
 import type { UserProfileForAnalysis } from 'shared';
-import { authService } from '@/services/api/AuthService';
-import { cardStyles, textStyles } from '@/styles/theme';
+import { authService } from '@/services';
+import { cardStyles, textStyles } from '@/styles';
 import InsightCard from './InsightCard';
 import SavePromptModal from './SavePromptModal';
-import FooterSection from '@/components/landing/sections/FooterSection';
-import PageNavigation from '@/components/shared/PageNavigation';
-import InsightsPageHeader from '@/components/insights/InsightsPageHeader';
-import { importFromJson } from '@/utils/fileUtils';
 import {
+  FooterSection,
+  PageNavigation,
+  InkBrushDecoration,
   ErrorCircleIcon,
   SearchIcon,
   SwitchHorizontalIcon,
@@ -60,8 +65,9 @@ import {
   RefreshIcon,
   LightningBoltIcon,
   ArrowRightIcon,
-} from '@/components/shared/icons';
-import InkBrushDecoration from '@/components/shared/InkBrushDecoration';
+} from '@/components';
+import InsightsPageHeader from './InsightsPageHeader';
+import { importFromJson } from '@/utils';
 
 interface Tab {
   id: string;
@@ -500,15 +506,15 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
             {/* Content */}
             <div className="space-y-4">
-              {activeTab === 'patterns' && analysis.patterns?.map((item, i) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'patterns' && analysis.patterns?.map((item: AnalysisPattern, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'contradictions' && analysis.contradictions?.map((item, i) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'contradictions' && analysis.contradictions?.map((item: AnalysisContradiction, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'blindSpots' && analysis.blindSpots?.map((item, i) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'blindSpots' && analysis.blindSpots?.map((item: AnalysisBlindSpot, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'leverage' && analysis.leveragePoints?.map((item, i) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'leverage' && analysis.leveragePoints?.map((item: AnalysisLeveragePoint, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'risks' && analysis.risks?.map((item, i) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'risks' && analysis.risks?.map((item: AnalysisRisk, i: number) => <InsightCard key={i} item={item} />)}
 
               {activeTab === 'synthesis' && analysis.identitySynthesis && (
                 <div className="space-y-6">
@@ -527,7 +533,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
                         {t('synthesisTab.hiddenStrengths')}
                       </h4>
                       <ul className="space-y-2">
-                        {analysis.identitySynthesis.hiddenStrengths.map((s, i) => (
+                        {analysis.identitySynthesis.hiddenStrengths.map((s: string, i: number) => (
                           <li key={i} className={`flex items-start gap-2 font-body ${textStyles.secondary}`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] mt-2 flex-shrink-0" />
                             <span>{s}</span>

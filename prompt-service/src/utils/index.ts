@@ -35,6 +35,7 @@ export {
   generatePasswordResetToken,
   generateEmailVerificationToken,
   generateTokenId,
+  generateFamilyId,
 } from './token';
 export {
   generateAccessToken,

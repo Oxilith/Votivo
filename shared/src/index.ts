@@ -9,6 +9,7 @@
  * - Re-exports API types from api.types
  * - Re-exports prompt types from prompt.types
  * - Re-exports response formatter from responseFormatter
+ * - Re-exports Zod validators for runtime validation
  * @dependencies
  * - ./assessment.types for assessment type definitions
  * - ./analysis.types for AI analysis type definitions
@@ -17,6 +18,7 @@
  * - ./api.types for API type definitions
  * - ./prompt.types for prompt configuration types
  * - ./responseFormatter for response formatting
+ * - ./validators for Zod schemas and parse functions
  */
 
 // Assessment Types
@@ -97,3 +99,11 @@ export {
   extractOrCreateTrace,
 } from './tracing';
 export type { TraceContext, TraceInfo } from './tracing';
+
+// Validators (Zod schemas and parse functions)
+export {
+  assessmentResponsesSchema,
+  parseAssessmentResponses,
+  aiAnalysisResultSchema,
+  parseAIAnalysisResult,
+} from './validators';

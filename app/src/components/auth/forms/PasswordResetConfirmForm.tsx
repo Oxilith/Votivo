@@ -16,13 +16,13 @@
  * - shared/index (PASSWORD_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH)
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import FormInput from '@/components/auth/forms/FormInput';
-import FormButton from '@/components/auth/forms/FormButton';
-import { authService } from '@/services/api/AuthService';
-import { CheckIcon } from '@/components/shared/icons';
+import FormInput from './FormInput';
+import FormButton from './FormButton';
+import { authService } from '@/services';
+import { CheckIcon } from '@/components';
 import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from 'shared/index';
 
 /**

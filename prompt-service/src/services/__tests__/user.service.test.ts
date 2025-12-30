@@ -40,6 +40,7 @@ const mockTokenFunctions = vi.hoisted(() => ({
   generateTokenId: vi.fn(() => 'generated_token_id'),
   generatePasswordResetToken: vi.fn(() => 'reset_token'),
   generateEmailVerificationToken: vi.fn(() => 'email_verify_token'),
+  generateFamilyId: vi.fn(() => 'family_id_123'),
 }));
 
 const mockPasswordFunctions = vi.hoisted(() => ({
@@ -136,6 +137,11 @@ vi.mock('@', () => ({
   },
 }));
 
+// Mock audit service to avoid logger initialization issues
+vi.mock('@/services/audit.service', () => ({
+  auditLog: vi.fn(),
+}));
+
 import {
   UserService,
   type RegisterInput,
@@ -185,6 +191,11 @@ describe('UserService', () => {
     token: 'token-123',
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
     createdAt: new Date(),
+    // Token family and device tracking fields
+    deviceInfo: null,
+    ipAddress: null,
+    familyId: 'family-123',
+    isRevoked: false,
   };
 
   beforeEach(() => {

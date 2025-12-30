@@ -10,7 +10,7 @@
  */
 
 import { createContext } from 'react';
-import type { Theme } from '@/hooks/useTheme';
+import type { Theme } from '@/hooks';
 
 export interface ThemeContextValue {
   theme: Theme;

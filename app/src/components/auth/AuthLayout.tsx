@@ -19,11 +19,8 @@
 
 import type { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import VotiveLogo from '@/components/landing/shared/VotiveLogo';
-import InkBrushDecoration from '@/components/shared/InkBrushDecoration';
-import { SunIcon, MoonIcon } from '@/components/shared/icons';
-import { useThemeContext } from '@/hooks/useThemeContext';
-import { useRouting } from '@/hooks/useRouting';
+import { VotiveLogo, InkBrushDecoration, SunIcon, MoonIcon } from '@/components';
+import { useThemeContext, useRouting } from '@/hooks';
 
 interface AuthLayoutProps {
   children: ReactNode;

@@ -10,12 +10,12 @@
  * @dependencies
  * - React (useState, useRef, useEffect)
  * - react-i18next (useTranslation)
- * - @/stores/useAuthStore (useCurrentUser)
+ * - @/stores (useCurrentUser)
  */
 
 import { useState, useRef, useEffect, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCurrentUser } from '@/stores/useAuthStore';
+import { useCurrentUser } from '@/stores';
 
 interface UserAvatarDropdownProps {
   onNavigateToProfile: () => void;

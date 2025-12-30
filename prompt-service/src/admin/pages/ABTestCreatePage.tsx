@@ -14,10 +14,14 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { abTestApi } from '@/admin/api/abTestApi';
-import { usePrompts } from '@/admin/hooks/usePrompts';
-import { colors, shadows, fonts } from '@/admin/styles/theme';
-import type { CreateABTestInput, PromptDTO } from '@/admin/types';
+import {
+  abTestApi,
+  usePrompts,
+  colors,
+  shadows,
+  fonts,
+} from '@/admin';
+import type { CreateABTestInput, PromptDTO } from '@/admin';
 
 export function ABTestCreatePage() {
   const navigate = useNavigate();
