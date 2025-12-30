@@ -3,7 +3,8 @@
  * @purpose Custom Vitest matchers with TypeScript type augmentation
  * @functionality
  * - toBeValidJWT: Validates JWT format (header.payload.signature)
- * - toBeValidUUID: Validates UUID v4 format
+ * - toBeValidUUID: Validates UUID format (any version: v1, v4, v7, etc.)
+ * - toBeValidUUIDv4: Validates UUID v4 format specifically
  * - toBeWithinSeconds: Compares dates within a tolerance
  * @dependencies
  * - vitest for matcher extension
@@ -23,12 +24,20 @@ declare module 'vitest' {
     toBeValidJWT(): T;
 
     /**
-     * Asserts that the value is a valid UUID v4 format
+     * Asserts that the value is a valid UUID (any version)
      *
      * @example
      * expect(id).toBeValidUUID();
      */
     toBeValidUUID(): T;
+
+    /**
+     * Asserts that the value is a valid UUID v4 format specifically
+     *
+     * @example
+     * expect(id).toBeValidUUIDv4();
+     */
+    toBeValidUUIDv4(): T;
 
     /**
      * Asserts that a date is within the specified number of seconds of another date
@@ -45,6 +54,7 @@ declare module 'vitest' {
   interface AsymmetricMatchersContaining {
     toBeValidJWT(): unknown;
     toBeValidUUID(): unknown;
+    toBeValidUUIDv4(): unknown;
     toBeWithinSeconds(expected: Date, seconds: number): unknown;
   }
 }
@@ -78,9 +88,8 @@ expect.extend({
   },
 
   /**
-   * Validates that a string is a valid UUID v4.
-   * UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-   * where y is one of 8, 9, a, or b
+   * Validates that a string is a valid UUID (any version).
+   * Accepts v1, v4, v7, and other standard UUID formats.
    */
   toBeValidUUID(received: unknown) {
     if (typeof received !== 'string') {
@@ -88,6 +97,34 @@ expect.extend({
         pass: false,
         message: () =>
           `Expected a string UUID, but received ${typeof received}`,
+      };
+    }
+
+    // General UUID regex - any version, any variant
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const pass = uuidRegex.test(received);
+
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected "${received}" not to be a valid UUID`
+          : `Expected "${received}" to be a valid UUID`,
+    };
+  },
+
+  /**
+   * Validates that a string is a valid UUID v4 specifically.
+   * UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+   * where y is one of 8, 9, a, or b
+   */
+  toBeValidUUIDv4(received: unknown) {
+    if (typeof received !== 'string') {
+      return {
+        pass: false,
+        message: () =>
+          `Expected a string UUID v4, but received ${typeof received}`,
       };
     }
 

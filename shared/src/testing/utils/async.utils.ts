@@ -15,6 +15,8 @@ import { vi } from 'vitest';
  * Waits for all pending promises to resolve.
  * Useful when testing code that uses Promise.resolve() or other microtasks.
  *
+ * Note: Uses Node.js `setImmediate` - intended for server-side test environments only.
+ *
  * @example
  * ```typescript
  * await flushPromises();

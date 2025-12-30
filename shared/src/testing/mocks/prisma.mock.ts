@@ -153,8 +153,8 @@ export function createMockPrisma(): MockPrismaClient {
 
     // Transaction - creates a FRESH mock instance for isolation.
     // Note: Mock setups on the parent client won't propagate to transaction.
-    // Set up mocks within the transaction callback if needed, or use the
-    // parent mock directly if state sharing is required.
+    // Set up mocks within the transaction callback if needed, or use
+    // createTransactionAwareMockPrisma() if state sharing is required.
     $transaction: vi.fn(async (callback: (tx: MockPrismaClient) => Promise<unknown>): Promise<unknown> => {
       const txMock = createMockPrisma();
       return callback(txMock);
@@ -223,3 +223,35 @@ export function resetMockPrisma(prisma: MockPrismaClient): void {
  * ```
  */
 export const createHoistedPrismaMock = (): MockPrismaClient => createMockPrisma();
+
+/**
+ * Creates a mock Prisma client where transactions share state with the parent.
+ * Use this when your tests need mock setups to propagate into $transaction callbacks.
+ *
+ * Unlike createMockPrisma(), the $transaction callback receives the same mock instance,
+ * so mock configurations set on the parent will be available inside the transaction.
+ *
+ * @returns Mock Prisma client with transaction state sharing
+ *
+ * @example
+ * ```typescript
+ * const mockPrisma = createTransactionAwareMockPrisma();
+ * mockPrisma.user.findUnique.mockResolvedValue({ id: '123', email: 'test@example.com' });
+ *
+ * // This will use the same mock setup inside the transaction
+ * await service.doSomethingWithTransaction(); // internally calls $transaction
+ * // The tx.user.findUnique inside will return { id: '123', email: 'test@example.com' }
+ * ```
+ */
+export function createTransactionAwareMockPrisma(): MockPrismaClient {
+  const prisma = createMockPrisma();
+
+  // Override $transaction to pass parent mock instead of fresh instance
+  prisma.$transaction = vi.fn(
+    async (callback: (tx: MockPrismaClient) => Promise<unknown>): Promise<unknown> => {
+      return callback(prisma);
+    }
+  ) as MockPrismaClient['$transaction'];
+
+  return prisma;
+}

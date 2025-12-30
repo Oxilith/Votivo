@@ -17,6 +17,25 @@
  */
 
 /**
+ * ## Testing Best Practice: Override What You Assert
+ *
+ * Fixture factories use faker for realistic random data. To avoid flaky tests:
+ * - Always override fields your test assertions depend on
+ * - Use random defaults only for fields your test doesn't care about
+ *
+ * @example
+ * ```typescript
+ * // ✅ Good - explicit about what matters
+ * const user = createMockUser({ email: 'test@example.com' });
+ * expect(user.email).toBe('test@example.com');
+ *
+ * // ❌ Bad - relies on random value
+ * const user = createMockUser();
+ * expect(user.email).toContain('@'); // Fragile - depends on faker behavior
+ * ```
+ */
+
+/**
  * Branded type for JSON-stringified fields in database records.
  * Provides compile-time indication of what the JSON string contains.
  * The required brand prevents bidirectional assignment with plain strings.

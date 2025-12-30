@@ -14,6 +14,7 @@
 // Prisma mock
 export {
   createMockPrisma,
+  createTransactionAwareMockPrisma,
   resetMockPrisma,
   createHoistedPrismaMock,
   type ModelMock,
