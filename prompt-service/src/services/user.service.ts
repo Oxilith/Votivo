@@ -174,7 +174,7 @@ function toSafeUser(user: User): SafeUser {
 }
 
 export class UserService {
-  private jwtConfig: JwtConfig;
+  private readonly jwtConfig: JwtConfig;
 
   constructor() {
     // Build JWT config from application configuration
