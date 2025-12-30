@@ -4,7 +4,7 @@
  * @functionality
  * - Edit test name, description, and date range
  * - Add, edit, and remove variants
- * - Adjust variant weights
+ * - Adjust variant weights via modal editor with percentage validation
  * - View impression and conversion statistics
  * - Activate/deactivate test
  * @dependencies
@@ -29,6 +29,9 @@ export function ABTestEditPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAddVariant, setShowAddVariant] = useState(false);
+  const [showWeightEditor, setShowWeightEditor] = useState(false);
+  const [weightEdits, setWeightEdits] = useState<Record<string, number>>({});
+  const [weightError, setWeightError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<UpdateABTestInput>({});
   const [newVariant, setNewVariant] = useState<CreateABVariantInput>({
@@ -115,17 +118,6 @@ export function ABTestEditPage() {
     }
   };
 
-  const handleUpdateVariantWeight = async (variantId: string, weight: number) => {
-    if (!id) return;
-
-    try {
-      await abTestApi.updateVariant(id, variantId, { weight });
-      await refetch();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update weight');
-    }
-  };
-
   const handleRemoveVariant = async (variantId: string) => {
     if (!id) return;
     if (!confirm('Are you sure you want to remove this variant?')) return;
@@ -135,6 +127,65 @@ export function ABTestEditPage() {
       await refetch();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to remove variant');
+    }
+  };
+
+  const openWeightEditor = () => {
+    if (!abTest) return;
+    // Initialize with current weights (as percentages)
+    const initialWeights: Record<string, number> = {};
+    abTest.variants.forEach((v) => {
+      initialWeights[v.id] = Math.round(v.weight * 100);
+    });
+    setWeightEdits(initialWeights);
+    setWeightError(null);
+    setShowWeightEditor(true);
+  };
+
+  const closeWeightEditor = () => {
+    setShowWeightEditor(false);
+    setWeightEdits({});
+    setWeightError(null);
+  };
+
+  const handleWeightChange = (variantId: string, value: string) => {
+    const numValue = parseInt(value, 10);
+    if (isNaN(numValue)) {
+      setWeightEdits((prev) => ({ ...prev, [variantId]: 0 }));
+      return;
+    }
+    if (numValue < 0 || numValue > 100) return;
+    setWeightEdits((prev) => ({ ...prev, [variantId]: numValue }));
+    setWeightError(null);
+  };
+
+  const calculateTotalWeight = (): number => {
+    return Object.values(weightEdits).reduce((sum, w) => sum + w, 0);
+  };
+
+  const saveWeights = async () => {
+    if (!id || !abTest) return;
+
+    const total = calculateTotalWeight();
+    if (total !== 100) {
+      setWeightError(`Weights must sum to 100% (currently ${total}%)`);
+      return;
+    }
+
+    setSaving(true);
+    setWeightError(null);
+
+    try {
+      // Update each variant's weight
+      for (const [variantId, weight] of Object.entries(weightEdits)) {
+        await abTestApi.updateVariant(id, variantId, { weight: weight / 100 });
+      }
+      await refetch();
+      closeWeightEditor();
+    } catch (err) {
+      setWeightError(err instanceof Error ? err.message : 'Failed to save weights');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -253,12 +304,22 @@ export function ABTestEditPage() {
       <div style={styles.card}>
         <div style={styles.variantsHeader}>
           <h2 style={styles.sectionTitle}>Variants ({abTest.variants.length})</h2>
-          <button
-            onClick={() => setShowAddVariant(true)}
-            style={styles.addVariantButton}
-          >
-            + Add Variant
-          </button>
+          <div style={styles.variantsActions}>
+            {abTest.variants.length >= 2 && (
+              <button
+                onClick={openWeightEditor}
+                style={styles.editWeightsButton}
+              >
+                Edit Weights
+              </button>
+            )}
+            <button
+              onClick={() => setShowAddVariant(true)}
+              style={styles.addVariantButton}
+            >
+              + Add Variant
+            </button>
+          </div>
         </div>
 
         {abTest.variants.length === 0 ? (
@@ -291,20 +352,10 @@ export function ABTestEditPage() {
                   </div>
                 </div>
 
-                <div style={styles.weightControl}>
-                  <label style={styles.weightLabel}>
+                <div style={styles.weightDisplay}>
+                  <span style={styles.weightText}>
                     Weight: {(variant.weight * 100).toFixed(0)}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={variant.weight * 100}
-                    onChange={(e) =>
-                      void handleUpdateVariantWeight(variant.id, parseInt(e.target.value, 10) / 100)
-                    }
-                    style={styles.weightSlider}
-                  />
+                  </span>
                 </div>
 
                 <details style={styles.variantDetails}>
@@ -366,19 +417,26 @@ export function ABTestEditPage() {
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>
-                Weight: {((newVariant.weight ?? 0.5) * 100).toFixed(0)}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={(newVariant.weight ?? 0.5) * 100}
-                onChange={(e) =>
-                  setNewVariant({ ...newVariant, weight: parseInt(e.target.value, 10) / 100 })
-                }
-                style={styles.weightSlider}
-              />
+              <label style={styles.label}>Initial Weight (%)</label>
+              <div style={styles.weightInputRow}>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={Math.round((newVariant.weight ?? 0.5) * 100)}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value) && value >= 0 && value <= 100) {
+                      setNewVariant({ ...newVariant, weight: value / 100 });
+                    }
+                  }}
+                  style={styles.weightNumberInput}
+                />
+                <span style={styles.weightPercent}>%</span>
+              </div>
+              <p style={styles.helpText}>
+                Weights will be normalized after adding the variant.
+              </p>
             </div>
 
             <div style={styles.modalActions}>
@@ -394,6 +452,60 @@ export function ABTestEditPage() {
                 disabled={!newVariant.name || !newVariant.content}
               >
                 Add Variant
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showWeightEditor && (
+        <div style={styles.modal}>
+          <div style={styles.modalContent}>
+            <h3 style={styles.modalTitle}>Edit Variant Weights</h3>
+            <p style={styles.modalDescription}>
+              Weights must sum to 100%. Variants are selected randomly based on these percentages.
+            </p>
+
+            {weightError && (
+              <div style={styles.weightErrorBox}>{weightError}</div>
+            )}
+
+            <div style={styles.weightEditorList}>
+              {abTest.variants.map((variant) => (
+                <div key={variant.id} style={styles.weightEditorRow}>
+                  <span style={styles.weightEditorName}>{variant.name}</span>
+                  <div style={styles.weightInputRow}>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={weightEdits[variant.id] ?? Math.round(variant.weight * 100)}
+                      onChange={(e) => handleWeightChange(variant.id, e.target.value)}
+                      style={styles.weightNumberInput}
+                    />
+                    <span style={styles.weightPercent}>%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={styles.weightEditorTotal}>
+              Total: {calculateTotalWeight()}%
+              {calculateTotalWeight() !== 100 && (
+                <span style={styles.weightTotalError}> (must equal 100%)</span>
+              )}
+            </div>
+
+            <div style={styles.modalActions}>
+              <button onClick={closeWeightEditor} style={styles.cancelButton}>
+                Cancel
+              </button>
+              <button
+                onClick={() => void saveWeights()}
+                style={styles.saveButton}
+                disabled={calculateTotalWeight() !== 100 || saving}
+              >
+                {saving ? 'Saving...' : 'Save Weights'}
               </button>
             </div>
           </div>
@@ -704,5 +816,93 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#fff',
     textDecoration: 'none',
     borderRadius: '0.375rem',
+  },
+  // Weight editor styles
+  weightDisplay: {
+    marginBottom: '0.75rem',
+  },
+  weightText: {
+    fontSize: '0.875rem',
+    color: '#374151',
+    fontWeight: 500,
+  },
+  variantsActions: {
+    display: 'flex',
+    gap: '0.5rem',
+  },
+  editWeightsButton: {
+    padding: '0.5rem 1rem',
+    backgroundColor: '#fff',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+  },
+  modalDescription: {
+    fontSize: '0.875rem',
+    color: '#6b7280',
+    marginBottom: '1.5rem',
+    marginTop: 0,
+  },
+  weightEditorList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    marginBottom: '1rem',
+  },
+  weightEditorRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0.75rem',
+    backgroundColor: '#f9fafb',
+    borderRadius: '0.375rem',
+  },
+  weightEditorName: {
+    fontWeight: 500,
+    color: '#111827',
+  },
+  weightInputRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+  },
+  weightNumberInput: {
+    width: '70px',
+    padding: '0.5rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    textAlign: 'right',
+  },
+  weightPercent: {
+    color: '#6b7280',
+    fontSize: '0.875rem',
+  },
+  weightEditorTotal: {
+    padding: '0.75rem',
+    backgroundColor: '#f3f4f6',
+    borderRadius: '0.375rem',
+    fontWeight: 500,
+    textAlign: 'center',
+    marginBottom: '1rem',
+  },
+  weightTotalError: {
+    color: '#dc2626',
+  },
+  weightErrorBox: {
+    padding: '0.75rem',
+    backgroundColor: '#fee2e2',
+    border: '1px solid #fecaca',
+    borderRadius: '0.375rem',
+    color: '#dc2626',
+    marginBottom: '1rem',
+    fontSize: '0.875rem',
+  },
+  helpText: {
+    fontSize: '0.75rem',
+    color: '#6b7280',
+    marginTop: '0.25rem',
+    marginBottom: 0,
   },
 };
