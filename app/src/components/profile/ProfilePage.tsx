@@ -33,7 +33,6 @@ import {
   RefreshIcon,
   InkBrushDecoration,
 } from '@/components';
-// Direct imports for code-splitting - avoids circular chunk dependencies
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCurrentUser } from '@/stores/useAuthStore';
 import { useUIStore } from '@/stores/useUIStore';

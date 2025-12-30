@@ -33,7 +33,6 @@ import { useTranslation } from 'react-i18next';
 import type { AssessmentResponses, AssessmentProps } from '@/types';
 import { useUIStore } from '@/stores/useUIStore';
 import { useIsAuthenticated } from '@/stores/useAuthStore';
-// Direct import for code-splitting - avoids circular chunk dependencies
 import { authService } from '@/services/api/AuthService';
 import {
   IntroStep,

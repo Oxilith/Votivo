@@ -45,7 +45,6 @@ import type {
   AnalysisLeveragePoint,
   AnalysisRisk,
 } from '@/types';
-// Direct imports for code-splitting - avoids circular chunk dependencies
 import { useAnalysisStore } from '@/stores/useAnalysisStore';
 import { useIsAuthenticated, useCurrentUser } from '@/stores/useAuthStore';
 import type { UserProfileForAnalysis } from 'shared';

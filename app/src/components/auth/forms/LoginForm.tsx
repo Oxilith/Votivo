@@ -23,7 +23,6 @@ import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormInput from './FormInput';
 import FormButton from './FormButton';
-// Direct import for code-splitting - avoids circular chunk dependencies
 import { authService } from '@/services/api/AuthService';
 import { useAuthStore } from '@/stores/useAuthStore';
 
