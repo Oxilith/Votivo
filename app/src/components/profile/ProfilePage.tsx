@@ -36,7 +36,7 @@ import {
 import { useAuthStore, useCurrentUser, useUIStore, useAssessmentStore, useAnalysisStore } from '@/stores';
 import { authService } from '@/services';
 import type { Gender, ProfileUpdateRequest, PasswordChangeRequest } from '@/types';
-import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH } from 'shared/index';
+import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH } from 'shared';
 
 /**
  * Profile tab type

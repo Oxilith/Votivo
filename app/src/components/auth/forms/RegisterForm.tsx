@@ -28,7 +28,7 @@ import FormButton from './FormButton';
 import { authService } from '@/services';
 import { useAuthStore } from '@/stores';
 import type { Gender } from '@/types';
-import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from 'shared/index';
+import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from 'shared';
 
 /**
  * Props for RegisterForm component

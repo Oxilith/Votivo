@@ -80,7 +80,7 @@ vi.mock('@/stores/useAuthStore', () => ({
 }));
 
 // Mock shared validation constants
-vi.mock('shared/index', () => ({
+vi.mock('shared', () => ({
   PASSWORD_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
   PASSWORD_MIN_LENGTH: 8,
   PASSWORD_MAX_LENGTH: 128,

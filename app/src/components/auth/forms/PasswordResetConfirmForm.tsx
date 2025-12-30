@@ -23,7 +23,7 @@ import FormInput from './FormInput';
 import FormButton from './FormButton';
 import { authService } from '@/services';
 import { CheckIcon } from '@/components';
-import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from 'shared/index';
+import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from 'shared';
 
 /**
  * Props for PasswordResetConfirmForm
