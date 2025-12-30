@@ -46,9 +46,6 @@ import {
 import { emailService } from '@/services/email.service';
 import { type Gender, isValidGender } from 'shared';
 
-// Re-export Gender for backward compatibility
-export type { Gender };
-
 /**
  * Token expiry constants in milliseconds
  */

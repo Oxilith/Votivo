@@ -7,6 +7,7 @@
  * - Displays analysis results in tabbed interface with vermilion accents
  * - Shows identity synthesis with hidden strengths and next steps
  * - Provides re-analyze functionality that creates new analysis record
+ * - Passes user profile (name, age, gender) for personalized AI analysis
  * - Includes loading states with ink-style dots and error handling
  * - Uses shared PageNavigation component for consistent navigation
  * - Includes decorative ink brush SVG and footer
@@ -20,9 +21,10 @@
  * - react-i18next (useTranslation)
  * - @/types/assessment.types (InsightsProps)
  * - @/stores (useAnalysisStore)
- * - @/stores/useAuthStore
+ * - @/stores/useAuthStore (useIsAuthenticated, useCurrentUser)
  * - @/services/api/AuthService
  * - @/styles/theme (cardStyles, textStyles)
+ * - shared (UserProfileForAnalysis)
  * - @/components/landing/sections/FooterSection
  * - @/components/shared/PageNavigation
  * - @/components/insights/InsightsPageHeader
@@ -37,7 +39,8 @@ import { useState, useCallback, useRef, useEffect, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next';
 import type { InsightsProps } from '@/types/assessment.types';
 import { useAnalysisStore } from '@/stores';
-import { useIsAuthenticated } from '@/stores/useAuthStore';
+import { useIsAuthenticated, useCurrentUser } from '@/stores/useAuthStore';
+import type { UserProfileForAnalysis } from 'shared';
 import { authService } from '@/services/api/AuthService';
 import { cardStyles, textStyles } from '@/styles/theme';
 import InsightCard from './InsightCard';
@@ -103,6 +106,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
   // Auth state
   const isAuthenticated = useIsAuthenticated();
+  const currentUser = useCurrentUser();
   const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const prevAnalysisRef = useRef(storeAnalysis);
@@ -172,8 +176,20 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
   const analyzeWithClaude = useCallback(async () => {
     const language = i18n.language === 'pl' ? 'polish' : 'english';
     setHasSaved(false); // Reset saved state for new analysis
-    await analyze(responses, language);
-  }, [analyze, responses, i18n.language]);
+
+    // Build user profile for demographic context if authenticated
+    let userProfile: UserProfileForAnalysis | undefined;
+    if (currentUser) {
+      const currentYear = new Date().getFullYear();
+      userProfile = {
+        name: currentUser.name,
+        age: currentYear - currentUser.birthYear,
+        gender: currentUser.gender,
+      };
+    }
+
+    await analyze(responses, language, userProfile);
+  }, [analyze, responses, i18n.language, currentUser]);
 
   // Save prompt handlers - use returnTo so user comes back to insights after auth
   const handleSavePromptSignIn = useCallback(() => {

@@ -4,6 +4,7 @@
  * @functionality
  * - Handles analyze request processing
  * - Validates request body using Zod schema
+ * - Passes optional user profile for demographic context
  * - Calls Claude service and formats response
  * - Handles errors appropriately
  * @dependencies
@@ -46,11 +47,11 @@ export async function analyze(
       return;
     }
 
-    const { responses, language } = validationResult.data;
+    const { responses, language, userProfile } = validationResult.data;
 
-    logger.info({ language }, 'Processing analysis request');
+    logger.info({ language, hasUserProfile: !!userProfile }, 'Processing analysis request');
 
-    const { analysis, rawResponse } = await analyzeAssessment(responses, language);
+    const { analysis, rawResponse } = await analyzeAssessment(responses, language, userProfile);
 
     res.status(StatusCodes.OK).json({
       success: true,

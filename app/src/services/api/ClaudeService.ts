@@ -4,6 +4,7 @@
  * @functionality
  * - Implements IClaudeService interface
  * - Sends analysis requests to backend API
+ * - Passes optional user profile for demographic context
  * - Handles response transformation
  * - Provides singleton instance for application use
  * @dependencies
@@ -40,6 +41,7 @@ export class ClaudeService implements IClaudeService {
       {
         responses: request.responses,
         language: request.language,
+        userProfile: request.userProfile,
       },
       {
         timeout: 60000 * 10, // 10 minutes for AI analysis with extended thinking

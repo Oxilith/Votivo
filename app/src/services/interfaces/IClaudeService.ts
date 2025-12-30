@@ -3,23 +3,24 @@
  * @purpose Interface definition for Claude AI analysis service
  * @functionality
  * - Defines contract for Claude API interactions
- * - Provides typed analysis request/response
+ * - Provides typed analysis request/response with optional user profile
  * - Enables dependency injection for testing
  * - Facilitates mocking in unit tests
  * @dependencies
  * - @/types/assessment.types (AssessmentResponses, AIAnalysisResult)
- * - @shared/index (AnalysisLanguage)
+ * - shared (AnalysisLanguage, UserProfileForAnalysis)
  */
 
 import type { AssessmentResponses, AIAnalysisResult } from '@/types/assessment.types';
-import type { AnalysisLanguage } from 'shared/index';
+import type { AnalysisLanguage, UserProfileForAnalysis } from 'shared';
 
 // Re-export for backward compatibility
-export type { AnalysisLanguage } from 'shared/index';
+export type { AnalysisLanguage } from 'shared';
 
 export interface AnalysisRequest {
   responses: AssessmentResponses;
   language: AnalysisLanguage;
+  userProfile?: UserProfileForAnalysis;
 }
 
 export interface AnalysisResponse {

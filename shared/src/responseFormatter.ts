@@ -6,29 +6,54 @@
  * - Maps enum values to human-readable labels
  * - Structures data by assessment phases for optimal AI comprehension
  * - Includes language specification for multilingual analysis
+ * - Includes optional user profile for demographic context
  * @dependencies
  * - ./assessment.types for AssessmentResponses type
- * - ./api.types for AnalysisLanguage type
+ * - ./api.types for AnalysisLanguage and UserProfileForAnalysis types
+ * - ./auth.types for Gender type
  * - ./labels for label mappings
  */
 
 import type { AssessmentResponses } from './assessment.types';
-import type { AnalysisLanguage } from './api.types';
+import type { AnalysisLanguage, UserProfileForAnalysis } from './api.types';
+import type { Gender } from './auth.types';
 import { valueLabels, timeLabels, triggerLabels, willpowerLabels } from './labels';
+
+/**
+ * Formats gender value for display in prompt
+ * @param gender - The gender value or null
+ * @returns Human-readable gender string
+ */
+const formatGender = (gender: Gender | null): string => {
+  if (!gender || gender === 'prefer-not-to-say') return 'Not specified';
+  return gender.charAt(0).toUpperCase() + gender.slice(1);
+};
 
 /**
  * Formats assessment responses into a structured markdown string for AI analysis
  * @param responses - The assessment responses to format
  * @param language - The language for AI analysis output
+ * @param userProfile - Optional user profile for demographic context
  * @returns Formatted markdown string
  */
 export const formatResponsesForPrompt = (
   responses: AssessmentResponses,
-  language: AnalysisLanguage
+  language: AnalysisLanguage,
+  userProfile?: UserProfileForAnalysis
 ): string => {
+  const userSection = userProfile
+    ? `
+## User Profile
+
+**Name:** ${userProfile.name}
+**Age:** ${userProfile.age} years old
+**Gender:** ${formatGender(userProfile.gender)}
+`
+    : '';
+
   return `
 **Language:** ${language}
-
+${userSection}
 ## Phase 1: State Awareness
 
 **Peak Energy Times:** ${responses.peak_energy_times.map((t) => timeLabels[t]).join(', ')}

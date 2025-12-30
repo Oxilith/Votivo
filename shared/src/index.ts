@@ -40,7 +40,7 @@ export type {
 } from './analysis.types';
 
 // API Types
-export type { AnalysisLanguage } from './api.types';
+export type { AnalysisLanguage, UserProfileForAnalysis } from './api.types';
 export { SUPPORTED_LANGUAGES } from './api.types';
 
 // Labels

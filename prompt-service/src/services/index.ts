@@ -39,7 +39,6 @@ export {
 export {
   UserService,
   userService,
-  type Gender,
   type SafeUser,
   type RegisterInput,
   type LoginInput,

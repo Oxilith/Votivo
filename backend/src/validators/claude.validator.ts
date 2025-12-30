@@ -4,11 +4,12 @@
  * @functionality
  * - Defines Zod schemas for request body validation
  * - Validates assessment responses structure using shared enum arrays
+ * - Validates optional user profile for demographic context
  * - Ensures language parameter is valid
  * - Provides type-safe validation errors
  * @dependencies
  * - zod for schema validation
- * - @shared/index for enum value arrays and supported languages
+ * - shared for enum value arrays and supported languages
  */
 
 import { z } from 'zod';
@@ -17,6 +18,7 @@ import {
   MOOD_TRIGGER_VALUES,
   WILLPOWER_PATTERN_VALUES,
   CORE_VALUE_VALUES,
+  GENDER_VALUES,
   SUPPORTED_LANGUAGES,
 } from 'shared';
 
@@ -24,6 +26,16 @@ const timeOfDaySchema = z.enum(TIME_OF_DAY_VALUES);
 const moodTriggerSchema = z.enum(MOOD_TRIGGER_VALUES);
 const willpowerPatternSchema = z.enum(WILLPOWER_PATTERN_VALUES);
 const coreValueSchema = z.enum(CORE_VALUE_VALUES);
+const genderSchema = z.enum(GENDER_VALUES);
+
+// Optional user profile for demographic context in analysis
+const userProfileSchema = z
+  .object({
+    name: z.string().min(1),
+    age: z.number().min(13).max(120),
+    gender: genderSchema.nullable(),
+  })
+  .optional();
 
 const assessmentResponsesSchema = z.object({
   // Phase 1: State Awareness
@@ -50,6 +62,7 @@ const assessmentResponsesSchema = z.object({
 export const analyzeRequestSchema = z.object({
   responses: assessmentResponsesSchema,
   language: z.enum(SUPPORTED_LANGUAGES).default('english'),
+  userProfile: userProfileSchema,
 });
 
 export type ValidatedAnalyzeRequest = z.infer<typeof analyzeRequestSchema>;

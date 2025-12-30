@@ -71,7 +71,7 @@ services:
       - CLAUDE_RATE_LIMIT_WINDOW_MS=60000
       - CLAUDE_RATE_LIMIT_MAX_REQUESTS=5
       - LOG_LEVEL=info
-      - THINKING_ENABLED=true
+      - THINKING_ENABLED=${THINKING_ENABLED:-true}
       - PROMPT_SERVICE_URL=http://prompt-service:3002
       # Circuit Breaker
       - CIRCUIT_BREAKER_TIMEOUT=10000

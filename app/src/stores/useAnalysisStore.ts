@@ -6,17 +6,20 @@
  * - Manages analysis loading and error state
  * - Caches raw response for debugging
  * - Provides analyze action that calls the API via service layer
+ * - Passes optional user profile for demographic context
  * - Supports export functionality
  * @dependencies
  * - zustand
  * - @/types/assessment.types (AIAnalysisResult, AssessmentResponses)
  * - @/services (claudeService, ApiClientError, AnalysisLanguage)
+ * - shared (UserProfileForAnalysis)
  */
 
 import { create } from 'zustand';
 import type { AIAnalysisResult, AssessmentResponses } from '@/types/assessment.types';
 import { claudeService, ApiClientError } from '@/services';
 import type { AnalysisLanguage } from '@/services';
+import type { UserProfileForAnalysis } from 'shared';
 
 interface AnalysisState {
   // State
@@ -26,7 +29,11 @@ interface AnalysisState {
   analysisError: string | null;
 
   // Actions
-  analyze: (responses: AssessmentResponses, language: AnalysisLanguage) => Promise<void>;
+  analyze: (
+    responses: AssessmentResponses,
+    language: AnalysisLanguage,
+    userProfile?: UserProfileForAnalysis
+  ) => Promise<void>;
   setAnalysis: (analysis: AIAnalysisResult, rawResponse: string) => void;
   clearAnalysis: () => void;
   clearError: () => void;
@@ -44,13 +51,14 @@ export const useAnalysisStore = create<AnalysisState>()((set, get) => ({
   analysisError: null,
 
   // Actions
-  analyze: async (responses, language) => {
+  analyze: async (responses, language, userProfile) => {
     set({ isAnalyzing: true, analysisError: null });
 
     try {
       const { analysis, rawResponse } = await claudeService.analyze({
         responses,
         language,
+        userProfile,
       });
       set({
         analysis,
