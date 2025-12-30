@@ -56,8 +56,13 @@ const EMAIL_VERIFY_TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 /**
  * User data without sensitive fields
  * Uses Omit to structurally enforce password exclusion
+ *
+ * Note: Gender is required at business logic level (defaults to 'prefer-not-to-say'),
+ * even though SQLite schema can't enforce NOT NULL constraint.
  */
-export type SafeUser = Omit<User, 'password'>;
+export type SafeUser = Omit<User, 'password' | 'gender'> & {
+  gender: Gender;
+};
 
 /**
  * Input for user registration
@@ -154,13 +159,17 @@ export interface RegistrationResult {
  * Strips sensitive fields from user object
  */
 function toSafeUser(user: User): SafeUser {
+  // Gender is nullable in SQLite (can't enforce NOT NULL constraint),
+  // but business logic ensures it always has a value ('prefer-not-to-say' default)
+  const gender = user.gender ?? 'prefer-not-to-say';
+
   return {
     id: user.id,
     email: user.email,
     emailVerified: user.emailVerified,
     emailVerifiedAt: user.emailVerifiedAt,
     name: user.name,
-    gender: isValidGender(user.gender) ? user.gender : null,
+    gender: isValidGender(gender) ? gender : 'prefer-not-to-say',
     birthYear: user.birthYear,
     failedLoginAttempts: user.failedLoginAttempts,
     lockoutUntil: user.lockoutUntil,
@@ -218,7 +227,7 @@ export class UserService {
           email: input.email.toLowerCase(),
           password: hashedPassword,
           name: input.name,
-          gender: input.gender ?? null,
+          gender: input.gender ?? 'prefer-not-to-say',
           birthYear: input.birthYear,
         },
       });
