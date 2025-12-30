@@ -9,10 +9,12 @@
  * - Provides email templates for consistent formatting
  * @dependencies
  * - nodemailer for email sending
+ * - @/utils/escapeHtml for HTML entity escaping in templates
  * - environment variables for SMTP configuration
  */
 
 import nodemailer from 'nodemailer';
+import { escapeHtml } from '@/utils';
 
 /**
  * SMTP configuration loaded from environment variables
@@ -143,7 +145,7 @@ export class EmailService {
   async sendPasswordResetEmail(input: PasswordResetEmailInput): Promise<EmailResult> {
     const appUrl = getAppUrl();
     const resetUrl = `${appUrl}/reset-password?token=${encodeURIComponent(input.resetToken)}`;
-    const greeting = input.userName ? `Hi ${input.userName}` : 'Hi';
+    const greeting = input.userName ? `Hi ${escapeHtml(input.userName)}` : 'Hi';
 
     const subject = 'Reset Your Votive Password';
     const text = `${greeting},
@@ -198,7 +200,7 @@ If you didn't request this password reset, you can safely ignore this email. You
   async sendEmailVerificationEmail(input: EmailVerificationInput): Promise<EmailResult> {
     const appUrl = getAppUrl();
     const verifyUrl = `${appUrl}/verify-email?token=${encodeURIComponent(input.verificationToken)}`;
-    const greeting = input.userName ? `Hi ${input.userName}` : 'Hi';
+    const greeting = input.userName ? `Hi ${escapeHtml(input.userName)}` : 'Hi';
 
     const subject = 'Verify Your Votive Email Address';
     const text = `${greeting},

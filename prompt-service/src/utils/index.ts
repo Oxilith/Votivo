@@ -53,4 +53,4 @@ export {
   generateCsrfToken,
   validateCsrfToken,
 } from './csrf';
-export { validatePromptContent, validatePromptKey } from './sanitize';
+export { validatePromptContent, validatePromptKey, escapeHtml } from './sanitize';

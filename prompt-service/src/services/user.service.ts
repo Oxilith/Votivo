@@ -951,6 +951,13 @@ export class UserService {
     }
 
     if (user.emailVerified) {
+      auditLog({
+        eventType: 'AUTH_VERIFICATION_ALREADY_VERIFIED',
+        userId,
+        email: user.email,
+        ip: ctx?.ip,
+        userAgent: ctx?.userAgent,
+      });
       return false; // Already verified
     }
 
