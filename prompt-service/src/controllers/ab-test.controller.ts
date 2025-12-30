@@ -14,7 +14,7 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { abTestService } from '@/services/ab-test.service.js';
+import { abTestService } from '@/services';
 import {
   createABTestSchema,
   updateABTestSchema,
@@ -22,8 +22,8 @@ import {
   updateABVariantSchema,
   abTestIdParamSchema,
   variantIdParamSchema,
-} from '@/validators/ab-test.validator.js';
-import { isAppError } from '@/errors/index.js';
+} from '@/validators';
+import { isAppError } from '@/errors';
 
 export class ABTestController {
   /**

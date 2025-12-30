@@ -37,4 +37,4 @@ export interface Job {
 }
 
 // Export all registered jobs
-export { tokenCleanupJob } from '@/jobs/token-cleanup.job.js';
+export { tokenCleanupJob } from './token-cleanup.job';

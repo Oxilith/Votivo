@@ -14,9 +14,9 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { abTestApi } from '../api/abTestApi.js';
-import { usePrompts } from '../hooks/usePrompts.js';
-import type { CreateABTestInput, PromptDTO } from '../types.js';
+import { abTestApi } from '../api/abTestApi';
+import { usePrompts } from '../hooks/usePrompts';
+import type { CreateABTestInput, PromptDTO } from '../types';
 
 export function ABTestCreatePage() {
   const navigate = useNavigate();

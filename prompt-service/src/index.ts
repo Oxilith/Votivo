@@ -26,32 +26,17 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import pino from 'pino';
 import pinoHttp from 'pino-http';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { config } from '@/config/index.js';
-import { apiRouter } from '@/routes/index.js';
-import { prisma } from '@/prisma/client.js';
-import { adminAuthMiddleware } from '@/middleware/admin-auth.middleware.js';
-import { tracingMiddleware } from '@/middleware/tracing.middleware.js';
+import { config } from '@/config';
+import { apiRouter } from '@/routes';
+import { prisma } from '@/prisma';
+import { adminAuthMiddleware, tracingMiddleware } from '@/middleware';
+import { logger } from '@/utils';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Initialize logger
-const logger = pino({
-  level: config.logLevel,
-  transport:
-    config.nodeEnv === 'development'
-      ? {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-          },
-        }
-      : undefined,
-});
 
 // Initialize Express app
 const app = express();
@@ -95,7 +80,6 @@ app.use(tracingMiddleware);
 
 // Request logging with trace context
 app.use(
-  // @ts-expect-error - pino-http types have ESM interop issues
   pinoHttp({
     logger,
     autoLogging: {

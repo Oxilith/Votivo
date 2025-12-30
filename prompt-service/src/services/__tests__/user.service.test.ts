@@ -91,21 +91,21 @@ const mockPrismaObj = vi.hoisted(() => ({
 }));
 
 // Mock modules with hoisted values
-vi.mock('@/prisma/client.js', () => ({
+vi.mock('@/prisma', () => ({
   prisma: mockPrismaObj,
 }));
 
-vi.mock('@/services/email.service.js', () => ({
+vi.mock('@/services/email.service', () => ({
   emailService: mockEmailServiceObj,
 }));
 
-vi.mock('@/utils/password.js', () => mockPasswordFunctions);
+vi.mock('@/utils', () => ({
+  ...mockPasswordFunctions,
+  ...mockJwtFunctions,
+  ...mockTokenFunctions,
+}));
 
-vi.mock('@/utils/jwt.js', () => mockJwtFunctions);
-
-vi.mock('@/utils/token.js', () => mockTokenFunctions);
-
-vi.mock('@/config/index.js', () => ({
+vi.mock('@/config', () => ({
   config: {
     jwtAccessSecret: 'test-access-secret',
     jwtRefreshSecret: 'test-refresh-secret',
@@ -120,7 +120,7 @@ vi.mock('@/config/index.js', () => ({
 }));
 
 // Mock @/index.js to provide logger without loading entire app
-vi.mock('@/index.js', () => ({
+vi.mock('@', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -141,14 +141,14 @@ import {
   type LoginInput,
   type ProfileUpdateInput,
   type PasswordChangeInput,
-} from '@/services/user.service.js';
+} from '@/services';
 import {
   NotFoundError,
   ConflictError,
   AuthenticationError,
   TokenError,
   ValidationError,
-} from '@/errors/index.js';
+} from '@/errors';
 
 // Use the hoisted mocks directly
 const mockPrisma = mockPrismaObj;

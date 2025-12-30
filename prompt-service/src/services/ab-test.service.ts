@@ -11,9 +11,9 @@
  * - @/prisma/client for database access
  */
 
-import { prisma } from '@/prisma/client.js';
-import type { ABTest, ABVariant, ABVariantConfig } from '@prisma/client';
-import { NotFoundError, ValidationError } from '@/errors/index.js';
+import {prisma} from '@/prisma';
+import type {ABTest, ABVariant, ABVariantConfig} from '@prisma/client';
+import {NotFoundError, ValidationError} from '@/errors';
 
 export interface ABTestWithVariants extends ABTest {
   variants: (ABVariant & { configs: ABVariantConfig[] })[];
@@ -342,9 +342,7 @@ export class ABTestService {
     }
 
     if (variants.length === 1) {
-      const firstVariant = variants[0];
-      if (!firstVariant) throw new ValidationError('Variant array is empty');
-      return firstVariant;
+        return variants[0];
     }
 
     const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
@@ -359,9 +357,7 @@ export class ABTestService {
     }
 
     // Fallback to last variant (shouldn't happen with proper weights)
-    const lastVariant = variants[variants.length - 1];
-    if (!lastVariant) throw new ValidationError('Variant array is empty');
-    return lastVariant;
+    return variants[variants.length - 1];
   }
 
   /**

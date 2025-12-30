@@ -10,8 +10,8 @@
  * - @/validators/prompt.validator for MAX_PROMPT_CONTENT_LENGTH
  */
 
-import { ValidationError } from '@/errors/index.js';
-import { MAX_PROMPT_CONTENT_LENGTH } from '@/validators/prompt.validator.js';
+import { ValidationError } from '@/errors';
+import { MAX_PROMPT_CONTENT_LENGTH } from '@/validators';
 
 /**
  * Patterns that indicate potential script injection attempts

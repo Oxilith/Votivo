@@ -17,10 +17,9 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { config } from '@/config/index.js';
-import { AUTH_CONSTANTS } from '@/constants/auth.js';
-import { timingSafeCompare } from '@/utils/crypto.js';
-import { validateAuthConfig } from '@/utils/auth.js';
+import { config } from '@/config';
+import { AUTH_CONSTANTS } from '@/constants';
+import { timingSafeCompare, validateAuthConfig } from '@/utils';
 
 export function adminAuthMiddleware(
   req: Request,

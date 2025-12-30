@@ -12,9 +12,9 @@
  * - @/utils/fetch-with-timeout for HTTP requests with timeout
  */
 
-import { config } from '@/config/index.js';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import type { HealthCheck, ComponentHealth } from '../types.js';
+import { config } from '@/config';
+import { fetchWithTimeout } from '@/utils';
+import type { HealthCheck, ComponentHealth } from '@/health';
 
 const HEALTH_CHECK_TIMEOUT_MS = 5000;
 

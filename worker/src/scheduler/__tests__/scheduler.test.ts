@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
-import type { Job, JobResult } from '@/jobs/index.js';
+import type { Job, JobResult } from '@/jobs';
 
 // Mock logger with hoisting
 const mockLoggerChild = vi.hoisted(() => ({
@@ -30,7 +30,7 @@ const mockLogger = vi.hoisted(() => ({
   error: vi.fn(),
 }));
 
-vi.mock('@/utils/logger.js', () => ({
+vi.mock('@/utils', () => ({
   logger: mockLogger,
 }));
 
@@ -56,7 +56,7 @@ vi.mock('node-cron', () => ({
   },
 }));
 
-import { Scheduler } from '@/scheduler/index.js';
+import { Scheduler } from '@/scheduler';
 import cron from 'node-cron';
 
 describe('Scheduler', () => {

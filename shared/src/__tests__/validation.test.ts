@@ -19,7 +19,7 @@ import {
   ARRAY_FIELDS,
   NUMBER_FIELDS,
   STRING_FIELDS,
-} from '../validation.js';
+} from '../validation';
 
 describe('Enum value arrays', () => {
   it('should define TIME_OF_DAY_VALUES with all expected values', () => {

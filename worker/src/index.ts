@@ -12,10 +12,10 @@
  * - @/prisma/client for database connection
  */
 
-import { Scheduler } from '@/scheduler/index.js';
-import { tokenCleanupJob } from '@/jobs/index.js';
-import { logger } from '@/utils/logger.js';
-import { prisma } from '@/prisma/client.js';
+import { Scheduler } from '@/scheduler';
+import { tokenCleanupJob } from '@/jobs';
+import { logger } from '@/utils';
+import { prisma } from '@/prisma';
 
 const log = logger.child({ component: 'main' });
 

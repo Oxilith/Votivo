@@ -15,11 +15,9 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { promptResolverService } from '@/services/prompt-resolver.service.js';
-import { abTestService } from '@/services/ab-test.service.js';
-import { resolvePromptSchema, variantIdParamSchema } from '@/validators/resolve.validator.js';
-import { logger } from '@/index.js';
-import { isAppError } from '@/errors/index.js';
+import { promptResolverService, abTestService } from '@/services';
+import { resolvePromptSchema, resolveVariantIdParamSchema as variantIdParamSchema } from '@/validators';
+import { isAppError } from '@/errors';
 
 export class ResolveController {
   /**
@@ -67,9 +65,8 @@ export class ResolveController {
     try {
       await abTestService.recordConversion(params.data.variantId);
       res.status(StatusCodes.NO_CONTENT).send();
-    } catch (error) {
-      // Don't fail on conversion tracking errors - just log and return success
-      logger.error({ error, variantId: params.data.variantId }, 'Failed to record conversion');
+    } catch {
+      // Don't fail on conversion tracking errors - return success silently
       res.status(StatusCodes.NO_CONTENT).send();
     }
   }

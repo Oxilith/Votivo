@@ -16,7 +16,7 @@ import type {
   HealthCheckResult,
   HealthStatus,
   ComponentHealth,
-} from './types.js';
+} from './types';
 
 const DEFAULT_TIMEOUT_MS = 5000;
 const VERSION = process.env['npm_package_version'] ?? '1.0.0';

@@ -16,10 +16,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useABTest } from '../hooks/useABTests.js';
-import { abTestApi } from '../api/abTestApi.js';
-import { CLAUDE_MODELS } from '../types.js';
-import type { UpdateABTestInput, CreateABVariantInput, ABVariantDTO } from '../types.js';
+import { useABTest } from '../hooks/useABTests';
+import { abTestApi } from '../api/abTestApi';
+import { CLAUDE_MODELS } from '../types';
+import type { UpdateABTestInput, CreateABVariantInput, ABVariantDTO } from '../types';
 
 export function ABTestEditPage() {
   const { id } = useParams<{ id: string }>();

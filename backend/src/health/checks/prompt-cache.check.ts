@@ -10,8 +10,8 @@
  * - @/services/prompt-cache.service for cache statistics
  */
 
-import type { HealthCheck, ComponentHealth } from '../types.js';
-import { promptCacheService } from '@/services/prompt-cache.service.js';
+import type { HealthCheck, ComponentHealth } from '@/health';
+import { promptCacheService } from '@/services';
 
 function checkPromptCache(): Promise<ComponentHealth> {
   const stats = promptCacheService.getStats();

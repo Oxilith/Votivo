@@ -16,7 +16,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaLibSQL } from '@prisma/adapter-libsql';
 import { createClient } from '@libsql/client';
-import { config } from '@/config/index.js';
+import { config } from '@/config';
 
 /**
  * Creates a fresh Prisma client with a new libsql connection.

@@ -39,7 +39,7 @@ describe('config', () => {
     it('should use default database URL in development', async () => {
       process.env['NODE_ENV'] = 'development';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.databaseUrl).toBe('file:./dev.db');
     });
@@ -47,7 +47,7 @@ describe('config', () => {
     it('should use default job schedule in development', async () => {
       process.env['NODE_ENV'] = 'development';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.jobs.tokenCleanup.schedule).toBe('0 * * * *');
     });
@@ -55,7 +55,7 @@ describe('config', () => {
     it('should enable job by default', async () => {
       process.env['NODE_ENV'] = 'development';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.jobs.tokenCleanup.enabled).toBe(true);
     });
@@ -63,7 +63,7 @@ describe('config', () => {
     it('should use default log level', async () => {
       process.env['NODE_ENV'] = 'development';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.logLevel).toBe('info');
     });
@@ -73,7 +73,7 @@ describe('config', () => {
     it('should throw error if DATABASE_URL is missing in production', async () => {
       process.env['NODE_ENV'] = 'production';
 
-      await expect(import('@/config/index.js')).rejects.toThrow(
+      await expect(import('@/config')).rejects.toThrow(
         'DATABASE_URL is required in production'
       );
     });
@@ -83,7 +83,7 @@ describe('config', () => {
       process.env['DATABASE_URL'] = 'libsql://prod.db';
       process.env['DATABASE_KEY'] = 'a'.repeat(32);
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.databaseUrl).toBe('libsql://prod.db');
     });
@@ -94,7 +94,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       process.env['JOB_TOKEN_CLEANUP_ENABLED'] = 'true';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.jobs.tokenCleanup.enabled).toBe(true);
     });
@@ -103,7 +103,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       process.env['JOB_TOKEN_CLEANUP_ENABLED'] = 'false';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.jobs.tokenCleanup.enabled).toBe(false);
     });
@@ -112,7 +112,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       process.env['JOB_TOKEN_CLEANUP_ENABLED'] = '1';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.jobs.tokenCleanup.enabled).toBe(true);
     });
@@ -123,7 +123,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       process.env['JOB_TOKEN_CLEANUP_SCHEDULE'] = '*/30 * * * *';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.jobs.tokenCleanup.schedule).toBe('*/30 * * * *');
     });
@@ -134,7 +134,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       process.env['LOG_LEVEL'] = 'debug';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.logLevel).toBe('debug');
     });
@@ -143,7 +143,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       process.env['LOG_LEVEL'] = 'invalid-level';
 
-      await expect(import('@/config/index.js')).rejects.toThrow(
+      await expect(import('@/config')).rejects.toThrow(
         'Configuration validation failed'
       );
     });
@@ -154,7 +154,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      await import('@/config/index.js');
+      await import('@/config');
 
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('DATABASE_KEY not set')
@@ -166,7 +166,7 @@ describe('config', () => {
       process.env['DATABASE_KEY'] = 'a'.repeat(32);
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      await import('@/config/index.js');
+      await import('@/config');
 
       expect(warnSpy).not.toHaveBeenCalled();
     });
@@ -175,7 +175,7 @@ describe('config', () => {
       process.env['NODE_ENV'] = 'development';
       process.env['DATABASE_KEY'] = 'tooshort';
 
-      await expect(import('@/config/index.js')).rejects.toThrow(
+      await expect(import('@/config')).rejects.toThrow(
         'Configuration validation failed'
       );
     });
@@ -185,7 +185,7 @@ describe('config', () => {
     it('should accept development environment', async () => {
       process.env['NODE_ENV'] = 'development';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.nodeEnv).toBe('development');
     });
@@ -193,7 +193,7 @@ describe('config', () => {
     it('should accept test environment', async () => {
       process.env['NODE_ENV'] = 'test';
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.nodeEnv).toBe('test');
     });
@@ -203,7 +203,7 @@ describe('config', () => {
       process.env['DATABASE_URL'] = 'libsql://prod.db';
       process.env['DATABASE_KEY'] = 'a'.repeat(32);
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.nodeEnv).toBe('production');
     });
@@ -211,7 +211,7 @@ describe('config', () => {
     it('should default to development when NODE_ENV is not set', async () => {
       delete process.env['NODE_ENV'];
 
-      const { config } = await import('@/config/index.js');
+      const { config } = await import('@/config');
 
       expect(config.nodeEnv).toBe('development');
     });

@@ -20,7 +20,7 @@ import {
   type BackgroundRefreshCallbacks,
   type BackgroundRefreshManagerConfig,
   type BackgroundTask,
-} from '@/utils/background-refresh-manager.js';
+} from '@/utils';
 
 describe('BackgroundRefreshManager', () => {
   let mockCallbacks: BackgroundRefreshCallbacks<string>;
@@ -222,9 +222,7 @@ describe('BackgroundRefreshManager', () => {
       expect(manager.getQueueLength()).toBe(1);
 
       // Complete first task
-      const firstResolver = resolvers[0];
-      if (!firstResolver) throw new Error('Expected resolver to be defined');
-      firstResolver();
+      resolvers[0]();
       await vi.runAllTimersAsync();
 
       // Task 3 should now be active
@@ -255,11 +253,8 @@ describe('BackgroundRefreshManager', () => {
       expect(manager.getQueueLength()).toBe(2);
 
       // Complete two tasks simultaneously
-      const resolver0 = resolvers[0];
-      const resolver1 = resolvers[1];
-      if (!resolver0 || !resolver1) throw new Error('Expected resolvers to be defined');
-      resolver0();
-      resolver1();
+      resolvers[0]();
+      resolvers[1]();
       await vi.runAllTimersAsync();
 
       // Both queued tasks should have started
@@ -418,9 +413,7 @@ describe('BackgroundRefreshManager', () => {
       const onTimeoutCallback = mockCallbacks.onTimeout;
       if (!onTimeoutCallback) throw new Error('Expected onTimeout to be defined');
       const onTimeoutMock = vi.mocked(onTimeoutCallback);
-      const onTimeoutCall = onTimeoutMock.mock.calls[0];
-      if (!onTimeoutCall) throw new Error('Expected onTimeout to have been called');
-      const durationMs = onTimeoutCall[1];
+      const durationMs = onTimeoutMock.mock.calls[0][1];
       expect(durationMs).toBeGreaterThan(3000);
     });
 

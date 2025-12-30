@@ -14,8 +14,8 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { config } from '@/config/index.js';
-import { verifyAccessToken, type AccessTokenPayload, type JwtConfig } from '@/utils/jwt.js';
+import { config } from '@/config';
+import { verifyAccessToken, type AccessTokenPayload, type JwtConfig } from '@/utils';
 
 /**
  * Extended Express Request with authenticated user payload

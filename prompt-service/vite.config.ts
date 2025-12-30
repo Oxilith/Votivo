@@ -8,8 +8,7 @@ export default defineConfig({
   base: '/admin/',
   build: {
     // Output to where compiled index.js expects it: path.join(__dirname, 'admin')
-    // In production: __dirname = /app/dist/prompt-service/src, so admin path = /app/dist/prompt-service/src/admin
-    outDir: '../../dist/prompt-service/src/admin',
+    outDir: '../../dist/src/admin',
     emptyOutDir: true,
   },
   resolve: {

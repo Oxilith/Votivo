@@ -10,7 +10,7 @@
  */
 
 import { Router } from 'express';
-import claudeRoutes from './claude.routes.js';
+import claudeRoutes from './claude.routes';
 
 const router = Router();
 

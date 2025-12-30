@@ -12,7 +12,7 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { abTestController } from '@/controllers/ab-test.controller.js';
+import { abTestController } from '@/controllers';
 
 const router = Router();
 

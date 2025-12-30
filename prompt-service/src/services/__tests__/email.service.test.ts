@@ -36,7 +36,7 @@ import {
   type SmtpConfig,
   type PasswordResetEmailInput,
   type EmailVerificationInput,
-} from '@/services/email.service.js';
+} from '@/services';
 
 describe('EmailService', () => {
   const validSmtpConfig: SmtpConfig = {

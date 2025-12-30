@@ -17,7 +17,7 @@ import {
   verifyAccessToken,
   verifyRefreshToken,
   type JwtConfig,
-} from '@/utils/jwt.js';
+} from '@/utils';
 
 describe('JWT Utilities', () => {
   const testConfig: JwtConfig = {

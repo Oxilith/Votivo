@@ -1,3 +1,29 @@
+## [1.1.0] - 2025-12-30
+
+### Added
+- Standardized barrel exports (`index.ts`) across all packages for cleaner imports
+- npm workspaces for unified dependency management and module resolution
+- tsup bundler for server packages (shared, backend, worker, prompt-service)
+- Build verification script to validate workspace symlinks and dist structure
+
+### Changed
+- Migrated from `*.js` extension imports to extensionless `@/*` path aliases
+- Switched moduleResolution from NodeNext to Bundler across all packages
+- Build tooling unified: tsup for server packages, Vite for frontend apps
+- Dockerfiles simplified from tarball pattern to npm workspaces (~40% fewer lines)
+- tsconfigs made standalone for better Docker build compatibility
+- All internal imports now use `@/` prefix for consistency
+
+### Removed
+- tsc-alias dependency (no longer needed with tsup)
+- Manual tarball packaging in Docker builds
+- Redundant tsconfig.base.json extends pattern in Docker context
+
+### Developer Experience
+- Cleaner imports: `import { config } from '@/config'` instead of `import { config } from '../config/index.js'`
+- Faster builds with tsup's esbuild-powered bundling
+- Simplified Docker builds with consistent module resolution in dev and production
+
 ## [1.0.7] - 2025-12-29
 
 ### Added

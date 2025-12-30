@@ -15,8 +15,8 @@
 
 import cron from 'node-cron';
 import { generateTraceId, generateSpanId } from 'shared/index';
-import type { Job } from '@/jobs/index.js';
-import { logger } from '@/utils/logger.js';
+import type { Job } from '@/jobs';
+import { logger } from '@/utils';
 
 /**
  * Scheduler class for managing background jobs

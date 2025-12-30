@@ -18,10 +18,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { NotFoundError, ValidationError, ConflictError, isAppError } from '@/errors/index.js';
-import { PromptResolverService } from '@/services/prompt-resolver.service.js';
-import { promptService } from '@/services/prompt.service.js';
-import { abTestService, type ABTestWithVariants } from '@/services/ab-test.service.js';
+import { NotFoundError, ValidationError, ConflictError, isAppError } from '@/errors';
+import { PromptResolverService, promptService, abTestService, type ABTestWithVariants } from '@/services';
 import type { Prompt, PromptVariant, ABVariant, ABVariantConfig } from '@prisma/client';
 
 describe('Error Types', () => {

@@ -11,8 +11,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { formatResponsesForPrompt } from '../responseFormatter.js';
-import type { AssessmentResponses } from '../assessment.types.js';
+import { formatResponsesForPrompt } from '../responseFormatter';
+import type { AssessmentResponses } from '../assessment.types';
 
 // Complete mock assessment responses
 const mockResponses: AssessmentResponses = {

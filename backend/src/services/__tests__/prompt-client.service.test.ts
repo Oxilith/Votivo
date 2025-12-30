@@ -17,8 +17,7 @@
 /* eslint-disable @typescript-eslint/unbound-method -- vitest mocks are safe to use unbound */
 
 import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
-import { PromptClientService, PromptServiceUnavailableError } from '@/services/prompt-client.service.js';
-import { promptCacheService } from '@/services/prompt-cache.service.js';
+import { PromptClientService, PromptServiceUnavailableError, promptCacheService } from '@/services';
 import type { PromptConfig } from 'shared';
 
 // Cast to mocked type for type safety
@@ -28,7 +27,7 @@ const mockCacheService = vi.mocked(promptCacheService);
 const mockScheduledTasks: Array<{ key: string; thinkingEnabled: boolean }> = [];
 
 // Mock BackgroundRefreshManager to isolate tests from async background operations
-vi.mock('@/utils/background-refresh-manager.js', () => ({
+vi.mock('@/utils/background-refresh-manager', () => ({
   BackgroundRefreshManager: class MockBackgroundRefreshManager {
     schedule = vi.fn((task: { id: { key: string; thinkingEnabled: boolean } }) => {
       // Track scheduled tasks for test assertions
@@ -42,7 +41,7 @@ vi.mock('@/utils/background-refresh-manager.js', () => ({
 }));
 
 // Mock dependencies
-vi.mock('@/config/index.js', () => ({
+vi.mock('@/config', () => ({
   config: {
     promptServiceUrl: 'http://localhost:3002',
     circuitBreakerTimeout: 5000,
@@ -53,7 +52,7 @@ vi.mock('@/config/index.js', () => ({
   },
 }));
 
-vi.mock('@/utils/logger.js', () => ({
+vi.mock('@/utils/logger', () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -63,7 +62,7 @@ vi.mock('@/utils/logger.js', () => ({
 }));
 
 // Mock prompt cache service - defined at module level with proper hoisting
-vi.mock('@/services/prompt-cache.service.js', () => ({
+vi.mock('@/services/prompt-cache.service', () => ({
   promptCacheService: {
     get: vi.fn(),
     set: vi.fn(),
@@ -77,7 +76,7 @@ vi.mock('@/services/prompt-cache.service.js', () => ({
 }));
 
 // Mock circuit breaker service
-vi.mock('@/services/circuit-breaker.service.js', () => ({
+vi.mock('@/services/circuit-breaker.service', () => ({
   createCircuitBreaker: vi.fn((_name: string, fn: (...args: unknown[]) => unknown) => {
     const breaker = {
       fire: vi.fn((...args: unknown[]) => fn(...args)),

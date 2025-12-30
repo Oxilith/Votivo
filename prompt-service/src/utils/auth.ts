@@ -10,7 +10,7 @@
  * - @/config for configuration access
  */
 
-import { config } from '@/config/index.js';
+import { config } from '@/config';
 
 /**
  * Result of auth configuration validation

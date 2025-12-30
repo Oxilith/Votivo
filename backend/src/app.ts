@@ -27,15 +27,15 @@ import {
   errorHandler,
   notFoundHandler,
   tracingMiddleware,
-} from './middleware/index.js';
-import routes from './routes/index.js';
-import { logger } from './utils/logger.js';
+} from '@/middleware';
+import routes from '@/routes';
+import { logger } from '@/utils';
 import {
   healthService,
   createAnthropicCheck,
   createPromptServiceCheck,
   createPromptCacheCheck,
-} from './health/index.js';
+} from '@/health';
 
 // Register health checks
 healthService.register(createAnthropicCheck());
@@ -58,7 +58,6 @@ app.use(tracingMiddleware);
 
 // Request logging with trace context
 app.use(
-  // @ts-expect-error - pino-http types have ESM interop issues
   pinoHttp({
     logger,
     autoLogging: {

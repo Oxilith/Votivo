@@ -16,7 +16,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
 
 // Mock the config module before importing the middleware
-vi.mock('@/config/index.js', () => ({
+vi.mock('@/config', () => ({
   config: {
     adminApiKey: '',
     nodeEnv: 'development',
@@ -24,8 +24,8 @@ vi.mock('@/config/index.js', () => ({
   },
 }));
 
-import { adminAuthMiddleware } from '../admin-auth.middleware.js';
-import { config } from '@/config/index.js';
+import { adminAuthMiddleware } from '@/middleware';
+import { config } from '@/config';
 
 // Helper to create mock request
 function createMockRequest(overrides: Partial<Request> = {}): Request {

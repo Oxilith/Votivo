@@ -21,10 +21,10 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { userAuthController } from '@/controllers/user-auth.controller.js';
-import { jwtAuthMiddleware } from '@/middleware/jwt-auth.middleware.js';
-import { csrfMiddleware } from '@/middleware/csrf.middleware.js';
+import { userAuthController } from '@/controllers';
 import {
+  jwtAuthMiddleware,
+  csrfMiddleware,
   loginLimiter,
   registerLimiter,
   passwordResetLimiter,
@@ -32,7 +32,7 @@ import {
   tokenRefreshLimiter,
   userDataLimiter,
   profileLimiter,
-} from '@/middleware/rate-limit.middleware.js';
+} from '@/middleware';
 
 const router = Router();
 

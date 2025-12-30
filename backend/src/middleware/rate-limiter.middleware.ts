@@ -12,7 +12,7 @@
 
 import rateLimit from 'express-rate-limit';
 import { StatusCodes } from 'http-status-codes';
-import { config } from '../config/index.js';
+import { config } from '@/config';
 
 export const rateLimiter = rateLimit({
   windowMs: config.rateLimitWindowMs,

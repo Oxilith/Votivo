@@ -8,14 +8,14 @@
  * - Reports cleanup metrics for monitoring
  * - Uses fresh database connection per execution to avoid stale connections
  * @dependencies
- * - @/prisma/client for database access (factory function)
+ * - @/prisma for database access (factory function)
  * - @/config for job configuration
  * - @/jobs for Job interface
  */
 
-import { createFreshPrismaClient } from '@/prisma/client.js';
-import { config } from '@/config/index.js';
-import type { Job, JobResult } from '@/jobs/index.js';
+import { createFreshPrismaClient } from '@/prisma';
+import { config } from '@/config';
+import type { Job, JobResult } from '@/jobs';
 
 /**
  * Token cleanup job

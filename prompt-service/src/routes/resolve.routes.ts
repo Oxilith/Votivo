@@ -11,7 +11,7 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { resolveController } from '@/controllers/resolve.controller.js';
+import { resolveController } from '@/controllers';
 
 const router = Router();
 

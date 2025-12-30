@@ -12,8 +12,8 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
-import { config } from '@/config/index.js';
-import type { HealthCheck, ComponentHealth } from '../types.js';
+import { config } from '@/config';
+import type { HealthCheck, ComponentHealth } from '@/health';
 
 const HEALTH_CHECK_MODEL = 'claude-sonnet-4-20250514';
 

@@ -14,10 +14,10 @@
  * - shared/prompt.types for PromptConfig type
  */
 
-import { prisma } from '@/prisma/client.js';
+import { prisma } from '@/prisma';
 import type { Prompt, PromptVariant, PromptVersion } from '@prisma/client';
-import { NotFoundError } from '@/errors/index.js';
-import { validatePromptContent, validatePromptKey } from '@/utils/sanitize.js';
+import { NotFoundError } from '@/errors';
+import { validatePromptContent, validatePromptKey } from '@/utils';
 
 export interface PromptWithVariants extends Prompt {
   variants: PromptVariant[];

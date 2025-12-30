@@ -13,7 +13,7 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { healthService, type HealthCheckResult } from '../health/index.js';
+import { healthService, type HealthCheckResult } from '@/health';
 
 interface LivenessResponse {
   status: 'healthy';

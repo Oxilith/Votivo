@@ -21,30 +21,29 @@
  * - shared/auth.types for Gender type
  */
 
-import { prisma } from '@/prisma/client.js';
+import { prisma } from '@/prisma';
 import type { User } from '@prisma/client';
-import { config } from '@/config/index.js';
-import { logger } from '@/index.js';
+import { config } from '@/config';
 import {
   NotFoundError,
   ConflictError,
   AuthenticationError,
   TokenError,
   ValidationError,
-} from '@/errors/index.js';
-import { hashPassword, comparePassword } from '@/utils/password.js';
+} from '@/errors';
 import {
+  hashPassword,
+  comparePassword,
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-  type JwtConfig,
-} from '@/utils/jwt.js';
-import {
   generateTokenId,
   generatePasswordResetToken,
   generateEmailVerificationToken,
-} from '@/utils/token.js';
-import { emailService } from '@/services/email.service.js';
+  logger,
+  type JwtConfig,
+} from '@/utils';
+import { emailService } from '@/services/email.service';
 import type { Gender } from 'shared';
 
 // Re-export Gender for backward compatibility

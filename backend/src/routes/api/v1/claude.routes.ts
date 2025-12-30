@@ -11,8 +11,8 @@
  */
 
 import { Router } from 'express';
-import { analyze } from '@/controllers/claude.controller.js';
-import { claudeRateLimiter } from '@/middleware/index.js';
+import { analyze } from '@/controllers';
+import { claudeRateLimiter } from '@/middleware';
 
 const router = Router();
 

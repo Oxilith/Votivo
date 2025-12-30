@@ -18,9 +18,9 @@ export type {
   ComponentHealth,
   HealthCheckResult,
   HealthCheck,
-} from './types.js';
+} from './types';
 
-export { HealthService, healthService } from './health-service.js';
-export { createAnthropicCheck } from './checks/anthropic.check.js';
-export { createPromptServiceCheck } from './checks/prompt-service.check.js';
-export { createPromptCacheCheck } from './checks/prompt-cache.check.js';
+export { HealthService, healthService } from './health-service';
+export { createAnthropicCheck } from './checks/anthropic.check';
+export { createPromptServiceCheck } from './checks/prompt-service.check';
+export { createPromptCacheCheck } from './checks/prompt-cache.check';

@@ -30,12 +30,12 @@ const mockPrisma = vi.hoisted(() => ({
   $disconnect: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@/prisma/client.js', () => ({
+vi.mock('@/prisma', () => ({
   createFreshPrismaClient: () => mockPrisma,
 }));
 
 // Mock config with hoisting
-vi.mock('@/config/index.js', () => ({
+vi.mock('@/config', () => ({
   config: {
     jobs: {
       tokenCleanup: {
@@ -46,7 +46,7 @@ vi.mock('@/config/index.js', () => ({
   },
 }));
 
-import { tokenCleanupJob } from '@/jobs/token-cleanup.job.js';
+import { tokenCleanupJob } from '@/jobs';
 
 describe('tokenCleanupJob', () => {
   beforeEach(() => {

@@ -8,7 +8,7 @@
  * - All middleware modules in this directory
  */
 
-export { corsMiddleware } from './cors.middleware.js';
-export { rateLimiter, claudeRateLimiter } from './rate-limiter.middleware.js';
-export { errorHandler, notFoundHandler, createAppError, type AppError } from './error.middleware.js';
-export { tracingMiddleware } from './tracing.middleware.js';
+export { corsMiddleware } from './cors.middleware';
+export { rateLimiter, claudeRateLimiter } from './rate-limiter.middleware';
+export { errorHandler, notFoundHandler, createAppError, type AppError } from './error.middleware';
+export { tracingMiddleware } from './tracing.middleware';

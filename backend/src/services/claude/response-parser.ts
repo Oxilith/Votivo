@@ -11,8 +11,8 @@
  */
 
 import type Anthropic from '@anthropic-ai/sdk';
-import { parseAiJsonResponse, type JsonParseResult } from '@/utils/json-validator.js';
-import type { AIAnalysisResult } from '@/types/claude.types.js';
+import { parseAiJsonResponse, type JsonParseResult } from '@/utils';
+import type { AIAnalysisResult } from '@/types';
 
 /**
  * Extracts text content from Claude message

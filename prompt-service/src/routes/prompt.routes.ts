@@ -11,7 +11,7 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { promptController } from '@/controllers/prompt.controller.js';
+import { promptController } from '@/controllers';
 
 const router = Router();
 

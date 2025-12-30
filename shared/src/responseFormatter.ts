@@ -12,9 +12,9 @@
  * - ./labels for label mappings
  */
 
-import type { AssessmentResponses } from './assessment.types.js';
-import type { AnalysisLanguage } from './api.types.js';
-import { valueLabels, timeLabels, triggerLabels, willpowerLabels } from './labels.js';
+import type { AssessmentResponses } from './assessment.types';
+import type { AnalysisLanguage } from './api.types';
+import { valueLabels, timeLabels, triggerLabels, willpowerLabels } from './labels';
 
 /**
  * Formats assessment responses into a structured markdown string for AI analysis

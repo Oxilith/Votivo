@@ -1,77 +1,57 @@
 # Worker Dockerfile
-# Background job worker for Votive
-
-# Stage 1: Build
 FROM node:22-alpine AS builder
 
-# Install OpenSSL for Prisma
 RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Copy root package files for workspace resolution
+# Copy workspace config
 COPY package.json package-lock.json ./
-
-# Copy all workspace package.json files
+COPY tsconfig.base.json ./
 COPY shared/package.json shared/
 COPY worker/package.json worker/
 
-# Install all workspaces
+# Install all dependencies
 RUN npm ci --workspaces --include-workspace-root
 
-# Copy shared source and build it first
+# Build shared
 COPY shared/src shared/src
 COPY shared/tsconfig.json shared/
+COPY shared/tsup.config.ts shared/
+RUN npm run build -w shared
 
-WORKDIR /app/shared
-RUN npm run build
+# Build worker
+COPY worker/src worker/src
+COPY worker/prisma worker/prisma
+COPY worker/tsconfig.json worker/
+COPY worker/tsup.config.ts worker/
+RUN npm run db:generate -w worker
+RUN npm run build -w worker
 
-# Copy worker source, prisma schema, and build
-WORKDIR /app/worker
-COPY worker/prisma ./prisma/
-COPY worker/src ./src
-COPY worker/tsconfig.json ./
+# Production
+FROM node:22-alpine
 
-# Generate Prisma client
-RUN npx prisma generate
-
-# Build TypeScript
-RUN npm run build
-
-# Stage 2: Production
-FROM node:22-alpine AS runner
-
-# Install OpenSSL for Prisma runtime
 RUN apk add --no-cache openssl
 
 WORKDIR /app
-
 ENV NODE_ENV=production
 
-# Copy root package files
 COPY package.json package-lock.json ./
 COPY shared/package.json shared/
 COPY worker/package.json worker/
 
-# Install production dependencies only
 RUN npm ci --workspaces --include-workspace-root --omit=dev
 
-# Copy built shared package
 COPY --from=builder /app/shared/dist shared/dist
-
-# Copy built worker and prisma
 COPY --from=builder /app/worker/dist worker/dist
 COPY --from=builder /app/worker/prisma worker/prisma
-COPY --from=builder /app/worker/node_modules/.prisma worker/node_modules/.prisma
+COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
 
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 appuser && \
+    chown -R appuser:nodejs /app
+
+USER appuser
 WORKDIR /app/worker
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 workerjs && \
-    chown -R workerjs:nodejs /app
-
-USER workerjs
-
-# Start the worker
 CMD ["node", "dist/index.js"]

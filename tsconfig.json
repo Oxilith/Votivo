@@ -4,7 +4,6 @@
     { "path": "./shared" },
     { "path": "./backend" },
     { "path": "./prompt-service" },
-    { "path": "./worker" },
-    { "path": "./app" }
+    { "path": "./worker" }
   ]
 }

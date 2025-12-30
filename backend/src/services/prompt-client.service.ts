@@ -20,16 +20,16 @@
  */
 
 import type CircuitBreaker from 'opossum';
-import { config } from '@/config/index.js';
-import { logger } from '@/utils/logger.js';
-import { createClientError } from '@/utils/error-sanitizer.js';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { createCircuitBreaker } from '@/services/circuit-breaker.service.js';
-import { promptCacheService } from '@/services/prompt-cache.service.js';
+import { config } from '@/config';
 import {
+  logger,
+  createClientError,
+  fetchWithTimeout,
   BackgroundRefreshManager,
   type BackgroundTask,
-} from '@/utils/background-refresh-manager.js';
+} from '@/utils';
+import { createCircuitBreaker } from './circuit-breaker.service';
+import { promptCacheService } from './prompt-cache.service';
 import type { PromptConfig } from 'shared';
 
 const REQUEST_TIMEOUT_MS = 5000;

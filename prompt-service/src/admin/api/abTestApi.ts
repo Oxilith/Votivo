@@ -23,8 +23,8 @@ import type {
   CreateABVariantInput,
   UpdateABVariantInput,
   ApiError,
-} from '../types.js';
-import { getAuthHeaders, getAuthHeadersNoContent, handleUnauthorized } from './auth.js';
+} from '../types';
+import { getAuthHeaders, getAuthHeadersNoContent, handleUnauthorized } from './auth';
 
 const API_BASE = '/api/ab-tests';
 

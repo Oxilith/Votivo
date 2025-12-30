@@ -11,8 +11,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { ValidationError } from '@/errors/index.js';
-import { validatePromptContent, validatePromptKey } from '@/utils/sanitize.js';
+import { ValidationError } from '@/errors';
+import { validatePromptContent, validatePromptKey } from '@/utils';
 
 describe('Prompt Validation', () => {
   describe('validatePromptKey', () => {

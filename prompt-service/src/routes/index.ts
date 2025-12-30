@@ -22,12 +22,12 @@
 
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { authRoutes } from '@/routes/auth.routes.js';
-import { promptRoutes } from '@/routes/prompt.routes.js';
-import { abTestRoutes } from '@/routes/ab-test.routes.js';
-import { resolveRoutes } from '@/routes/resolve.routes.js';
-import { userAuthRoutes } from '@/routes/user-auth.routes.js';
-import { adminAuthMiddleware } from '@/middleware/admin-auth.middleware.js';
+import { authRoutes } from '@/routes/auth.routes';
+import { promptRoutes } from '@/routes/prompt.routes';
+import { abTestRoutes } from '@/routes/ab-test.routes';
+import { resolveRoutes } from '@/routes/resolve.routes';
+import { userAuthRoutes } from '@/routes/user-auth.routes';
+import { adminAuthMiddleware } from '@/middleware';
 
 const router = Router();
 

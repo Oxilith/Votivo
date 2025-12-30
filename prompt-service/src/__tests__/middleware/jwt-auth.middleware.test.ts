@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
 
 // Mock config before importing middleware
-vi.mock('@/config/index.js', () => ({
+vi.mock('@/config', () => ({
   config: {
     jwtAccessSecret: 'test-access-secret-1234567890abcdef',
     jwtRefreshSecret: 'test-refresh-secret-0987654321fedcba',
@@ -28,8 +28,8 @@ import {
   jwtAuthMiddleware,
   optionalJwtAuthMiddleware,
   type AuthenticatedRequest,
-} from '@/middleware/jwt-auth.middleware.js';
-import { generateAccessToken, type JwtConfig } from '@/utils/jwt.js';
+} from '@/middleware';
+import { generateAccessToken, type JwtConfig } from '@/utils';
 
 describe('JWT Auth Middleware', () => {
   let mockRequest: Partial<Request>;

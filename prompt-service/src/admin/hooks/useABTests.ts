@@ -12,8 +12,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { abTestApi } from '../api/abTestApi.js';
-import type { ABTestDTO } from '../types.js';
+import { abTestApi } from '../api/abTestApi';
+import type { ABTestDTO } from '../types';
 
 interface UseABTestsResult {
   abTests: ABTestDTO[];

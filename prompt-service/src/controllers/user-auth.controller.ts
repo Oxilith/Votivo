@@ -22,16 +22,8 @@
  */
 
 import type { Request, Response } from 'express';
-import { logger } from '@/index.js';
-
-/**
- * Type for request cookies containing refresh token
- */
-interface AuthCookies {
-  refreshToken?: string;
-}
 import { StatusCodes } from 'http-status-codes';
-import { userService } from '@/services/user.service.js';
+import { userService } from '@/services';
 import {
   registerSchema,
   loginSchema,
@@ -40,14 +32,21 @@ import {
   emailVerifyTokenParamSchema,
   profileUpdateSchema,
   passwordChangeSchema,
-} from '@/validators/auth.validator.js';
+} from '@/validators';
 import {
   isAppError,
   AuthenticationError,
   TokenError,
-} from '@/errors/index.js';
-import type { AuthenticatedRequest } from '@/middleware/jwt-auth.middleware.js';
-import { setCsrfToken, clearCsrfToken } from '@/middleware/csrf.middleware.js';
+} from '@/errors';
+import { type AuthenticatedRequest, setCsrfToken, clearCsrfToken } from '@/middleware';
+import { logger } from '@/utils';
+
+/**
+ * Type for request cookies containing refresh token
+ */
+interface AuthCookies {
+  refreshToken?: string;
+}
 
 /**
  * Cookie name for refresh token

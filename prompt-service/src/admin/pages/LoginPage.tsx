@@ -14,7 +14,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../api/auth.js';
+import { login } from '../api/auth';
 
 export function LoginPage() {
   const [apiKey, setApiKey] = useState('');

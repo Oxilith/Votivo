@@ -14,15 +14,15 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { promptService } from '@/services/prompt.service.js';
+import { promptService } from '@/services';
 import {
   createPromptSchema,
   updatePromptSchema,
   promptIdParamSchema,
   promptKeyParamSchema,
   versionIdParamSchema,
-} from '@/validators/prompt.validator.js';
-import { isAppError } from '@/errors/index.js';
+} from '@/validators';
+import { isAppError } from '@/errors';
 
 export class PromptController {
   /**

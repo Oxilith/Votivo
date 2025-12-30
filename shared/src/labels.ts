@@ -10,7 +10,7 @@
  * - ./assessment.types for type definitions
  */
 
-import type { TimeOfDay, MoodTrigger, CoreValue, WillpowerPattern } from './assessment.types.js';
+import type { TimeOfDay, MoodTrigger, CoreValue, WillpowerPattern } from './assessment.types';
 
 export const timeLabels: Record<TimeOfDay, string> = {
   early_morning: 'Early morning (5-8am)',

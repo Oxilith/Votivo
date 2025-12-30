@@ -14,8 +14,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { usePrompts } from '../hooks/usePrompts.js';
-import type { PromptDTO } from '../types.js';
+import { usePrompts } from '../hooks/usePrompts';
+import type { PromptDTO } from '../types';
 
 export function PromptListPage() {
   const { prompts, loading, error, refetch } = usePrompts();

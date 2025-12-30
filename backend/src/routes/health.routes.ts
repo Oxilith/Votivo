@@ -10,7 +10,7 @@
  */
 
 import { Router } from 'express';
-import { liveness, readiness } from '@/controllers/health.controller.js';
+import { liveness, readiness } from '@/controllers';
 
 const router = Router();
 

@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+import { fetchWithTimeout } from '@/utils';
 
 // Store original fetch
 const originalFetch = globalThis.fetch;

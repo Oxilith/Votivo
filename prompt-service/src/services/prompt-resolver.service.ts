@@ -13,11 +13,10 @@
  * - shared/prompt.types for PromptConfig type
  */
 
-import { promptService } from '@/services/prompt.service.js';
-import { abTestService, type ABTestWithVariants } from '@/services/ab-test.service.js';
+import { promptService, abTestService, type ABTestWithVariants } from '@/services';
 import { ClaudeModel, type PromptConfig, type ClaudeModel as ClaudeModelType } from 'shared';
 import type { ABVariantConfig } from '@prisma/client';
-import { NotFoundError, ValidationError } from '@/errors/index.js';
+import { NotFoundError, ValidationError } from '@/errors';
 
 /**
  * Valid ClaudeModel values for runtime validation

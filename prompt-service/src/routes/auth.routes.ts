@@ -15,11 +15,9 @@
  */
 
 import { Router, type Request, type Response } from 'express';
-import { config } from '@/config/index.js';
-import { AUTH_CONSTANTS } from '@/constants/auth.js';
-import { timingSafeCompare } from '@/utils/crypto.js';
-import { validateAuthConfig } from '@/utils/auth.js';
-import { logger } from '@/index.js';
+import { config } from '@/config';
+import { AUTH_CONSTANTS } from '@/constants';
+import { timingSafeCompare, validateAuthConfig, logger } from '@/utils';
 
 const router = Router();
 

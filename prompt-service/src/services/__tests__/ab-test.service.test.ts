@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { ABTestService } from '../ab-test.service.js';
+import { ABTestService } from '@/services';
 import type { ABVariant, ABVariantConfig } from '@prisma/client';
 
 // Create a test instance without database dependency

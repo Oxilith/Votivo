@@ -15,8 +15,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
-import { csrfMiddleware, setCsrfToken, clearCsrfToken } from '@/middleware/csrf.middleware.js';
-import { CSRF_COOKIE, CSRF_HEADER, generateCsrfToken } from '@/utils/csrf.js';
+import { csrfMiddleware, setCsrfToken, clearCsrfToken } from '@/middleware';
+import { CSRF_COOKIE, CSRF_HEADER, generateCsrfToken } from '@/utils';
 
 describe('CSRF Middleware', () => {
   let mockReq: Partial<Request>;

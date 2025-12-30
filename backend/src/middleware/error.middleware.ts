@@ -16,9 +16,9 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { StatusCodes, getReasonPhrase } from 'http-status-codes';
-import { logger } from '../utils/logger.js';
-import { config } from '../config/index.js';
-import { PromptServiceUnavailableError } from '@/services/prompt-client.service.js';
+import { logger } from '@/utils';
+import { config } from '@/config';
+import { PromptServiceUnavailableError } from '@/services';
 
 export interface AppError extends Error {
   statusCode?: number;

@@ -77,7 +77,7 @@ describe('config validation', () => {
 
       // Act & Assert
       await expect(async () => {
-        await import('../index.js');
+        await import('..');
       }).rejects.toThrow('Cookie signing secret is required');
     });
 
@@ -86,7 +86,7 @@ describe('config validation', () => {
 
       // Act & Assert
       await expect(async () => {
-        await import('../index.js');
+        await import('..');
       }).rejects.toThrow(/SESSION_SECRET.*ADMIN_API_KEY/s);
     });
 
@@ -95,7 +95,7 @@ describe('config validation', () => {
 
       // Act & Assert
       await expect(async () => {
-        await import('../index.js');
+        await import('..');
       }).rejects.toThrow('Example:');
     });
 
@@ -107,7 +107,7 @@ describe('config validation', () => {
       process.env['DATABASE_KEY'] = 'test-database-key-at-least-32-characters';
 
       // Act
-      const { config } = await import('../index.js');
+      const { config } = await import('..');
 
       // Assert
       expect(config).toBeDefined();
@@ -122,7 +122,7 @@ describe('config validation', () => {
       process.env['DATABASE_KEY'] = 'test-database-key-at-least-32-characters';
 
       // Act
-      const { config } = await import('../index.js');
+      const { config } = await import('..');
 
       // Assert
       expect(config).toBeDefined();
@@ -139,7 +139,7 @@ describe('config validation', () => {
       process.env['DATABASE_KEY'] = 'test-database-key-at-least-32-characters';
 
       // Act
-      const { config } = await import('../index.js');
+      const { config } = await import('..');
 
       // Assert
       expect(config.sessionSecret).toBe('primary-session-secret-at-least-32-characters');
@@ -154,7 +154,7 @@ describe('config validation', () => {
       process.env['DATABASE_KEY'] = 'test-database-key-at-least-32-characters';
 
       // Act
-      await import('../index.js');
+      await import('..');
 
       // Assert
       expect(warnSpy).toHaveBeenCalledWith(
@@ -172,7 +172,7 @@ describe('config validation', () => {
 
       // Act & Assert
       await expect(async () => {
-        await import('../index.js');
+        await import('..');
       }).rejects.toThrow(/at least 32 character/i);
     });
   });
@@ -199,7 +199,7 @@ describe('config validation', () => {
 
       // Act & Assert
       await expect(async () => {
-        await import('../index.js');
+        await import('..');
       }).rejects.toThrow('SESSION_SECRET is required in production');
     });
 
@@ -211,7 +211,7 @@ describe('config validation', () => {
 
       // Act & Assert
       await expect(async () => {
-        await import('../index.js');
+        await import('..');
       }).rejects.toThrow(/security risk/i);
     });
 
@@ -223,7 +223,7 @@ describe('config validation', () => {
       process.env['DATABASE_KEY'] = 'production-database-key-at-least-32-chars';
 
       // Act
-      const { config } = await import('../index.js');
+      const { config } = await import('..');
 
       // Assert
       expect(config).toBeDefined();

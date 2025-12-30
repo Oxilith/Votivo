@@ -12,7 +12,7 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { CSRF_COOKIE, CSRF_HEADER, generateCsrfToken, validateCsrfToken } from '@/utils/csrf.js';
+import { CSRF_COOKIE, CSRF_HEADER, generateCsrfToken, validateCsrfToken } from '@/utils';
 
 /**
  * CSRF cookie options

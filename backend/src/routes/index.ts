@@ -11,8 +11,8 @@
  */
 
 import { Router } from 'express';
-import v1Routes from './api/v1/index.js';
-import healthRoutes from './health.routes.js';
+import v1Routes from '@/routes/api/v1';
+import healthRoutes from '@/routes/health.routes';
 
 const router = Router();
 

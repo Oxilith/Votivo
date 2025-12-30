@@ -12,7 +12,7 @@
  */
 
 import CircuitBreaker from 'opossum';
-import { logger } from '@/utils/logger.js';
+import { logger } from '@/utils';
 
 // Registry to track circuit breakers for cleanup during shutdown
 const circuitBreakerRegistry = new Map<string, CircuitBreaker>();

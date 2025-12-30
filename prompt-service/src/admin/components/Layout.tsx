@@ -15,7 +15,7 @@
 
 import { NavLink } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import { logout } from '../api/auth.js';
+import { logout } from '../api/auth';
 
 interface LayoutProps {
   children: ReactNode;

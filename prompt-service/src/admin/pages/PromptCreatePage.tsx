@@ -14,9 +14,9 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { promptApi } from '../api/promptApi.js';
-import { CLAUDE_MODELS } from '../types.js';
-import type { CreatePromptInput } from '../types.js';
+import { promptApi } from '../api/promptApi';
+import { CLAUDE_MODELS } from '../types';
+import type { CreatePromptInput } from '../types';
 
 export function PromptCreatePage() {
   const navigate = useNavigate();

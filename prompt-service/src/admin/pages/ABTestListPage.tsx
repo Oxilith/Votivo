@@ -14,9 +14,9 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useABTests } from '../hooks/useABTests.js';
-import { abTestApi } from '../api/abTestApi.js';
-import type { ABTestDTO, ABVariantDTO } from '../types.js';
+import { useABTests } from '../hooks/useABTests';
+import { abTestApi } from '../api/abTestApi';
+import type { ABTestDTO, ABVariantDTO } from '../types';
 
 export function ABTestListPage() {
   const { abTests, loading, error, refetch } = useABTests();
