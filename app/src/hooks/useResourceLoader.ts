@@ -104,7 +104,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
   const loadMostRecentAssessment = useCallback(async (): Promise<string | undefined> => {
     try {
       const assessments = await authService.getAssessments();
-      if (assessments.length > 0) {
+      if (Array.isArray(assessments) && assessments.length > 0) {
         // Sort by createdAt descending and get most recent
         const sorted = [...assessments].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -129,7 +129,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
   > => {
     try {
       const analyses = await authService.getAnalyses();
-      if (analyses.length > 0) {
+      if (Array.isArray(analyses) && analyses.length > 0) {
         // Sort by createdAt descending and get most recent
         const sorted = [...analyses].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

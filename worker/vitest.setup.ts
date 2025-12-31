@@ -1,5 +1,14 @@
-// Backend test setup
-// No need to import vitest globals when globals: true in vitest.config.ts
+/**
+ * @file vitest.setup.ts
+ * @purpose Set required environment variables before test execution
+ * @functionality
+ * - Mocks dotenv to suppress promotional tips during tests
+ * - Sets NODE_ENV to test mode
+ * - Sets LOG_LEVEL to error to reduce test output noise
+ * - Clears mocks after each test
+ * @dependencies
+ * - Vitest setup mechanism
+ */
 
 // Mock dotenv to suppress promotional tips during tests
 vi.mock('dotenv', () => ({
@@ -9,10 +18,6 @@ vi.mock('dotenv', () => ({
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 process.env.LOG_LEVEL = 'error';
-process.env.JWT_SECRET = 'test-jwt-secret';
-process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret';
-process.env.ANTHROPIC_API_KEY = 'test-anthropic-api-key';
-process.env.PROMPT_SERVICE_URL = 'http://prompt-service:3002';
 
 // Reset mocks after each test
 afterEach(() => {

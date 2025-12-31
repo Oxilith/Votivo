@@ -107,6 +107,9 @@ describe('useResourceLoader', () => {
     mockAnalysis = null;
     mockCurrentView = 'assessment';
     mockResourceId = undefined;
+    // Set default return values for mocked services to avoid undefined access
+    mockGetAssessments.mockResolvedValue([]);
+    mockGetAnalyses.mockResolvedValue([]);
   });
 
   describe('auth state checks', () => {
@@ -276,8 +279,14 @@ describe('useResourceLoader', () => {
   });
 
   describe('clearError', () => {
-    it('should return clearError function', () => {
+    it('should return clearError function', async () => {
       const { result } = renderHook(() => useResourceLoader());
+
+      // Wait for hook to settle after initial effects
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
       expect(typeof result.current.clearError).toBe('function');
     });
   });
