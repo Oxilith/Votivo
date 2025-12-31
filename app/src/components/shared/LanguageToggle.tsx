@@ -17,13 +17,13 @@ const LanguageToggle: FC = () => {
   const { i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+    void i18n.changeLanguage(lng);
   };
 
   return (
     <div className="flex items-center gap-0.5 font-mono text-xs text-[var(--text-faint)]">
       <button
-        onClick={() => changeLanguage('en')}
+        onClick={() => { changeLanguage('en'); }}
         className={`px-1.5 py-1 transition-colors ${
           i18n.language === 'en'
             ? 'text-[var(--text-primary)]'
@@ -34,7 +34,7 @@ const LanguageToggle: FC = () => {
       </button>
       <span className="text-[var(--border-strong)]">|</span>
       <button
-        onClick={() => changeLanguage('pl')}
+        onClick={() => { changeLanguage('pl'); }}
         className={`px-1.5 py-1 transition-colors ${
           i18n.language === 'pl'
             ? 'text-[var(--text-primary)]'

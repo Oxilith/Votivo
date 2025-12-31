@@ -83,7 +83,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelectAsync = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -94,6 +94,10 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
     } catch (err) {
       setImportError(err instanceof Error ? err.message : t('header:errors.importFailed'));
     }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    void handleFileSelectAsync(event);
   };
 
   const handleExportClick = () => {
@@ -308,7 +312,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   };
 
   // Complete handler - saves assessment to database for authenticated users
-  const handleComplete = async () => {
+  const handleCompleteAsync = async () => {
     if (isAuthenticated && !isReadOnly) {
       setIsSaving(true);
       try {
@@ -324,6 +328,10 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
       }
     }
     onComplete(responses as AssessmentResponses);
+  };
+
+  const handleComplete = () => {
+    void handleCompleteAsync();
   };
 
   // Determine if navigation should be shown (hide only for intro steps)
@@ -345,45 +353,54 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
           />
         );
 
-      case 'multiSelect':
+      case 'multiSelect': {
+        const rawValue = responses[currentStepData.id as keyof AssessmentResponses];
+        const multiSelectValue = Array.isArray(rawValue) ? rawValue : [];
         return (
           <MultiSelectStep
             step={currentStepData}
-            value={(responses[currentStepData.id as keyof AssessmentResponses] as string[]) ?? []}
-            onChange={(value) => updateResponse(currentStepData.id, value)}
+            value={multiSelectValue}
+            onChange={(value) => { updateResponse(currentStepData.id, value); }}
             isReadOnly={isReadOnly}
           />
         );
+      }
 
       case 'singleSelect':
         return (
           <SingleSelectStep
             step={currentStepData}
             value={responses[currentStepData.id as keyof AssessmentResponses] as string | undefined}
-            onChange={(value) => updateResponse(currentStepData.id, value)}
+            onChange={(value) => { updateResponse(currentStepData.id, value); }}
             isReadOnly={isReadOnly}
           />
         );
 
-      case 'scale':
+      case 'scale': {
+        const rawScaleValue = responses[currentStepData.id as keyof AssessmentResponses];
+        const scaleValue = typeof rawScaleValue === 'number' ? rawScaleValue : 3;
         return (
           <ScaleStep
             step={currentStepData}
-            value={(responses[currentStepData.id as keyof AssessmentResponses] as number) ?? 3}
-            onChange={(value) => updateResponse(currentStepData.id, value)}
+            value={scaleValue}
+            onChange={(value) => { updateResponse(currentStepData.id, value); }}
             isReadOnly={isReadOnly}
           />
         );
+      }
 
-      case 'textarea':
+      case 'textarea': {
+        const rawTextValue = responses[currentStepData.id as keyof AssessmentResponses];
+        const textValue = typeof rawTextValue === 'string' ? rawTextValue : '';
         return (
           <TextareaStep
             step={currentStepData}
-            value={(responses[currentStepData.id as keyof AssessmentResponses] as string) ?? ''}
-            onChange={(value) => updateResponse(currentStepData.id, value)}
+            value={textValue}
+            onChange={(value) => { updateResponse(currentStepData.id, value); }}
             isReadOnly={isReadOnly}
           />
         );
+      }
 
       case 'synthesis':
         return (
@@ -416,7 +433,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
       <PageNavigation
         currentPage="assessment"
         onNavigateToLanding={onNavigateToLanding}
-        onNavigateToAssessment={() => {}} // Already on assessment
+        onNavigateToAssessment={undefined} // Already on assessment
         onNavigateToInsights={onNavigateToInsights}
         onNavigateToAuth={onNavigateToAuth}
         onImport={isReadOnly ? undefined : handleImportClick}
@@ -439,7 +456,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
           <ErrorCircleIcon size="sm" className="flex-shrink-0" />
           <span>{importError}</span>
           <button
-            onClick={() => setImportError(null)}
+            onClick={() => { setImportError(null); }}
             className="ml-auto text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
           >
             ✕

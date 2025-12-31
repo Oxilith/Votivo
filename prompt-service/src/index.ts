@@ -51,11 +51,11 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"], // Required for inline styles
+        scriptSrc: ["'self'", "'unsafe-inline'"], // Required for Vite module scripts
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         imgSrc: ["'self'", 'data:'],
         connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
         upgradeInsecureRequests: [],
@@ -152,16 +152,16 @@ if (config.nodeEnv === 'production') {
   // Protected admin UI in production with rate limiting
   app.use('/admin', adminStaticRateLimiter, adminAuthMiddleware, express.static(adminPath));
 
-  // SPA fallback for admin routes
-  app.get('/admin/*', adminStaticRateLimiter, adminAuthMiddleware, (_req, res) => {
+  // SPA fallback for admin routes (Express 5 requires named wildcard parameter)
+  app.get('/admin/*path', adminStaticRateLimiter, adminAuthMiddleware, (_req, res) => {
     res.sendFile(path.join(adminPath, 'index.html'));
   });
 } else {
   // Development mode - serve without auth for easier testing
   app.use('/admin', adminStaticRateLimiter, express.static(adminPath));
 
-  // SPA fallback for admin routes
-  app.get('/admin/*', adminStaticRateLimiter, (_req, res) => {
+  // SPA fallback for admin routes (Express 5 requires named wildcard parameter)
+  app.get('/admin/*path', adminStaticRateLimiter, (_req, res) => {
     res.sendFile(path.join(adminPath, 'index.html'));
   });
 }

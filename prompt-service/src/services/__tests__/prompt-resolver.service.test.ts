@@ -17,7 +17,6 @@
  * - abTestService from @/services/ab-test.service (mocked)
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NotFoundError, ValidationError, ConflictError, isAppError } from '@/errors';
 import { PromptResolverService, promptService, abTestService, type ABTestWithVariants } from '@/services';
 import type { Prompt, PromptVariant, ABVariant, ABVariantConfig } from '@prisma/client';

@@ -94,8 +94,11 @@ describe('Scheduler', () => {
       expect(cron.schedule).toHaveBeenCalledWith(
         '0 * * * *',
         expect.any(Function),
-        { scheduled: false }
+        { name: 'test-job' }
       );
+      // node-cron 4.x: tasks start automatically, so we stop them immediately
+      // and start them explicitly via start()
+      expect(mockTask.stop).toHaveBeenCalled();
       expect(scheduler.jobCount).toBe(1);
       expect(scheduler.jobNames).toEqual(['test-job']);
       expect(mockLoggerChild.info).toHaveBeenCalledWith(

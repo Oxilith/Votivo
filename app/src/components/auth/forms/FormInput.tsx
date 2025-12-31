@@ -74,7 +74,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           {isPasswordField && (
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => { setShowPassword(!showPassword); }}
               className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >

@@ -57,19 +57,21 @@ npx vitest run --reporter=verbose path/to/file   # Verbose output for debugging
 
 ## Docker
 
-Development uses Docker exclusively:
+Development uses Docker exclusively with [dotenvx](https://dotenvx.com) for encrypted environment variables:
 
 ```bash
 # Local development (build from source)
-ANTHROPIC_API_KEY=<key> DATABASE_KEY=<32+chars> ADMIN_API_KEY=<32+chars> SESSION_SECRET=<32+chars> \
-JWT_ACCESS_SECRET=<32+chars> JWT_REFRESH_SECRET=<32+chars> \
-  docker compose up --build
+DOTENV_PRIVATE_KEY=<your-private-key> docker compose up --build
 
 # Production (OCI deployment with pre-built images)
-ANTHROPIC_API_KEY=<key> DATABASE_KEY=<32+chars> ADMIN_API_KEY=<32+chars> SESSION_SECRET=<32+chars> \
-JWT_ACCESS_SECRET=<32+chars> JWT_REFRESH_SECRET=<32+chars> \
-  docker compose -f oci://oxilith/votive-oci:latest up
+DOTENV_PRIVATE_KEY=<your-private-key> docker compose -f oci://oxilith/votive-oci:latest up
+
+# Set/update environment variables
+dotenvx set THINKING_ENABLED true
+dotenvx set ANTHROPIC_API_KEY "sk-ant-..."
 ```
+
+The `.env` file is encrypted and committed - only `.env.keys` (the private key) must stay secret.
 
 See [docs/docker-hub.md](../docs/docker-hub.md) for complete workflow documentation.
 

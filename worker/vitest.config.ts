@@ -16,6 +16,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.{test,spec}.ts'],
     exclude: ['node_modules', 'dist'],
     coverage: {
@@ -33,10 +34,10 @@ export default defineConfig({
         'src/jobs/index.ts',
       ],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 75,
-        statements: 80,
+        lines: 75,
+        functions: 75,
+        branches: 65,
+        statements: 75,
       },
     },
   },

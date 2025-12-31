@@ -49,7 +49,7 @@ import {
 } from '@/utils';
 import { emailService } from './email.service';
 import { auditLog, type RequestContext } from './audit.service';
-import { type Gender } from 'shared';
+import type { Gender } from 'shared';
 
 /**
  * Token expiry constants in milliseconds
@@ -528,7 +528,7 @@ export class UserService {
     newTokenId: string,
     newExpiresAt: Date,
     ctx?: RequestContext,
-    fetchUser: boolean = false
+    fetchUser = false
   ): Promise<User | undefined> {
     // Find the refresh token in database (inside transaction for atomicity)
     const storedToken = await tx.refreshToken.findUnique({
@@ -536,7 +536,7 @@ export class UserService {
     });
 
     // Validate stored token
-    if (!storedToken || storedToken.userId !== userId) {
+    if (storedToken?.userId !== userId) {
       throw new TokenError('Invalid refresh token');
     }
 
@@ -708,7 +708,8 @@ export class UserService {
       async (tx) => {
         const userData = await this.rotateTokenInTransaction(tx, userId, tokenId, newTokenId, newExpiresAt, ctx, true);
         // TypeScript: fetchUser=true guarantees userData is defined
-        return userData as User;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- fetchUser=true ensures non-null return
+        return userData!;
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
     );

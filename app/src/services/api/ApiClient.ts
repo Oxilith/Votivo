@@ -84,7 +84,7 @@ async function fetchWithTimeout(
   timeout: number
 ): Promise<Response> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const timeoutId = setTimeout(() => { controller.abort(); }, timeout);
 
   try {
     const response = await fetch(url, {
@@ -138,10 +138,13 @@ export class ApiClient implements IApiClient {
       return this.refreshPromise;
     }
 
+    // Capture handler reference for the async IIFE
+    const handler = this.onUnauthorized;
+
     // Create new refresh promise
     this.refreshPromise = (async () => {
       try {
-        return await this.onUnauthorized!();
+        return await handler();
       } finally {
         // Clear the promise when done (success or failure)
         this.refreshPromise = null;
@@ -194,12 +197,12 @@ export class ApiClient implements IApiClient {
 
         if (!response.ok) {
           // Extract error message - handle both { error: string } and { error: { message: string } }
-          let errorMessage = `Request failed with status ${response.status}`;
-          if (data && typeof data === 'object' && 'error' in data) {
+          let errorMessage = `Request failed with status ${String(response.status)}`;
+          if (typeof data === 'object' && data !== null && 'error' in data) {
             const errorField = (data as { error: string | { message: string } }).error;
             if (typeof errorField === 'string') {
               errorMessage = errorField;
-            } else if (errorField && typeof errorField === 'object' && 'message' in errorField) {
+            } else {
               errorMessage = errorField.message;
             }
           }
@@ -309,11 +312,11 @@ export class ApiClient implements IApiClient {
     return this.request<T>('GET', url, undefined, config);
   }
 
-  async post<T, B = unknown>(url: string, body: B, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async post<T>(url: string, body: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>('POST', url, body, config);
   }
 
-  async put<T, B = unknown>(url: string, body: B, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async put<T>(url: string, body: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>('PUT', url, body, config);
   }
 
@@ -324,5 +327,7 @@ export class ApiClient implements IApiClient {
 
 // Default API client instance
 // Use empty string for Docker (nginx proxy) or explicit URL for local dev
-const API_URL = import.meta.env.VITE_API_URL ?? '';
+const API_URL: string = typeof import.meta.env.VITE_API_URL === 'string'
+  ? import.meta.env.VITE_API_URL
+  : '';
 export const apiClient = new ApiClient(API_URL);

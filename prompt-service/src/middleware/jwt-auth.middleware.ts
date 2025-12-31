@@ -52,7 +52,7 @@ function getJwtConfig(): JwtConfig | null {
  * @returns The token string or null if not valid Bearer format
  */
 function extractBearerToken(authHeader: string | undefined): string | null {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith('Bearer ')) {
     return null;
   }
   return authHeader.slice(7); // Remove 'Bearer ' prefix

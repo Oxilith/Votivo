@@ -20,7 +20,7 @@ export const resolvePromptSchema = z.object({
 });
 
 export const variantIdParamSchema = z.object({
-  variantId: z.string().uuid(),
+  variantId: z.uuid(),
 });
 
 export type ResolvePromptInput = z.infer<typeof resolvePromptSchema>;

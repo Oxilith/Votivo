@@ -13,25 +13,23 @@
 import { z } from 'zod';
 
 export const createABTestSchema = z.object({
-  promptId: z.string().uuid(),
+  promptId: z.uuid(),
   name: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
-  startDate: z.string().datetime().optional().transform((val) => (val ? new Date(val) : undefined)),
-  endDate: z.string().datetime().optional().transform((val) => (val ? new Date(val) : undefined)),
+  startDate: z.iso.datetime().optional().transform((val) => (val ? new Date(val) : undefined)),
+  endDate: z.iso.datetime().optional().transform((val) => (val ? new Date(val) : undefined)),
 });
 
 export const updateABTestSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   description: z.string().max(1000).optional().nullable(),
   startDate: z
-    .string()
-    .datetime()
+    .iso.datetime()
     .optional()
     .nullable()
     .transform((val) => (val ? new Date(val) : null)),
   endDate: z
-    .string()
-    .datetime()
+    .iso.datetime()
     .optional()
     .nullable()
     .transform((val) => (val ? new Date(val) : null)),
@@ -64,12 +62,12 @@ export const updateABVariantSchema = z.object({
 });
 
 export const abTestIdParamSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 export const variantIdParamSchema = z.object({
-  id: z.string().uuid(),
-  variantId: z.string().uuid(),
+  id: z.uuid(),
+  variantId: z.uuid(),
 });
 
 export type CreateABTestInput = z.infer<typeof createABTestSchema>;

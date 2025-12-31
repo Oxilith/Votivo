@@ -14,13 +14,9 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  abTestApi,
-  usePrompts,
-  colors,
-  shadows,
-  fonts,
-} from '@/admin';
+import { abTestApi } from '@/admin/api';
+import { usePrompts } from '@/admin/hooks';
+import { colors, shadows, fonts } from '@/admin/styles';
 import type { CreateABTestInput, PromptDTO } from '@/admin';
 
 export function ABTestCreatePage() {
@@ -42,7 +38,7 @@ export function ABTestCreatePage() {
 
     try {
       const created = await abTestApi.create(formData);
-      navigate(`/ab-tests/${created.id}`);
+      await navigate(`/ab-tests/${created.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create A/B test');
     } finally {

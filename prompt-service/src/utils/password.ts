@@ -31,7 +31,7 @@ export interface PasswordConfig {
  * @returns Password configuration with salt rounds
  */
 export function createPasswordConfig(): PasswordConfig {
-  const saltRoundsEnv = process.env['BCRYPT_SALT_ROUNDS'];
+  const saltRoundsEnv = process.env.BCRYPT_SALT_ROUNDS;
   const saltRounds = saltRoundsEnv ? parseInt(saltRoundsEnv, 10) : DEFAULT_SALT_ROUNDS;
 
   // Ensure valid salt rounds (bcrypt accepts 4-31)

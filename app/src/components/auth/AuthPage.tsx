@@ -51,7 +51,7 @@ const PasswordResetRequestForm: React.FC<{
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitAsync = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -65,6 +65,10 @@ const PasswordResetRequestForm: React.FC<{
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    void handleSubmitAsync(e);
   };
 
   if (submitted) {
@@ -106,7 +110,7 @@ const PasswordResetRequestForm: React.FC<{
           label={t('forgotPassword.email')}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); }}
           required
           autoComplete="email"
           placeholder={t('forgotPassword.emailPlaceholder')}
@@ -151,21 +155,21 @@ const AuthPage: React.FC<AuthPageProps> = ({
     <AuthLayout maxWidth="lg">
       {mode === 'login' && (
         <LoginForm
-          onSwitchToRegister={() => setMode('register')}
-          onForgotPassword={() => setMode('forgot-password')}
+          onSwitchToRegister={() => { setMode('register'); }}
+          onForgotPassword={() => { setMode('forgot-password'); }}
           onSuccess={handleAuthSuccess}
         />
       )}
 
       {mode === 'register' && (
         <RegisterForm
-          onSwitchToLogin={() => setMode('login')}
+          onSwitchToLogin={() => { setMode('login'); }}
           onSuccess={handleAuthSuccess}
         />
       )}
 
       {mode === 'forgot-password' && (
-        <PasswordResetRequestForm onBack={() => setMode('login')} />
+        <PasswordResetRequestForm onBack={() => { setMode('login'); }} />
       )}
     </AuthLayout>
   );

@@ -14,37 +14,24 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import { PrismaLibSQL } from '@prisma/adapter-libsql';
-import { createClient } from '@libsql/client';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient(): PrismaClient {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL ?? 'file:./dev.db';
   const encryptionKey = process.env.DATABASE_KEY;
 
-  // If encryption key is provided, use libsql with SQLCipher
-  if (encryptionKey) {
-    const libsql = createClient({
-      url: databaseUrl ?? 'file:./dev.db',
-      encryptionKey,
-    });
+  // Create adapter with libsql config (Prisma 7+ API)
+  const adapter = new PrismaLibSql({
+    url: databaseUrl,
+    encryptionKey,
+  });
 
-    const adapter = new PrismaLibSQL(libsql);
-
-    return new PrismaClient({
-      adapter,
-      log:
-        process.env.NODE_ENV === 'development'
-          ? ['query', 'error', 'warn']
-          : ['error'],
-    });
-  }
-
-  // No encryption key - use standard Prisma client
   return new PrismaClient({
+    adapter,
     log:
       process.env.NODE_ENV === 'development'
         ? ['query', 'error', 'warn']

@@ -10,7 +10,8 @@
  * - @/controllers/prompt.controller for request handling
  */
 
-import { Router, Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { promptController } from '@/controllers';
 
 const router = Router();

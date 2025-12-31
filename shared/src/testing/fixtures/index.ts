@@ -72,12 +72,14 @@ export {
 export {
   createCompleteAssessment,
   createMockAssessment,
+  createMockSavedAssessment,
   createPartialAssessment,
   createPhase1Assessment,
   createPhase2Assessment,
   type MockAssessmentResponsesOptions,
   type MockAssessmentRecordOptions,
   type MockAssessmentRecord,
+  type SavedAssessmentFrontend,
 } from './assessment.fixture';
 
 // Analysis fixtures
@@ -90,10 +92,13 @@ export {
   createMockIdentitySynthesis,
   createMockAnalysisResult,
   createMockAnalysis,
+  createMockSavedAnalysis,
   createEmptyAnalysisResult,
   type MockAnalysisResultOptions,
   type MockAnalysisRecordOptions,
   type MockAnalysisRecord,
+  type MockSavedAnalysisOptions,
+  type SavedAnalysisFrontend,
 } from './analysis.fixture';
 
 // Prompt fixtures

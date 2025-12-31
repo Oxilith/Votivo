@@ -22,7 +22,7 @@ interface LivenessResponse {
   uptime: number;
 }
 
-const VERSION = process.env['npm_package_version'] ?? '1.0.0';
+const VERSION = process.env.npm_package_version ?? '1.0.0';
 const startTime = Date.now();
 
 export function liveness(_req: Request, res: Response<LivenessResponse>): void {

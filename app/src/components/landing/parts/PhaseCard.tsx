@@ -44,7 +44,7 @@ const PhaseCard: FC<PhaseCardProps> = ({
       className={`stone-card relative p-8 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm reveal ${rotation} ${
         isActive ? '' : 'coming-soon'
       } ${className}`.trim()}
-      style={{ animationDelay: `${(phaseNumber - 1) * 100}ms` }}
+      style={{ animationDelay: `${String((phaseNumber - 1) * 100)}ms` }}
     >
       {/* Coming Soon badge - absolute top right */}
       {!isActive && (

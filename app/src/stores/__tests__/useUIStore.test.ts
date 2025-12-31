@@ -11,7 +11,6 @@
  * - @/stores/useUIStore
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
 import { useUIStore } from '../useUIStore';
 
 describe('useUIStore', () => {

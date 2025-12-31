@@ -8,7 +8,6 @@
  * - Returning 200 and attaching user to request when token is valid
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
 
 // Mock config before importing middleware
@@ -364,12 +363,8 @@ describe('JWT Protected Routes Integration', () => {
       expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ code: 'INVALID_TOKEN' }));
     });
 
-    it('should return 401 for /me with expired token', () => {
-      // Create an expired token by using a very short expiry and waiting
-      // For unit testing, we verify the middleware handles TokenExpiredError correctly
-      // This is covered by the verifyAccessToken tests in jwt.test.ts
-      expect(true).toBe(true); // Placeholder - expiry is tested at JWT utility level
-    });
+    // Note: Expired token handling is tested in jwt.test.ts:129-140
+    // "should return error for expired token" verifies TOKEN_EXPIRED behavior
   });
 
   describe('POST /logout-all endpoint protection', () => {

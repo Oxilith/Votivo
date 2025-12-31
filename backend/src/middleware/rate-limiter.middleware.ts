@@ -27,7 +27,9 @@ export const rateLimiter = rateLimit({
     },
   },
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
-  keyGenerator: (req) => req.ip ?? 'unknown',
+  // express-rate-limit 8.x: validate: false disables the IPv6 keyGenerator warning
+  // since we're behind nginx which normalizes IPs
+  validate: { ip: false },
 });
 
 // Stricter rate limiter for Claude API calls (configurable)
@@ -44,5 +46,5 @@ export const claudeRateLimiter = rateLimit({
     },
   },
   statusCode: StatusCodes.TOO_MANY_REQUESTS,
-  keyGenerator: (req) => req.ip ?? 'unknown',
+  validate: { ip: false },
 });

@@ -5,7 +5,7 @@
  * - Provides setTestPrisma for injecting test database client
  * - Provides getTestPrisma for retrieving the configured client
  * - Provides hasTestPrisma for checking client initialization
- * - Provides cleanupTestDb for clearing all test data (ignores missing tables)
+ * - Provides cleanupTestDb for clearing all test data (supports strictMode option)
  * - Provides cleanupTables for clearing specific tables (throws on error)
  * - Provides disconnectTestDb for cleanup after test suite
  * - Provides setupTestDb for automatic lifecycle management
@@ -116,20 +116,42 @@ export const CLEANUP_TABLE_ORDER = [
 export type TableName = (typeof CLEANUP_TABLE_ORDER)[number];
 
 /**
+ * Options for database cleanup operations.
+ */
+export interface CleanupOptions {
+  /**
+   * When true, collects all errors during cleanup and throws after completion.
+   * This ensures all tables are attempted before failing.
+   * Default: false (errors are logged but cleanup continues silently)
+   */
+  strictMode?: boolean;
+}
+
+/**
  * Cleans up all test data from the database.
  * Deletes from tables in correct order to respect foreign key constraints.
  *
+ * @param options - Optional cleanup configuration
  * @throws Error if no client has been configured
+ * @throws Error if strictMode is true and any table cleanup fails
  *
  * @example
  * ```typescript
+ * // Default behavior: log errors and continue
  * beforeEach(async () => {
  *   await cleanupTestDb();
  * });
+ *
+ * // Strict mode: collect and throw all errors
+ * beforeEach(async () => {
+ *   await cleanupTestDb({ strictMode: true });
+ * });
  * ```
  */
-export async function cleanupTestDb(): Promise<void> {
+export async function cleanupTestDb(options: CleanupOptions = {}): Promise<void> {
+  const { strictMode = false } = options;
   const prisma = getTestPrisma();
+  const errors: { table: string; error: unknown }[] = [];
 
   for (const table of CLEANUP_TABLE_ORDER) {
     try {
@@ -142,10 +164,20 @@ export async function cleanupTestDb(): Promise<void> {
           error.message.includes('does not exist'));
 
       if (!isTableNotExist) {
-        // Log unexpected errors (connection, permissions) but continue cleanup
+        // Log unexpected errors (connection, permissions)
         console.error(`[cleanupTestDb] Failed to clean table "${table}":`, error);
+        if (strictMode) {
+          errors.push({ table, error });
+        }
       }
     }
+  }
+
+  if (strictMode && errors.length > 0) {
+    const tableList = errors.map((e) => e.table).join(', ');
+    throw new Error(
+      `Database cleanup failed for ${errors.length} table(s): ${tableList}`
+    );
   }
 }
 
@@ -239,6 +271,7 @@ export function setupTestDb(options: { cleanupBeforeEach?: boolean } = {}): void
  * All data created during the callback will be deleted after it completes.
  *
  * @param callback - Test function to run
+ * @param options - Optional cleanup configuration (passed to cleanupTestDb)
  * @returns Promise that resolves with the callback's return value after cleanup
  *
  * @example
@@ -251,16 +284,24 @@ export function setupTestDb(options: { cleanupBeforeEach?: boolean } = {}): void
  *   });
  *   expect(result.success).toBe(true);
  * });
+ *
+ * // With strict mode
+ * it('fails on cleanup errors', async () => {
+ *   await withCleanup(async (prisma) => {
+ *     // ... test code
+ *   }, { strictMode: true });
+ * });
  * ```
  */
 export async function withCleanup<T>(
-  callback: (prisma: PrismaLikeClient) => Promise<T>
+  callback: (prisma: PrismaLikeClient) => Promise<T>,
+  options?: CleanupOptions
 ): Promise<T> {
   const prisma = getTestPrisma();
 
   try {
     return await callback(prisma);
   } finally {
-    await cleanupTestDb();
+    await cleanupTestDb(options);
   }
 }

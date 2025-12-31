@@ -1,7 +1,9 @@
 # Prompt Service Dockerfile
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 RUN apk add --no-cache openssl
+
+RUN npm install -g @dotenvx/dotenvx
 
 WORKDIR /app
 
@@ -31,9 +33,10 @@ RUN npm run db:generate -w prompt-service
 RUN npm run build -w prompt-service
 
 # Production
-FROM node:20-alpine
+FROM node:24-alpine
 
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl && \
+    npm install -g @dotenvx/dotenvx
 
 WORKDIR /app
 ENV NODE_ENV=production
@@ -48,9 +51,15 @@ COPY --from=builder /app/shared/dist shared/dist
 COPY --from=builder /app/prompt-service/dist prompt-service/dist
 COPY --from=builder /app/prompt-service/prisma prompt-service/prisma
 COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
+COPY .env prompt-service/.env
 
-RUN mkdir -p /app/data
+# Create non-root user matching worker (UID 1001) for shared volume access
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 appuser && \
+    mkdir -p /app/data && \
+    chown -R appuser:nodejs /app
 
+USER appuser
 WORKDIR /app/prompt-service
 ENV DATABASE_URL=file:/app/data/prompts.db
 
@@ -59,4 +68,4 @@ EXPOSE 3002
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD node -e "fetch('http://localhost:3002/health').then(r=>r.ok||process.exit(1)).catch(()=>process.exit(1))"
 
-CMD ["sh", "-c", "if [ -n \"$DATABASE_KEY\" ]; then node dist/scripts/migrate.js; else npx prisma migrate deploy; fi && node dist/prisma/seed.js && node dist/src/index.js"]
+CMD ["dotenvx", "run", "--", "sh", "-c", "if [ -n \"$DATABASE_KEY\" ]; then node dist/scripts/migrate.js; else npx prisma migrate deploy; fi && node dist/prisma/seed.js && node dist/src/index.js"]

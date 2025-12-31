@@ -15,8 +15,10 @@ dist
 dist-ssr
 *.local
 
-# Environment files
-.env
+# Environment files - allow encrypted .env for dotenvx
+# Block .env.keys (private keys) and .env.local variants
+.env.keys
+**/.env.keys
 
 # Editor directories and files
 .vscode/*

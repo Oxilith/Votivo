@@ -14,7 +14,6 @@
  * - BackgroundRefreshManager for utility under test
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import {
   BackgroundRefreshManager,
   type BackgroundRefreshCallbacks,

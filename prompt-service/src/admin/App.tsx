@@ -15,9 +15,8 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Layout, ProtectedRoute } from './components';
 import {
-  Layout,
-  ProtectedRoute,
   LoginPage,
   PromptListPage,
   PromptEditPage,
@@ -25,7 +24,7 @@ import {
   ABTestListPage,
   ABTestEditPage,
   ABTestCreatePage,
-} from '@/admin';
+} from './pages';
 
 export function App() {
   return (

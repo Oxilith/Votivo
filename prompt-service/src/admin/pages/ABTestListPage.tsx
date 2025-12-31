@@ -16,7 +16,9 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useABTests, abTestApi, colors, shadows } from '@/admin';
+import { useABTests } from '@/admin/hooks';
+import { abTestApi } from '@/admin/api';
+import { colors, shadows } from '@/admin/styles';
 import type { ABTestDTO, ABVariantDTO } from '@/admin';
 
 export function ABTestListPage() {

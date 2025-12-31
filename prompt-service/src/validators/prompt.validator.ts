@@ -62,7 +62,7 @@ export const updatePromptSchema = z.object({
 });
 
 export const promptIdParamSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 export const promptKeyParamSchema = z.object({
@@ -70,8 +70,8 @@ export const promptKeyParamSchema = z.object({
 });
 
 export const versionIdParamSchema = z.object({
-  id: z.string().uuid(),
-  versionId: z.string().uuid(),
+  id: z.uuid(),
+  versionId: z.uuid(),
 });
 
 export type CreatePromptInput = z.infer<typeof createPromptSchema>;

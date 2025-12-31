@@ -33,6 +33,15 @@ interface RouteConfig {
 }
 
 /**
+ * History state type for popstate events
+ */
+interface HistoryState {
+  view: AppView;
+  authMode?: AuthMode;
+  resourceId?: string;
+}
+
+/**
  * Route parameters extracted from URL
  */
 export interface RouteParams {
@@ -46,7 +55,7 @@ export interface RouteParams {
 /**
  * Path to route configuration mapping
  */
-const ROUTES: Record<string, RouteConfig> = {
+const ROUTES: Partial<Record<string, RouteConfig>> = {
   '/': { view: 'landing' },
   '/assessment': { view: 'assessment' },
   '/insights': { view: 'insights' },
@@ -87,7 +96,7 @@ export function parseRoute(pathname: string, search: string, hash: string): Rout
   }
 
   // Check for resource ID patterns: /assessment/:id or /insights/:id
-  const assessmentMatch = pathname.match(/^\/assessment\/([^/]+)$/);
+  const assessmentMatch = /^\/assessment\/([^/]+)$/.exec(pathname);
   if (assessmentMatch) {
     return {
       view: 'assessment',
@@ -97,7 +106,7 @@ export function parseRoute(pathname: string, search: string, hash: string): Rout
     };
   }
 
-  const insightsMatch = pathname.match(/^\/insights\/([^/]+)$/);
+  const insightsMatch = /^\/insights\/([^/]+)$/.exec(pathname);
   if (insightsMatch) {
     return {
       view: 'insights',
@@ -261,10 +270,11 @@ export function useRouting() {
       if (isNavigatingRef.current) return;
 
       const params = getRouteParams();
+      const state = event.state as HistoryState | null;
 
       // Update auth mode from state or URL
-      if (event.state?.authMode) {
-        authModeRef.current = event.state.authMode;
+      if (state?.authMode) {
+        authModeRef.current = state.authMode;
       } else if (params.authMode) {
         authModeRef.current = params.authMode;
       }
@@ -274,7 +284,7 @@ export function useRouting() {
     };
 
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    return () => { window.removeEventListener('popstate', handlePopState); };
   }, [getRouteParams, setView]);
 
   // Sync URL when view changes externally (e.g., from setView calls)

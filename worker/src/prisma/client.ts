@@ -9,13 +9,11 @@
  * @dependencies
  * - @prisma/client for database access
  * - @prisma/adapter-libsql for libsql support
- * - @libsql/client for SQLite with encryption
  * - @/config for database configuration
  */
 
 import { PrismaClient } from '@prisma/client';
-import { PrismaLibSQL } from '@prisma/adapter-libsql';
-import { createClient } from '@libsql/client';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
 import { config } from '@/config';
 
 /**
@@ -24,25 +22,21 @@ import { config } from '@/config';
  * Remember to call prisma.$disconnect() when done.
  */
 export function createFreshPrismaClient(): PrismaClient {
-  const libsql = createClient({
+  const adapter = new PrismaLibSql({
     url: config.databaseUrl,
     encryptionKey: config.databaseKey,
   });
-  const adapter = new PrismaLibSQL(libsql);
   return new PrismaClient({
     adapter,
     log: config.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 }
 
-// Create libsql client with optional encryption
-const libsql = createClient({
+// Create Prisma adapter with libsql config (Prisma 7+ API)
+const adapter = new PrismaLibSql({
   url: config.databaseUrl,
   encryptionKey: config.databaseKey,
 });
-
-// Create Prisma adapter
-const adapter = new PrismaLibSQL(libsql);
 
 // Create Prisma client with adapter (for startup/immediate use)
 export const prisma = new PrismaClient({

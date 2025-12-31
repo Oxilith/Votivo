@@ -80,7 +80,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmitAsync = async (e: FormEvent) => {
     e.preventDefault();
     setApiError(null);
 
@@ -105,6 +105,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
     }
   };
 
+  const handleSubmit = (e: FormEvent) => {
+    void handleSubmitAsync(e);
+  };
+
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
@@ -121,7 +125,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           label={t('login.email')}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); }}
           error={errors.email}
           required
           autoComplete="email"
@@ -132,7 +136,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           label={t('login.password')}
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => { setPassword(e.target.value); }}
           error={errors.password}
           required
           autoComplete="current-password"

@@ -11,16 +11,16 @@
  * - InsightCard component
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import InsightCard from '../InsightCard';
-import type {
-  AnalysisPattern,
-  AnalysisContradiction,
-  AnalysisBlindSpot,
-  AnalysisLeveragePoint,
-  AnalysisRisk,
-} from '@/types';
+import {
+  createMockPattern,
+  createMockContradiction,
+  createMockBlindSpot,
+  createMockLeveragePoint,
+  createMockRisk,
+} from 'shared/testing';
+import type { AnalysisPattern } from '@/types';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
@@ -44,8 +44,8 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-// Test fixtures
-const patternFixture: AnalysisPattern = {
+// Test fixtures using shared factory functions
+const patternFixture = createMockPattern({
   title: 'Morning Energy Pattern',
   icon: '🌅',
   severity: 'high',
@@ -53,34 +53,38 @@ const patternFixture: AnalysisPattern = {
   evidence: ['Peak productivity before 10am', 'Decline after lunch'],
   implication: 'Consider scheduling important tasks early.',
   leverage: 'Block mornings for deep work.',
-};
+});
 
-const contradictionFixture: AnalysisContradiction = {
+const contradictionFixture = createMockContradiction({
   title: 'Work-Life Balance Tension',
   icon: '⚖️',
   description: 'Your values conflict with your behaviors.',
   sides: ['Desire for family time', 'Workaholic tendencies'],
   hypothesis: 'Achievement may be compensating for insecurity.',
   question: 'What would "enough" look like for you?',
-};
+});
 
-const blindSpotFixture: AnalysisBlindSpot = {
+const blindSpotFixture = createMockBlindSpot({
   title: 'Undervalued Creativity',
   icon: '🎨',
   observation: 'You dismiss creative pursuits as unproductive.',
   evidence: 'Multiple mentions of abandoned artistic hobbies.',
   reframe: 'Creativity enhances problem-solving in all domains.',
-};
+});
 
-const leveragePointFixture: AnalysisLeveragePoint & { icon?: string } = {
-  title: 'Community Connection',
-  insight: 'Building a support network could amplify your growth.',
+const leveragePointFixture = {
+  ...createMockLeveragePoint({
+    title: 'Community Connection',
+    insight: 'Building a support network could amplify your growth.',
+  }),
   icon: '🎯',
 };
 
-const riskFixture: AnalysisRisk & { icon?: string } = {
-  title: 'Burnout Risk',
-  description: 'Current pace is unsustainable without intervention.',
+const riskFixture = {
+  ...createMockRisk({
+    title: 'Burnout Risk',
+    description: 'Current pace is unsustainable without intervention.',
+  }),
   icon: '⚠️',
 };
 

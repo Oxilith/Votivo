@@ -20,7 +20,8 @@
  * - @/middleware/rate-limit.middleware for per-route rate limiting
  */
 
-import { Router, Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { userAuthController } from '@/controllers';
 import {
   jwtAuthMiddleware,

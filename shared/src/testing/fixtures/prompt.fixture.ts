@@ -235,8 +235,8 @@ export function createMockPromptConfig(
  * @returns Mock ThinkingConfigParam
  */
 export function createMockThinkingConfig(
-  enabled: boolean = true,
-  budgetTokens: number = 10000
+  enabled = true,
+  budgetTokens = 10000
 ): ThinkingConfigParam {
   if (enabled) {
     return {

@@ -11,7 +11,6 @@
  * - adminAuthMiddleware for middleware under test
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
 
 // Mock the config module before importing the middleware

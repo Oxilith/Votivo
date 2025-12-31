@@ -69,7 +69,7 @@ export const SynthesisStep: React.FC<SynthesisStepProps> = ({
         <div className={`p-6 ${cardStyles.base}`}>
           <h3 className={`font-display font-semibold ${textStyles.primary} mb-4 flex items-center gap-3`}>
             <span className={phaseBadge}>
-              {String(t('synthesis.sections.operatingRhythm.number')).padStart(2, '0')}
+              {t('synthesis.sections.operatingRhythm.number').padStart(2, '0')}
             </span>
             <span className="text-base">
               {t('synthesis.sections.operatingRhythm.title')}
@@ -109,7 +109,7 @@ export const SynthesisStep: React.FC<SynthesisStepProps> = ({
         <div className={`p-6 ${cardStyles.base}`}>
           <h3 className={`font-display font-semibold ${textStyles.primary} mb-4 flex items-center gap-3`}>
             <span className={phaseBadge}>
-              {String(t('synthesis.sections.energyManagement.number')).padStart(2, '0')}
+              {t('synthesis.sections.energyManagement.number').padStart(2, '0')}
             </span>
             <span className="text-base">
               {t('synthesis.sections.energyManagement.title')}
@@ -145,7 +145,7 @@ export const SynthesisStep: React.FC<SynthesisStepProps> = ({
         <div className={`p-6 ${cardStyles.base}`}>
           <h3 className={`font-display font-semibold ${textStyles.primary} mb-4 flex items-center gap-3`}>
             <span className={phaseBadge}>
-              {String(t('synthesis.sections.currentIdentity.number')).padStart(2, '0')}
+              {t('synthesis.sections.currentIdentity.number').padStart(2, '0')}
             </span>
             <span className="text-base">
               {t('synthesis.sections.currentIdentity.title')}
@@ -179,7 +179,7 @@ export const SynthesisStep: React.FC<SynthesisStepProps> = ({
         <div className={`p-6 ${cardStyles.base}`}>
           <h3 className={`font-display font-semibold ${textStyles.primary} mb-4 flex items-center gap-3`}>
             <span className={phaseBadge}>
-              {String(t('synthesis.sections.behavioralFoundation.number')).padStart(2, '0')}
+              {t('synthesis.sections.behavioralFoundation.number').padStart(2, '0')}
             </span>
             <span className="text-base">
               {t('synthesis.sections.behavioralFoundation.title')}
@@ -209,7 +209,7 @@ export const SynthesisStep: React.FC<SynthesisStepProps> = ({
         <div className={`p-6 ${cardStyles.base}`}>
           <h3 className={`font-display font-semibold ${textStyles.primary} mb-4 flex items-center gap-3`}>
             <span className={phaseBadge}>
-              {String(t('synthesis.sections.valuesStrengths.number')).padStart(2, '0')}
+              {t('synthesis.sections.valuesStrengths.number').padStart(2, '0')}
             </span>
             <span className="text-base">
               {t('synthesis.sections.valuesStrengths.title')}
