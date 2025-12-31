@@ -67,14 +67,12 @@ jobs:
         run: npm run test:run
 
       - name: Run tests with coverage
-        if: false  # Disabled temporarily
         run: npm run test:coverage
 
       - name: Upload coverage to Codecov
-        if: false  # Disabled temporarily
         uses: codecov/codecov-action@v5
         with:
-          files: ./app/coverage/lcov.info,./backend/coverage/lcov.info
+          files: ./app/coverage/lcov.info,./backend/coverage/lcov.info,./prompt-service/coverage/lcov.info,./shared/coverage/lcov.info,./worker/coverage/lcov.info
           fail_ci_if_error: false
 
   build:
