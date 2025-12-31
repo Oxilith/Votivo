@@ -304,7 +304,8 @@ describe('claude.service', () => {
         await vi.runAllTimersAsync();
         await resultPromise;
 
-        expect(caughtError).toBeDefined();
+        expect(caughtError).toBeInstanceOf(Error);
+        expect(caughtError?.message).toContain('JSON');
         expect(mockMessagesCreate).toHaveBeenCalledTimes(3);
       });
     });

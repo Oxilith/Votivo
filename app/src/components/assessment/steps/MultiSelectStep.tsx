@@ -8,7 +8,8 @@
  * - Supports option descriptions
  * @dependencies
  * - React
- * - @/components (MultiSelectStep, SelectOption, CheckIcon)
+ * - @/components (CheckIcon - icon component)
+ * - @/components types (MultiSelectStep, SelectOption)
  */
 
 import { CheckIcon } from '@/components';

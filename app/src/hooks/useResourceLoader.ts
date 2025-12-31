@@ -10,6 +10,7 @@
  * - React (useEffect, useCallback, useState)
  * - @/stores (useAuthStore, useAssessmentStore, useAnalysisStore, useUIStore)
  * - @/services (authService)
+ * - @/utils (logger)
  * - ./useRouting
  * - @/types (AppView, ViewOnlyAssessment, ViewOnlyAnalysis)
  */

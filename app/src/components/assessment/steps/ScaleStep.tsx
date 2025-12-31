@@ -8,7 +8,7 @@
  * - Highlights selected value with vermilion background
  * @dependencies
  * - React
- * - @/components (ScaleStep)
+ * - @/components types (ScaleStep - type definition)
  */
 
 import type { ScaleStep as ScaleStepType } from '@/components';

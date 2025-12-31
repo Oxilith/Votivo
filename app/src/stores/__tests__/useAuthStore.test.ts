@@ -242,6 +242,20 @@ describe('useAuthStore', () => {
       setAssessmentsList([createMockSavedAssessment()]);
       expect(isAssessmentsListStale()).toBe(false);
     });
+
+    it('should report stale after cache threshold expires', () => {
+      vi.useFakeTimers();
+      const { setAssessmentsList, isAssessmentsListStale } = useAuthStore.getState();
+
+      setAssessmentsList([createMockSavedAssessment()]);
+      expect(isAssessmentsListStale()).toBe(false);
+
+      // Advance past 5 minute threshold (300,001ms)
+      vi.advanceTimersByTime(300001);
+      expect(isAssessmentsListStale()).toBe(true);
+
+      vi.useRealTimers();
+    });
   });
 
   describe('analyses list caching', () => {
@@ -283,6 +297,20 @@ describe('useAuthStore', () => {
 
       setAnalysesList([createMockSavedAnalysis()]);
       expect(isAnalysesListStale()).toBe(false);
+    });
+
+    it('should report stale after cache threshold expires', () => {
+      vi.useFakeTimers();
+      const { setAnalysesList, isAnalysesListStale } = useAuthStore.getState();
+
+      setAnalysesList([createMockSavedAnalysis()]);
+      expect(isAnalysesListStale()).toBe(false);
+
+      // Advance past 5 minute threshold (300,001ms)
+      vi.advanceTimersByTime(300001);
+      expect(isAnalysesListStale()).toBe(true);
+
+      vi.useRealTimers();
     });
   });
 });

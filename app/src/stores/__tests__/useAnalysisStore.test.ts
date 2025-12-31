@@ -212,7 +212,7 @@ describe('useAnalysisStore', () => {
       const state = useAnalysisStore.getState();
       expect(state.analysisError).toBe('Rate limit exceeded');
       expect(state.isAnalyzing).toBe(false);
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledTimes(1);
 
       consoleSpy.mockRestore();
     });
@@ -230,6 +230,7 @@ describe('useAnalysisStore', () => {
       const state = useAnalysisStore.getState();
       expect(state.analysisError).toBe('Network failure');
       expect(state.isAnalyzing).toBe(false);
+      expect(consoleSpy).toHaveBeenCalledTimes(1);
 
       consoleSpy.mockRestore();
     });
@@ -246,6 +247,8 @@ describe('useAnalysisStore', () => {
       const state = useAnalysisStore.getState();
       expect(state.analysisError).toBe('Failed to analyze responses');
       expect(state.isAnalyzing).toBe(false);
+      // Note: console.error is NOT called for unknown error types (only ApiClientError and Error instances)
+      expect(consoleSpy).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
     });

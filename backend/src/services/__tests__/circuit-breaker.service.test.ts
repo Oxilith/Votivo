@@ -200,5 +200,21 @@ describe('circuit-breaker.service', () => {
       // Circuit should close
       expect(breaker.closed).toBe(true);
     });
+
+    it('should open circuit after reaching error threshold', async () => {
+      const mockFn = vi.fn().mockRejectedValue(new Error('failure'));
+      const breaker = createCircuitBreaker('test-threshold', mockFn, {
+        errorThresholdPercentage: 50,
+        volumeThreshold: 2, // Need at least 2 requests before circuit can open
+      });
+
+      // First failure - circuit still closed (not enough volume)
+      await expect(breaker.fire()).rejects.toThrow('failure');
+      expect(breaker.closed).toBe(true);
+
+      // Second failure - should trip circuit (100% failure rate > 50% threshold)
+      await expect(breaker.fire()).rejects.toThrow('failure');
+      expect(breaker.opened).toBe(true);
+    });
   });
 });

@@ -7,6 +7,7 @@
  * - Controls loading and error states
  * - Manages navigation history for back/forward
  * - Handles assessment key for component remounting
+ * - Manages read-only mode for viewing saved resources by ID
  * @dependencies
  * - zustand
  * - @/types/assessment.types (AppView)

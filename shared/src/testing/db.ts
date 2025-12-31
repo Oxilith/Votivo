@@ -5,7 +5,7 @@
  * - Provides setTestPrisma for injecting test database client
  * - Provides getTestPrisma for retrieving the configured client
  * - Provides hasTestPrisma for checking client initialization
- * - Provides cleanupTestDb for clearing all test data (ignores missing tables)
+ * - Provides cleanupTestDb for clearing all test data (supports strictMode option)
  * - Provides cleanupTables for clearing specific tables (throws on error)
  * - Provides disconnectTestDb for cleanup after test suite
  * - Provides setupTestDb for automatic lifecycle management
