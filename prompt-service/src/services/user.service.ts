@@ -224,7 +224,7 @@ export class UserService {
     const hashedPassword = await hashPassword(input.password);
 
     // Create user and tokens in a transaction
-    const { user, refreshTokenRecord, rawVerificationToken } = await prisma.$transaction(async (tx) => {
+    const { user, refreshTokenRecord, rawVerificationToken } = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Create user with profile fields
       const newUser = await tx.user.create({
         data: {
@@ -656,7 +656,7 @@ export class UserService {
 
     // Atomic transaction: lookup, validate, detect theft, and rotate in one operation
     await prisma.$transaction(
-      async (tx) => {
+      async (tx: Prisma.TransactionClient) => {
         await this.rotateTokenInTransaction(tx, userId, tokenId, newTokenId, newExpiresAt, ctx, false);
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
@@ -705,7 +705,7 @@ export class UserService {
 
     // Atomic transaction: lookup, validate, detect theft, rotate tokens, and fetch user
     const user = await prisma.$transaction(
-      async (tx) => {
+      async (tx: Prisma.TransactionClient) => {
         const userData = await this.rotateTokenInTransaction(tx, userId, tokenId, newTokenId, newExpiresAt, ctx, true);
         // TypeScript: fetchUser=true guarantees userData is defined
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- fetchUser=true ensures non-null return
@@ -832,7 +832,7 @@ export class UserService {
     const hashedPassword = await hashPassword(newPassword);
 
     // Update password and mark token as used in transaction
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.user.update({
         where: { id: resetToken.userId },
         data: { password: hashedPassword },
@@ -884,7 +884,7 @@ export class UserService {
     }
 
     // Update user and mark token as used in transaction
-    const user = await prisma.$transaction(async (tx) => {
+    const user = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updatedUser = await tx.user.update({
         where: { id: verifyToken.userId },
         data: {

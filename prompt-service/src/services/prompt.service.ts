@@ -15,7 +15,7 @@
  */
 
 import { prisma } from '@/prisma';
-import type { Prompt, PromptVariant, PromptVersion } from '@prisma/client';
+import type { Prisma, Prompt, PromptVariant, PromptVersion } from '@prisma/client';
 import { NotFoundError } from '@/errors';
 import { validatePromptContent, validatePromptKey } from '@/utils';
 
@@ -165,7 +165,7 @@ export class PromptService {
     const modelChanged = input.model !== undefined && input.model !== existingPrompt.model;
 
     // Use transaction to ensure atomic version increment
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Get the latest version number within transaction
       const latestVersion = await tx.promptVersion.findFirst({
         where: { promptId: id },

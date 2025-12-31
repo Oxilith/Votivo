@@ -12,7 +12,7 @@
  */
 
 import {prisma} from '@/prisma';
-import type {ABTest, ABVariant, ABVariantConfig} from '@prisma/client';
+import type {ABTest, ABVariant, ABVariantConfig, Prisma} from '@prisma/client';
 import {NotFoundError, ValidationError} from '@/errors';
 
 export interface ABTestWithVariants extends ABTest {
@@ -178,7 +178,7 @@ export class ABTestService {
     }
 
     // Use transaction to ensure atomicity - prevents multiple active tests
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Deactivate other tests for the same prompt
       await tx.aBTest.updateMany({
         where: {
@@ -345,7 +345,7 @@ export class ABTestService {
         return variants[0];
     }
 
-    const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
+    const totalWeight = variants.reduce((sum: number, v: { weight: number }) => sum + v.weight, 0);
     const random = Math.random() * totalWeight;
 
     let cumulative = 0;
@@ -373,7 +373,7 @@ export class ABTestService {
 
     if (variants.length === 0) return;
 
-    const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
+    const totalWeight = variants.reduce((sum: number, v: { weight: number }) => sum + v.weight, 0);
 
     if (totalWeight === 0) {
       // Distribute equally if all weights are 0
