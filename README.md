@@ -1,5 +1,8 @@
 # Votive
 
+[![CI](https://github.com/Oxilith/Votive/actions/workflows/ci.yml/badge.svg)](https://github.com/Oxilith/Votive/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/Oxilith/Votive/graph/badge.svg?token=SG0YTF6RYB)](https://codecov.io/github/Oxilith/Votive)
+
 > *Every action is a vote for who you're becoming.*
 
 Self-discovery before goal-setting. Most habit apps fail because they skip the foundation—understanding who you already are.
