@@ -22,7 +22,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['src/**/*.{test,spec}.ts'],
+    include: ['__tests__/**/*.test.ts', '__tests__/**/*.flow.test.ts'],
     exclude: ['node_modules', 'dist'],
     coverage: {
       provider: 'v8',

@@ -17,8 +17,9 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
-    include: ['src/**/*.{test,spec}.ts'],
+    include: ['__tests__/**/*.test.ts', '__tests__/**/*.flow.test.ts'],
     exclude: ['node_modules', 'dist'],
+    testTimeout: 10000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],

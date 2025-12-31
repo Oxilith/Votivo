@@ -1,3 +1,298 @@
+app/src/components/assessment/IdentityFoundationsAssessment.tsx
+85	0	0	85
+0.00%
+prompt-service/src/services/prompt.service.ts
+71	1	0	70
+1.41%
+prompt-service/src/services/ab-test.service.ts
+74	13	0	61
+17.57%
+prompt-service/src/services/user.service.ts
+270	215	0	55
+79.63%
+backend/src/services/prompt-client.service.ts
+119	82	0	37
+68.91%
+app/src/components/insights/IdentityInsightsAI.tsx
+118	83	0	35
+70.34%
+app/src/hooks/useResourceLoader.ts
+145	111	0	34
+76.55%
+app/src/components/shared/ExportDropdown.tsx
+31	1	0	30
+3.23%
+app/src/components/shared/UserAvatarDropdown.tsx
+27	1	0	26
+3.70%
+app/src/services/api/ApiClient.ts
+128	102	0	26
+79.69%
+app/src/components/profile/ProfilePage.tsx
+209	183	1	25
+87.56%
+prompt-service/src/controllers/ab-test.controller.ts
+112	95	0	17
+84.82%
+prompt-service/src/controllers/prompt.controller.ts
+87	75	0	12
+86.21%
+app/src/components/insights/InsightsPageHeader.tsx
+11	1	0	10
+9.09%
+app/src/services/api/AuthService.ts
+78	68	0	10
+87.18%
+prompt-service/src/middleware/jwt-auth.middleware.ts
+43	34	0	9
+79.07%
+app/src/components/shared/ChunkErrorBoundary.tsx
+40	33	0	7
+82.50%
+app/src/components/assessment/AssessmentPageHeader.tsx
+6	1	0	5
+16.67%
+app/src/components/auth/forms/RegisterForm.tsx
+73	68	0	5
+93.15%
+app/src/stores/useUIStore.ts
+19	14	0	5
+73.68%
+shared/src/validation.ts
+18	13	0	5
+72.22%
+backend/src/middleware/tracing.middleware.ts
+5	0	0	5
+0.00%
+backend/src/utils/error-sanitizer.ts
+15	10	0	5
+66.67%
+prompt-service/src/utils/jwt.ts
+29	24	0	5
+82.76%
+app/src/components/auth/forms/PasswordResetConfirmForm.tsx
+46	42	0	4
+91.30%
+app/src/components/insights/SavePromptModal.tsx
+6	2	0	4
+33.33%
+shared/src/responseFormatter.ts
+13	10	0	3
+76.92%
+backend/src/services/prompt-cache.service.ts
+87	84	0	3
+96.55%
+app/src/components/auth/AuthLayout.tsx
+20	16	2	2
+80.00%
+app/src/components/auth/forms/FormInput.tsx
+24	21	1	2
+87.50%
+app/src/hooks/useRouting.ts
+88	86	0	2
+97.73%
+backend/src/services/circuit-breaker.service.ts
+31	29	0	2
+93.55%
+backend/src/utils/background-refresh-manager.ts
+75	73	0	2
+97.33%
+prompt-service/src/middleware/admin-auth.middleware.ts
+27	25	0	2
+92.59%
+app/src/components/auth/EmailVerificationPage.tsx
+61	60	0	1
+98.36%
+app/src/components/auth/forms/LoginForm.tsx
+41	40	0	1
+97.56%
+app/src/utils/fileUtils.ts
+44	43	0	1
+97.73%
+prompt-service/src/controllers/resolve.controller.ts
+22	21	0	1
+95.45%
+prompt-service/src/prisma/client.ts
+10	9	0	1
+90.00%
+prompt-service/src/services/email.service.ts
+68	67	0	1
+98.53%
+prompt-service/src/services/prompt-resolver.service.ts
+42	41	0	1
+97.62%
+prompt-service/src/utils/csrf.ts
+10	9	0	1
+90.00%
+prompt-service/src/utils/logger.ts
+3	2	0	1
+66.67%
+prompt-service/src/utils/sanitize.ts
+12	11	0	1
+91.67%
+app/src/components/assessment/hooks/useAssessmentNavigation.ts
+31	31	0	0
+100.00%
+app/src/components/assessment/navigation/AssessmentProgress.tsx
+5	5	0	0
+100.00%
+app/src/components/assessment/navigation/NavigationControls.tsx
+20	20	0	0
+100.00%
+app/src/components/assessment/steps/IntroStep.tsx
+8	8	0	0
+100.00%
+app/src/components/assessment/steps/MultiSelectStep.tsx
+24	24	0	0
+100.00%
+app/src/components/assessment/steps/ScaleStep.tsx
+14	14	0	0
+100.00%
+app/src/components/assessment/steps/SingleSelectStep.tsx
+20	20	0	0
+100.00%
+app/src/components/assessment/steps/SynthesisStep.tsx
+48	48	0	0
+100.00%
+app/src/components/assessment/steps/TextareaStep.tsx
+7	7	0	0
+100.00%
+app/src/components/auth/AuthGuard.tsx
+16	16	0	0
+100.00%
+app/src/components/auth/AuthPage.tsx
+39	39	0	0
+100.00%
+app/src/components/auth/PasswordResetPage.tsx
+11	11	0	0
+100.00%
+app/src/components/auth/forms/FormButton.tsx
+15	15	0	0
+100.00%
+app/src/components/insights/InsightCard.tsx
+31	31	0	0
+100.00%
+app/src/components/shared/DateBadge.tsx
+7	7	0	0
+100.00%
+app/src/components/shared/InkBrushDecoration.tsx
+5	5	0	0
+100.00%
+app/src/components/shared/LanguageToggle.tsx
+13	13	0	0
+100.00%
+app/src/components/shared/LoadingFallback.tsx
+5	5	0	0
+100.00%
+app/src/config/auth.config.ts
+1	1	0	0
+100.00%
+app/src/contexts/ThemeContext.ts
+1	1	0	0
+100.00%
+app/src/services/api/ClaudeService.ts
+11	11	0	0
+100.00%
+app/src/stores/useAnalysisStore.ts
+45	45	0	0
+100.00%
+app/src/stores/useAssessmentStore.ts
+30	30	0	0
+100.00%
+app/src/stores/useAuthStore.ts
+33	33	0	0
+100.00%
+shared/src/labels.ts
+4	4	0	0
+100.00%
+worker/src/jobs/token-cleanup.job.ts
+14	14	0	0
+100.00%
+worker/src/scheduler/index.ts
+43	43	0	0
+100.00%
+backend/src/controllers/claude.controller.ts
+13	13	0	0
+100.00%
+backend/src/controllers/health.controller.ts
+12	12	0	0
+100.00%
+backend/src/health/health-service.ts
+53	53	0	0
+100.00%
+backend/src/health/checks/anthropic.check.ts
+12	12	0	0
+100.00%
+backend/src/health/checks/prompt-cache.check.ts
+6	6	0	0
+100.00%
+backend/src/health/checks/prompt-service.check.ts
+15	15	0	0
+100.00%
+backend/src/middleware/cors.middleware.ts
+1	1	0	0
+100.00%
+backend/src/middleware/error.middleware.ts
+23	23	0	0
+100.00%
+backend/src/services/claude.service.ts
+46	46	0	0
+100.00%
+backend/src/services/claude/response-parser.ts
+5	5	0	0
+100.00%
+backend/src/utils/fetch-with-timeout.ts
+9	9	0	0
+100.00%
+backend/src/utils/json-validator.ts
+11	11	0	0
+100.00%
+backend/src/utils/logger.ts
+5	5	0	0
+100.00%
+backend/src/validators/claude.validator.ts
+8	8	0	0
+100.00%
+app/src/utils/logger.ts
+21	21	0	0
+100.00%
+worker/src/config/index.ts
+19	19	0	0
+100.00%
+prompt-service/src/constants/auth.ts
+1	1	0	0
+100.00%
+prompt-service/src/middleware/csrf.middleware.ts
+17	17	0	0
+100.00%
+prompt-service/src/middleware/rate-limit.middleware.ts
+9	9	0	0
+100.00%
+prompt-service/src/middleware/tracing.middleware.ts
+5	5	0	0
+100.00%
+prompt-service/src/utils/auth.ts
+4	4	0	0
+100.00%
+prompt-service/src/utils/crypto.ts
+11	11	0	0
+100.00%
+prompt-service/src/utils/password.ts
+12	12	0	0
+100.00%
+prompt-service/src/utils/token.ts
+13	13	0	0
+100.00%
+prompt-service/src/validators/ab-test.validator.ts
+11	11	0	0
+100.00%
+prompt-service/src/validators/auth.validator.ts
+13	13	0	0
+100.00%
+prompt-service/src/validators/prompt.validator.ts
+8	8	0	0
+100.00%
+prompt-service/src/validators/resolve.validator.ts
 # Production Deployment Guide
 
 This guide covers security considerations and configuration requirements for deploying Votive in production environments.
