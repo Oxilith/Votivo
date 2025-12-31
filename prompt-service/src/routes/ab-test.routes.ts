@@ -11,7 +11,8 @@
  * - @/controllers/ab-test.controller for request handling
  */
 
-import { Router, Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { abTestController } from '@/controllers';
 
 const router = Router();

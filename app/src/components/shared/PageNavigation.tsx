@@ -71,7 +71,7 @@ const PageNavigation: FC<PageNavigationProps> = ({
   const isAuthenticated = user !== null;
 
   // Check if we have any import/export options to show
-  const hasImportExport = onImport || onExportAssessment || onExportAnalysis;
+  const hasImportExport = onImport ?? onExportAssessment ?? onExportAnalysis;
 
   return (
     <nav className="fixed top-4 left-4 right-4 lg:top-6 lg:left-10 lg:right-10 z-[100] flex justify-between items-center px-4 py-3 lg:px-6 bg-[var(--bg-primary)]/85 backdrop-blur-[12px] border border-[var(--border)] transition-colors">

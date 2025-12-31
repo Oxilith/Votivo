@@ -14,7 +14,6 @@
  * - Mock BackgroundRefreshManager for isolation
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
 import { PromptClientService, PromptServiceUnavailableError, promptCacheService } from '@/services';
 import { createMockPromptConfig } from 'shared/testing';
 
@@ -22,7 +21,7 @@ import { createMockPromptConfig } from 'shared/testing';
 const mockCacheService = vi.mocked(promptCacheService);
 
 // Track scheduled refresh tasks for testing
-const mockScheduledTasks: Array<{ key: string; thinkingEnabled: boolean }> = [];
+const mockScheduledTasks: { key: string; thinkingEnabled: boolean }[] = [];
 
 // Mock BackgroundRefreshManager to isolate tests from async background operations
 vi.mock('@/utils/background-refresh-manager', () => ({
@@ -91,7 +90,7 @@ const originalFetch = globalThis.fetch;
 
 describe('PromptClientService', () => {
   let service: PromptClientService;
-  let mockFetch: Mock;
+  let mockFetch: ReturnType<typeof vi.fn>;
 
   const mockPromptConfig = createMockPromptConfig({
     prompt: 'Test prompt content',
@@ -222,7 +221,7 @@ describe('PromptClientService', () => {
 
       // Create a new service with mocked open circuit
       const { createCircuitBreaker } = await import('@/services/circuit-breaker.service.js');
-      (createCircuitBreaker as Mock).mockImplementationOnce(() => ({
+      (createCircuitBreaker as ReturnType<typeof vi.fn>).mockImplementationOnce(() => ({
         fire: vi.fn(),
         opened: true,
         halfOpen: false,

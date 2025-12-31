@@ -151,7 +151,7 @@ export interface CleanupOptions {
 export async function cleanupTestDb(options: CleanupOptions = {}): Promise<void> {
   const { strictMode = false } = options;
   const prisma = getTestPrisma();
-  const errors: Array<{ table: string; error: unknown }> = [];
+  const errors: { table: string; error: unknown }[] = [];
 
   for (const table of CLEANUP_TABLE_ORDER) {
     try {

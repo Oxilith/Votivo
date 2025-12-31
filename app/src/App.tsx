@@ -98,7 +98,7 @@ function App() {
       }
     };
 
-    initAuth();
+    void initAuth();
   }, [isAuthHydrated, isAuthInitialized, setAuth, setInitialized, setLoading, clearAuth]);
 
   const handleAssessmentComplete = useCallback(
@@ -186,7 +186,7 @@ function App() {
   }, [navigate, setPendingAuthReturn]);
 
   // Sign out - clear auth and all user data
-  const handleSignOut = useCallback(async () => {
+  const handleSignOutAsync = useCallback(async () => {
     try {
       await authService.logout();
     } catch {
@@ -198,6 +198,11 @@ function App() {
       navigate('landing');
     }
   }, [clearResponses, clearAnalysis, clearAuth, navigate]);
+
+  // Sync wrapper for event handlers
+  const handleSignOut = useCallback(() => {
+    void handleSignOutAsync();
+  }, [handleSignOutAsync]);
 
   const hasAnalysisResults = !!analysis;
 

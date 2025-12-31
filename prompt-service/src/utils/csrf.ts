@@ -42,7 +42,7 @@ export function generateCsrfToken(): string {
  */
 export function validateCsrfToken(token: string, expected: string): boolean {
   // Length check first (not timing-sensitive for different lengths)
-  if (!token || !expected || token.length !== expected.length) {
+  if (token.length !== expected.length) {
     return false;
   }
 

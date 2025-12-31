@@ -67,7 +67,7 @@ const InsightCard: React.FC<InsightCardProps> = ({ item }) => {
           {'icon' in item && item.icon && <span className="text-2xl">{item.icon}</span>}
           <h4 className={`font-display font-semibold ${textStyles.primary}`}>{item.title}</h4>
         </div>
-        {'severity' in item && item.severity && (
+        {'severity' in item && (
           <span
             className={`font-mono text-xs px-2 py-0.5 rounded-sm ${
               item.severity === 'high' ? badgeStyles.accent : badgeStyles.default
@@ -116,7 +116,7 @@ const InsightCard: React.FC<InsightCardProps> = ({ item }) => {
       )}
 
       {/* Sides / Tension (contradictions) */}
-      {'sides' in item && item.sides && (
+      {'sides' in item && (
         <div className="space-y-1">
           <p className={`font-mono text-xs uppercase tracking-wider ${textStyles.muted}`}>
             {t('cards.theTension')}

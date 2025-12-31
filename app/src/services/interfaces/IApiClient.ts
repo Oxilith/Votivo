@@ -47,12 +47,12 @@ export interface IApiClient {
   /**
    * Performs a POST request
    */
-  post<T, B = unknown>(url: string, body: B, config?: RequestConfig): Promise<ApiResponse<T>>;
+  post<T>(url: string, body: unknown, config?: RequestConfig): Promise<ApiResponse<T>>;
 
   /**
    * Performs a PUT request
    */
-  put<T, B = unknown>(url: string, body: B, config?: RequestConfig): Promise<ApiResponse<T>>;
+  put<T>(url: string, body: unknown, config?: RequestConfig): Promise<ApiResponse<T>>;
 
   /**
    * Performs a DELETE request

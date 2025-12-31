@@ -34,7 +34,7 @@ const UserAvatarDropdown: FC<UserAvatarDropdownProps> = ({
   // Get user initial for avatar
   const userInitial = user?.name
     ? user.name.charAt(0).toUpperCase()
-    : user?.email?.charAt(0).toUpperCase() ?? '?';
+    : user?.email.charAt(0).toUpperCase() ?? '?';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -67,7 +67,7 @@ const UserAvatarDropdown: FC<UserAvatarDropdownProps> = ({
     <div className="relative" ref={dropdownRef}>
       {/* Avatar Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { setIsOpen(!isOpen); }}
         className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--accent)] text-white font-body text-sm font-medium hover:opacity-90 transition-opacity"
         aria-label={t('nav.profile')}
         aria-expanded={isOpen}

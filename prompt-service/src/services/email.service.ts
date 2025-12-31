@@ -61,12 +61,12 @@ export interface EmailVerificationInput {
  * Creates SMTP configuration from environment variables
  */
 export function createSmtpConfig(): SmtpConfig {
-  const host = process.env['SMTP_HOST'] ?? '';
-  const port = parseInt(process.env['SMTP_PORT'] ?? '587', 10);
-  const secure = process.env['SMTP_SECURE'] === 'true';
-  const user = process.env['SMTP_USER'] ?? '';
-  const password = process.env['SMTP_PASSWORD'] ?? '';
-  const from = process.env['SMTP_FROM'] ?? 'noreply@votive.app';
+  const host = process.env.SMTP_HOST ?? '';
+  const port = parseInt(process.env.SMTP_PORT ?? '587', 10);
+  const secure = process.env.SMTP_SECURE === 'true';
+  const user = process.env.SMTP_USER ?? '';
+  const password = process.env.SMTP_PASSWORD ?? '';
+  const from = process.env.SMTP_FROM ?? 'noreply@votive.app';
 
   return { host, port, secure, user, password, from };
 }
@@ -75,7 +75,7 @@ export function createSmtpConfig(): SmtpConfig {
  * Gets the application URL for email links
  */
 function getAppUrl(): string {
-  return process.env['APP_URL'] ?? 'http://localhost:3000';
+  return process.env.APP_URL ?? 'http://localhost:3000';
 }
 
 export class EmailService {
@@ -263,7 +263,7 @@ If you didn't create a Votive account, you can safely ignore this email.
     if (!this.isConfigured()) {
       const errorMessage = 'Email service is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD environment variables.';
       // Log warning in development, return skipped result
-      if (process.env['NODE_ENV'] === 'development') {
+      if (process.env.NODE_ENV === 'development') {
         console.warn(`[EmailService] ${errorMessage}`);
         console.warn(`[EmailService] Would have sent email to: ${options.to}`);
         console.warn(`[EmailService] Subject: ${options.subject}`);

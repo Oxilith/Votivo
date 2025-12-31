@@ -283,3 +283,54 @@ export function createEmptyAnalysisResult(): AIAnalysisResult {
     identitySynthesis: createMockIdentitySynthesis(),
   };
 }
+
+/**
+ * Frontend format for saved analyses (parsed JSON, ISO date strings).
+ * Use this type for frontend store tests where data is already parsed.
+ */
+export interface SavedAnalysisFrontend {
+  id: string;
+  userId: string;
+  assessmentId: string | null;
+  result: AIAnalysisResult;
+  language: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Extended options for creating a mock saved analysis (frontend format)
+ */
+export interface MockSavedAnalysisOptions extends MockAnalysisRecordOptions {
+  language?: string;
+  updatedAt?: Date;
+}
+
+/**
+ * Creates a mock analysis in frontend format (parsed result, ISO date strings).
+ * Use this for testing frontend stores where data has already been processed.
+ *
+ * @param options - Optional overrides for record fields
+ * @returns Mock analysis in frontend-ready format
+ *
+ * @example
+ * ```typescript
+ * const analysis = createMockSavedAnalysis({ userId: 'user-123' });
+ * expect(analysis.result.patterns).toBeDefined();
+ * ```
+ */
+export function createMockSavedAnalysis(
+  options: MockSavedAnalysisOptions = {}
+): SavedAnalysisFrontend {
+  const now = new Date();
+
+  return {
+    id: options.id ?? faker.string.uuid(),
+    userId: options.userId ?? faker.string.uuid(),
+    assessmentId: options.assessmentId ?? null,
+    result: options.result ?? createMockAnalysisResult(),
+    language: options.language ?? 'english',
+    createdAt: (options.createdAt ?? now).toISOString(),
+    updatedAt: (options.updatedAt ?? now).toISOString(),
+  };
+}

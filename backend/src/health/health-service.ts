@@ -19,11 +19,11 @@ import type {
 } from './types';
 
 const DEFAULT_TIMEOUT_MS = 5000;
-const VERSION = process.env['npm_package_version'] ?? '1.0.0';
+const VERSION = process.env.npm_package_version ?? '1.0.0';
 
 export class HealthService {
   private checks: HealthCheck[] = [];
-  private cachedResults: Map<string, ComponentHealth> = new Map();
+  private cachedResults = new Map<string, ComponentHealth>();
   private readonly startTime = Date.now();
 
   register(check: HealthCheck): void {
@@ -56,11 +56,11 @@ export class HealthService {
   }
 
   async evaluate(): Promise<HealthCheckResult> {
-    const checkResults: Array<{
+    const checkResults: {
       name: string;
       critical: boolean;
       result: ComponentHealth;
-    }> = [];
+    }[] = [];
 
     // Process all checks
     for (const check of this.checks) {

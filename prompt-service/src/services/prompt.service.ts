@@ -204,13 +204,13 @@ export class PromptService {
         if (input.variants.withThinking) {
           const thinkingData: Record<string, number> = {};
           if (input.variants.withThinking.temperature !== undefined) {
-            thinkingData['temperature'] = input.variants.withThinking.temperature;
+            thinkingData.temperature = input.variants.withThinking.temperature;
           }
           if (input.variants.withThinking.maxTokens !== undefined) {
-            thinkingData['maxTokens'] = input.variants.withThinking.maxTokens;
+            thinkingData.maxTokens = input.variants.withThinking.maxTokens;
           }
           if (input.variants.withThinking.budgetTokens !== undefined) {
-            thinkingData['budgetTokens'] = input.variants.withThinking.budgetTokens;
+            thinkingData.budgetTokens = input.variants.withThinking.budgetTokens;
           }
           if (Object.keys(thinkingData).length > 0) {
             await tx.promptVariant.updateMany({
@@ -222,10 +222,10 @@ export class PromptService {
         if (input.variants.withoutThinking) {
           const nonThinkingData: Record<string, number> = {};
           if (input.variants.withoutThinking.temperature !== undefined) {
-            nonThinkingData['temperature'] = input.variants.withoutThinking.temperature;
+            nonThinkingData.temperature = input.variants.withoutThinking.temperature;
           }
           if (input.variants.withoutThinking.maxTokens !== undefined) {
-            nonThinkingData['maxTokens'] = input.variants.withoutThinking.maxTokens;
+            nonThinkingData.maxTokens = input.variants.withoutThinking.maxTokens;
           }
           if (Object.keys(nonThinkingData).length > 0) {
             await tx.promptVariant.updateMany({
@@ -277,7 +277,7 @@ export class PromptService {
       where: { id: versionId },
     });
 
-    if (!version || version.promptId !== promptId) {
+    if (version?.promptId !== promptId) {
       throw new NotFoundError('Version', versionId);
     }
 

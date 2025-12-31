@@ -51,14 +51,14 @@ describe('EmailService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset environment variables
-    delete process.env['SMTP_HOST'];
-    delete process.env['SMTP_PORT'];
-    delete process.env['SMTP_SECURE'];
-    delete process.env['SMTP_USER'];
-    delete process.env['SMTP_PASSWORD'];
-    delete process.env['SMTP_FROM'];
-    delete process.env['APP_URL'];
-    delete process.env['NODE_ENV'];
+    delete process.env.SMTP_HOST;
+    delete process.env.SMTP_PORT;
+    delete process.env.SMTP_SECURE;
+    delete process.env.SMTP_USER;
+    delete process.env.SMTP_PASSWORD;
+    delete process.env.SMTP_FROM;
+    delete process.env.APP_URL;
+    delete process.env.NODE_ENV;
   });
 
   afterEach(() => {
@@ -80,12 +80,12 @@ describe('EmailService', () => {
     });
 
     it('should read values from environment variables', () => {
-      process.env['SMTP_HOST'] = 'smtp.test.com';
-      process.env['SMTP_PORT'] = '465';
-      process.env['SMTP_SECURE'] = 'true';
-      process.env['SMTP_USER'] = 'testuser';
-      process.env['SMTP_PASSWORD'] = 'testpass';
-      process.env['SMTP_FROM'] = 'test@test.com';
+      process.env.SMTP_HOST = 'smtp.test.com';
+      process.env.SMTP_PORT = '465';
+      process.env.SMTP_SECURE = 'true';
+      process.env.SMTP_USER = 'testuser';
+      process.env.SMTP_PASSWORD = 'testpass';
+      process.env.SMTP_FROM = 'test@test.com';
 
       const config = createSmtpConfig();
 
@@ -100,7 +100,7 @@ describe('EmailService', () => {
     });
 
     it('should handle invalid port gracefully', () => {
-      process.env['SMTP_PORT'] = 'not-a-number';
+      process.env.SMTP_PORT = 'not-a-number';
 
       const config = createSmtpConfig();
 
@@ -202,7 +202,7 @@ describe('EmailService', () => {
 
     it('should include reset URL with token in email body', async () => {
       mockTransporter.sendMail.mockResolvedValue({ messageId: 'msg-123' });
-      process.env['APP_URL'] = 'https://votive.app';
+      process.env.APP_URL = 'https://votive.app';
       const emailService = new EmailService(validSmtpConfig);
 
       await emailService.sendPasswordResetEmail(resetEmailInput);
@@ -239,7 +239,7 @@ describe('EmailService', () => {
     it('should handle send errors gracefully', async () => {
       mockTransporter.sendMail.mockRejectedValue(new Error('SMTP error'));
       const emailService = new EmailService(validSmtpConfig);
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
 
       const result = await emailService.sendPasswordResetEmail(resetEmailInput);
 
@@ -250,12 +250,12 @@ describe('EmailService', () => {
     });
 
     it('should return skipped result in development mode without SMTP config', async () => {
-      process.env['NODE_ENV'] = 'development';
+      process.env.NODE_ENV = 'development';
       const unconfiguredService = new EmailService({
         ...validSmtpConfig,
         host: '',
       });
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
       const result = await unconfiguredService.sendPasswordResetEmail(resetEmailInput);
 
@@ -268,7 +268,7 @@ describe('EmailService', () => {
     });
 
     it('should return error in production mode without SMTP config', async () => {
-      process.env['NODE_ENV'] = 'production';
+      process.env.NODE_ENV = 'production';
       const unconfiguredService = new EmailService({
         ...validSmtpConfig,
         host: '',
@@ -307,7 +307,7 @@ describe('EmailService', () => {
 
     it('should include verification URL with token in email body', async () => {
       mockTransporter.sendMail.mockResolvedValue({ messageId: 'msg-456' });
-      process.env['APP_URL'] = 'https://votive.app';
+      process.env.APP_URL = 'https://votive.app';
       const emailService = new EmailService(validSmtpConfig);
 
       await emailService.sendEmailVerificationEmail(verifyEmailInput);
@@ -343,7 +343,7 @@ describe('EmailService', () => {
     it('should handle send errors gracefully', async () => {
       mockTransporter.sendMail.mockRejectedValue(new Error('Connection refused'));
       const emailService = new EmailService(validSmtpConfig);
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
 
       const result = await emailService.sendEmailVerificationEmail(verifyEmailInput);
 
@@ -388,7 +388,7 @@ describe('EmailService', () => {
       });
 
       // Should not throw
-      expect(() => emailService.close()).not.toThrow();
+      expect(() => { emailService.close(); }).not.toThrow();
     });
   });
 
@@ -443,7 +443,7 @@ describe('EmailService', () => {
     it('should handle non-Error exceptions', async () => {
       mockTransporter.sendMail.mockRejectedValue('String error');
       const emailService = new EmailService(validSmtpConfig);
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
 
       const result = await emailService.sendPasswordResetEmail({
         to: 'user@example.com',

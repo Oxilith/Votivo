@@ -79,7 +79,7 @@ const PasswordResetConfirmForm: React.FC<PasswordResetConfirmFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmitAsync = async (e: FormEvent) => {
     e.preventDefault();
     setApiError(null);
 
@@ -101,6 +101,10 @@ const PasswordResetConfirmForm: React.FC<PasswordResetConfirmFormProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    void handleSubmitAsync(e);
   };
 
   if (isSuccess) {
@@ -142,7 +146,7 @@ const PasswordResetConfirmForm: React.FC<PasswordResetConfirmFormProps> = ({
           label={t('resetPassword.password')}
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => { setPassword(e.target.value); }}
           error={errors.password}
           required
           autoComplete="new-password"
@@ -153,7 +157,7 @@ const PasswordResetConfirmForm: React.FC<PasswordResetConfirmFormProps> = ({
           label={t('resetPassword.confirmPassword')}
           type="password"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={(e) => { setConfirmPassword(e.target.value); }}
           error={errors.confirmPassword}
           required
           autoComplete="new-password"

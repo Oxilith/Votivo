@@ -22,7 +22,7 @@ import { logger } from '@/utils';
  * Scheduler class for managing background jobs
  */
 export class Scheduler {
-  private tasks: Map<string, cron.ScheduledTask> = new Map();
+  private tasks = new Map<string, cron.ScheduledTask>();
   private log = logger.child({ component: 'scheduler' });
 
   /**

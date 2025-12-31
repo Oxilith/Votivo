@@ -68,7 +68,7 @@ import {
   ArrowRightIcon,
 } from '@/components';
 import InsightsPageHeader from './InsightsPageHeader';
-import { importFromJson } from '@/utils';
+import { importFromJson, logger } from '@/utils';
 
 interface Tab {
   id: string;
@@ -128,16 +128,16 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
       if (isAuthenticated) {
         // Auto-save for authenticated users
         // Pass viewingAssessmentId to link this analysis to its assessment
-        const saveAnalysis = async () => {
+        const saveAnalysisAsync = async () => {
           try {
             await authService.saveAnalysis(storeAnalysis, viewingAssessmentId ?? undefined);
             setHasSaved(true);
-          } catch {
+          } catch (error) {
             // Silently fail - user can still see their analysis
-            console.error('Failed to save analysis');
+            logger.error('Failed to save analysis', error);
           }
         };
-        saveAnalysis();
+        void saveAnalysisAsync();
       }
     }
   }, [storeAnalysis, isAuthenticated, loading, isReadOnly, viewingAssessmentId]);
@@ -153,11 +153,11 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
       const timer = setTimeout(() => {
         setShowSavePrompt(true);
       }, 500);
-      return () => clearTimeout(timer);
+      return () => { clearTimeout(timer); };
     }
   }, [shouldShowPrompt]);
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelectAsync = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -170,6 +170,10 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
     }
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    void handleFileSelectAsync(event);
+  };
+
   const handleExportClick = () => {
     onExport?.();
   };
@@ -180,7 +184,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
   const hasResponses = Object.keys(responses).length > 0;
 
-  const analyzeWithClaude = useCallback(async () => {
+  const analyzeWithClaudeAsync = useCallback(async () => {
     const language = i18n.language === 'pl' ? 'polish' : 'english';
     setHasSaved(false); // Reset saved state for new analysis
 
@@ -197,6 +201,10 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
     await analyze(responses, language, userProfile);
   }, [analyze, responses, i18n.language, currentUser]);
+
+  const analyzeWithClaude = useCallback(() => {
+    void analyzeWithClaudeAsync();
+  }, [analyzeWithClaudeAsync]);
 
   // Save prompt handlers - use returnTo so user comes back to insights after auth
   const handleSavePromptSignIn = useCallback(() => {
@@ -224,11 +232,11 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
   const tabs: Tab[] = analysis
     ? [
-        { id: 'patterns', label: t('tabs.patterns'), count: analysis.patterns?.length ?? 0, icon: <SearchIcon size="md" /> },
-        { id: 'contradictions', label: t('tabs.contradictions'), count: analysis.contradictions?.length ?? 0, icon: <SwitchHorizontalIcon size="md" /> },
-        { id: 'blindSpots', label: t('tabs.blindSpots'), count: analysis.blindSpots?.length ?? 0, icon: <EyeIcon size="md" /> },
-        { id: 'leverage', label: t('tabs.leverage'), count: analysis.leveragePoints?.length ?? 0, icon: <TargetIcon size="md" /> },
-        { id: 'risks', label: t('tabs.risks'), count: analysis.risks?.length ?? 0, icon: <AlertTriangleIcon size="md" /> },
+        { id: 'patterns', label: t('tabs.patterns'), count: analysis.patterns.length, icon: <SearchIcon size="md" /> },
+        { id: 'contradictions', label: t('tabs.contradictions'), count: analysis.contradictions.length, icon: <SwitchHorizontalIcon size="md" /> },
+        { id: 'blindSpots', label: t('tabs.blindSpots'), count: analysis.blindSpots.length, icon: <EyeIcon size="md" /> },
+        { id: 'leverage', label: t('tabs.leverage'), count: analysis.leveragePoints.length, icon: <TargetIcon size="md" /> },
+        { id: 'risks', label: t('tabs.risks'), count: analysis.risks.length, icon: <AlertTriangleIcon size="md" /> },
         { id: 'synthesis', label: t('tabs.synthesis'), count: null, icon: <MirrorIcon size="md" /> },
       ]
     : [];
@@ -260,7 +268,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
         currentPage="insights"
         onNavigateToLanding={onNavigateToLanding}
         onNavigateToAssessment={onNavigateToAssessment}
-        onNavigateToInsights={() => {}} // Already on insights
+        onNavigateToInsights={undefined} // Already on insights
         onNavigateToAuth={onNavigateToAuth}
         onExportAssessment={isReadOnly ? undefined : (hasResponses ? handleExportClick : undefined)}
         onExportAnalysis={isReadOnly ? undefined : (hasAnalysis && onExportAnalysis ? handleExportAnalysisClick : undefined)}
@@ -283,7 +291,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
           <ErrorCircleIcon size="sm" className="flex-shrink-0" />
           <span>{importError}</span>
           <button
-            onClick={() => setImportError(null)}
+            onClick={() => { setImportError(null); }}
             className="ml-auto text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
           >
             ✕
@@ -482,7 +490,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => { setActiveTab(tab.id); }}
                     className={`px-4 py-3 font-body text-sm font-medium whitespace-nowrap border-b-2 transition-colors flex-1 flex items-center justify-center gap-2 ${
                       activeTab === tab.id
                         ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent)]/5'
@@ -507,17 +515,17 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
             {/* Content */}
             <div className="space-y-4">
-              {activeTab === 'patterns' && analysis.patterns?.map((item: AnalysisPattern, i: number) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'patterns' && analysis.patterns.map((item: AnalysisPattern, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'contradictions' && analysis.contradictions?.map((item: AnalysisContradiction, i: number) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'contradictions' && analysis.contradictions.map((item: AnalysisContradiction, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'blindSpots' && analysis.blindSpots?.map((item: AnalysisBlindSpot, i: number) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'blindSpots' && analysis.blindSpots.map((item: AnalysisBlindSpot, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'leverage' && analysis.leveragePoints?.map((item: AnalysisLeveragePoint, i: number) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'leverage' && analysis.leveragePoints.map((item: AnalysisLeveragePoint, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'risks' && analysis.risks?.map((item: AnalysisRisk, i: number) => <InsightCard key={i} item={item} />)}
+              {activeTab === 'risks' && analysis.risks.map((item: AnalysisRisk, i: number) => <InsightCard key={i} item={item} />)}
 
-              {activeTab === 'synthesis' && analysis.identitySynthesis && (
+              {activeTab === 'synthesis' && (
                 <div className="space-y-6">
                   <div className={`p-6 ${cardStyles.hero}`}>
                     <div className="flex items-center gap-2 mb-4">
@@ -527,7 +535,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
                     <p className={`font-body ${textStyles.secondary} leading-relaxed`}>{analysis.identitySynthesis.currentIdentityCore}</p>
                   </div>
 
-                  {analysis.identitySynthesis.hiddenStrengths?.length > 0 && (
+                  {analysis.identitySynthesis.hiddenStrengths.length > 0 && (
                     <div className={`p-5 ${cardStyles.base}`}>
                       <h4 className={`font-display font-semibold ${textStyles.primary} mb-3 flex items-center gap-2`}>
                         <LightningBoltIcon size="md" className="text-[var(--accent)]" />

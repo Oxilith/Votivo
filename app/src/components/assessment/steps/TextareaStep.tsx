@@ -21,8 +21,6 @@ interface TextareaStepProps {
 }
 
 export const TextareaStep: React.FC<TextareaStepProps> = ({ step, value, onChange, isReadOnly = false }) => {
-  const currentValue = value ?? '';
-
   return (
     <div className="space-y-4">
       <div>
@@ -34,8 +32,8 @@ export const TextareaStep: React.FC<TextareaStepProps> = ({ step, value, onChang
         )}
       </div>
       <textarea
-        value={currentValue}
-        onChange={(e) => !isReadOnly && onChange(e.target.value)}
+        value={value}
+        onChange={isReadOnly ? undefined : (e) => { onChange(e.target.value); }}
         placeholder={step.placeholder}
         rows={step.rows ?? 5}
         readOnly={isReadOnly}

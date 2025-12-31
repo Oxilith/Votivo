@@ -60,9 +60,7 @@ export interface ModelMock {
  * Model properties mapped from MODEL_NAMES.
  * Ensures interface stays in sync with the const array.
  */
-type ModelProperties = {
-  [K in ModelName]: ModelMock;
-};
+type ModelProperties = Record<ModelName, ModelMock>;
 
 /**
  * Mock Prisma client interface covering all models from the schema.

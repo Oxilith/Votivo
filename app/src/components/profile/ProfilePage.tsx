@@ -79,8 +79,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
   // Profile form state
   const [name, setName] = useState(user?.name ?? '');
-  const [birthYear, setBirthYear] = useState(user?.birthYear?.toString() ?? '');
-  const [gender, setGender] = useState<Gender | ''>(user?.gender ?? '');
+  const [birthYear, setBirthYear] = useState(user ? String(user.birthYear) : '');
+  const [gender, setGender] = useState<Gender>(user?.gender ?? 'prefer-not-to-say');
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
@@ -118,13 +118,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   useEffect(() => {
     if (user) {
       setName(user.name);
-      setBirthYear(user.birthYear?.toString() ?? '');
-      setGender(user.gender ?? '');
+      setBirthYear(String(user.birthYear));
+      setGender(user.gender);
     }
   }, [user]);
 
   // Load functions wrapped in useCallback
-  const loadAssessments = useCallback(async () => {
+  const loadAssessmentsAsync = useCallback(async () => {
     setAssessmentsLoading(true);
     setAssessmentsError(null);
     try {
@@ -139,7 +139,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   }, [setAssessmentsList, t]);
 
-  const loadAnalyses = useCallback(async () => {
+  const loadAssessments = useCallback(() => {
+    void loadAssessmentsAsync();
+  }, [loadAssessmentsAsync]);
+
+  const loadAnalysesAsync = useCallback(async () => {
     setAnalysesLoading(true);
     setAnalysesError(null);
     try {
@@ -153,6 +157,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       setAnalysesLoading(false);
     }
   }, [setAnalysesList, t]);
+
+  const loadAnalyses = useCallback(() => {
+    void loadAnalysesAsync();
+  }, [loadAnalysesAsync]);
 
   // Load assessments when tab changes (only if cache is stale or empty)
   useEffect(() => {
@@ -180,7 +188,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     setView('insights');
   }, [setView]);
 
-  const handleLogout = async () => {
+  const handleLogoutAsync = useCallback(async () => {
     try {
       await authService.logout();
     } catch {
@@ -192,9 +200,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       clearAuth();
       setView('landing');
     }
-  };
+  }, [clearResponses, clearAnalysis, clearAuth, setView]);
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
+  const handleLogout = useCallback(() => {
+    void handleLogoutAsync();
+  }, [handleLogoutAsync]);
+
+  const handleProfileSubmitAsync = async (e: React.FormEvent) => {
     e.preventDefault();
     setProfileError(null);
     setProfileSuccess(false);
@@ -203,12 +215,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     try {
       const updates: ProfileUpdateRequest = {};
       if (name !== user?.name) updates.name = name;
-      if (birthYear !== user?.birthYear?.toString()) updates.birthYear = parseInt(birthYear, 10);
-      if (gender !== (user?.gender ?? '')) updates.gender = gender || undefined;
+      if (birthYear !== String(user?.birthYear)) updates.birthYear = parseInt(birthYear, 10);
+      if (gender !== user?.gender) updates.gender = gender;
 
       if (Object.keys(updates).length === 0) {
         setProfileSuccess(true);
-        setTimeout(() => setProfileSuccess(false), 3000);
+        setTimeout(() => { setProfileSuccess(false); }, 3000);
         setProfileLoading(false);
         return;
       }
@@ -216,7 +228,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       const updatedUser = await authService.updateProfile(updates);
       setUser(updatedUser);
       setProfileSuccess(true);
-      setTimeout(() => setProfileSuccess(false), 3000);
+      setTimeout(() => { setProfileSuccess(false); }, 3000);
     } catch (error) {
       // Use translated error message to avoid leaking internal details
       logger.error('Profile update failed', error);
@@ -226,7 +238,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   };
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
+  const handleProfileSubmit = (e: React.FormEvent) => {
+    void handleProfileSubmitAsync(e);
+  };
+
+  const handlePasswordSubmitAsync = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
     setPasswordSuccess(false);
@@ -258,7 +274,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      setTimeout(() => setPasswordSuccess(false), 3000);
+      setTimeout(() => { setPasswordSuccess(false); }, 3000);
     } catch (error) {
       // Use translated error message to avoid leaking internal details
       logger.error('Password change failed', error);
@@ -268,7 +284,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     }
   };
 
-  const handleDeleteAccount = async () => {
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    void handlePasswordSubmitAsync(e);
+  };
+
+  const handleDeleteAccountAsync = async () => {
     setDeleteLoading(true);
     setDeleteError(null);
     try {
@@ -282,6 +302,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       setDeleteLoading(false);
       setShowDeleteConfirm(false);
     }
+  };
+
+  const handleDeleteAccount = () => {
+    void handleDeleteAccountAsync();
   };
 
   const formatDate = (dateString: string) => {
@@ -312,8 +336,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
         onNavigateToLanding={handleNavigateToLanding}
         onNavigateToAssessment={handleNavigateToAssessment}
         onNavigateToInsights={handleNavigateToInsights}
-        onNavigateToAuth={() => {}} // Already authenticated on profile page
-        onNavigateToProfile={() => {}} // Already on profile
+        onNavigateToAuth={undefined}
+        onNavigateToProfile={undefined}
         onSignOut={handleLogout}
       />
 
@@ -336,7 +360,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
               {tabs.map((tab) => (
                 <li key={tab.id}>
                   <button
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => { setActiveTab(tab.id); }}
                     className={`
                       w-full text-left px-4 py-2 font-body text-sm rounded-sm transition-colors whitespace-nowrap
                       ${activeTab === tab.id
@@ -381,7 +405,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     label={t('profileTab.name')}
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => { setName(e.target.value); }}
                     required
                   />
 
@@ -389,7 +413,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     label={t('profileTab.birthYear')}
                     type="number"
                     value={birthYear}
-                    onChange={(e) => setBirthYear(e.target.value)}
+                    onChange={(e) => { setBirthYear(e.target.value); }}
                     min={minYear}
                     max={maxYear}
                     required
@@ -405,7 +429,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     <select
                       id="gender"
                       value={gender}
-                      onChange={(e) => setGender(e.target.value as Gender | '')}
+                      onChange={(e) => { setGender(e.target.value as Gender); }}
                       className={`
                         w-full p-3 font-body text-base
                         bg-[var(--bg-primary)] text-[var(--text-primary)]
@@ -414,7 +438,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                         focus:outline-none focus:border-[var(--accent)]
                       `}
                     >
-                      <option value="">{t('profileTab.genderOptions.default')}</option>
+                      <option value="prefer-not-to-say">{t('profileTab.genderOptions.default')}</option>
                       <option value="male">{t('profileTab.genderOptions.male')}</option>
                       <option value="female">{t('profileTab.genderOptions.female')}</option>
                       <option value="other">{t('profileTab.genderOptions.other')}</option>
@@ -451,7 +475,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     label={t('passwordTab.currentPassword')}
                     type="password"
                     value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    onChange={(e) => { setCurrentPassword(e.target.value); }}
                     required
                     autoComplete="current-password"
                   />
@@ -460,7 +484,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     label={t('passwordTab.newPassword')}
                     type="password"
                     value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    onChange={(e) => { setNewPassword(e.target.value); }}
                     required
                     autoComplete="new-password"
                     placeholder={t('passwordTab.newPasswordPlaceholder')}
@@ -470,7 +494,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     label={t('passwordTab.confirmPassword')}
                     type="password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => { setConfirmPassword(e.target.value); }}
                     required
                     autoComplete="new-password"
                   />
@@ -586,11 +610,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                           <p className="font-body text-[var(--text-primary)]">
                             {t('analysesTab.fromDate', { date: formatDate(analysis.createdAt) })}
                           </p>
-                          {analysis.result.identitySynthesis && (
-                            <p className="font-body text-sm text-[var(--text-secondary)] mt-1 line-clamp-2">
-                              {analysis.result.identitySynthesis.currentIdentityCore}
-                            </p>
-                          )}
+                          <p className="font-body text-sm text-[var(--text-secondary)] mt-1 line-clamp-2">
+                            {analysis.result.identitySynthesis.currentIdentityCore}
+                          </p>
                         </li>
                       ))}
                     </ul>
@@ -624,7 +646,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     {!showDeleteConfirm ? (
                       <button
                         type="button"
-                        onClick={() => setShowDeleteConfirm(true)}
+                        onClick={() => { setShowDeleteConfirm(true); }}
                         className="px-4 py-2 font-body text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-sm transition-colors"
                       >
                         {t('dangerTab.deleteButton')}
@@ -645,7 +667,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                           </button>
                           <button
                             type="button"
-                            onClick={() => setShowDeleteConfirm(false)}
+                            onClick={() => { setShowDeleteConfirm(false); }}
                             className="px-4 py-2 font-body text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                           >
                             {t('dangerTab.cancel')}

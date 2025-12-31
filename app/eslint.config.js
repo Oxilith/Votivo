@@ -1,30 +1,84 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
+// eslint.config.js
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import vitest from '@vitest/eslint-plugin';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 
-export default defineConfig([
-  globalIgnores(['dist', 'coverage']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+export default tseslint.config(
+    eslint.configs.recommended,
+
+    {
+        ignores: ['dist/**', 'node_modules/**', '*.js', '*.mjs', 'coverage/**', 'vitest.config.ts', 'vite.config.ts'],
     },
-  },
-  // Disable react-refresh for test files
-  {
-    files: ['**/test/**/*.{ts,tsx}', '**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
-    rules: {
-      'react-refresh/only-export-components': 'off',
+
+    // Production code - strict type-checked rules with React
+    {
+        files: ['src/**/*.{ts,tsx}'],
+        ignores: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.spec.ts', 'src/**/*.spec.tsx', 'src/test/**'],
+        extends: [
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.stylisticTypeChecked,
+        ],
+        plugins: {
+            'react-hooks': reactHooks,
+            'react-refresh': reactRefresh,
+        },
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'module',
+            globals: {
+                ...globals.browser,
+            },
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        rules: {
+            ...reactHooks.configs.recommended.rules,
+            'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+            ],
+            '@typescript-eslint/consistent-type-imports': 'error',
+            '@typescript-eslint/no-import-type-side-effects': 'error',
+        },
     },
-  },
-])
+
+    // Test files - strict rules without type-checking (vitest globals cause type issues)
+    {
+        files: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.spec.ts', 'src/**/*.spec.tsx', 'src/test/**/*.{ts,tsx}'],
+        extends: [
+            ...tseslint.configs.strict,
+            ...tseslint.configs.stylistic,
+        ],
+        plugins: {
+            vitest,
+        },
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'module',
+            globals: {
+                ...globals.browser,
+                ...vitest.environments.env.globals,
+            },
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        rules: {
+            ...vitest.configs.recommended.rules,
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+            ],
+            // Allow empty functions in tests (mock implementations)
+            '@typescript-eslint/no-empty-function': 'off',
+            'react-refresh/only-export-components': 'off',
+        },
+    }
+);

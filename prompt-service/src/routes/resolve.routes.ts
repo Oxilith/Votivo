@@ -10,7 +10,8 @@
  * - @/controllers/resolve.controller for request handling
  */
 
-import { Router, Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { resolveController } from '@/controllers';
 
 const router = Router();

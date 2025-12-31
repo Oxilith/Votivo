@@ -35,6 +35,7 @@ export class RequestBuilder {
    * Creates a new RequestBuilder instance.
    * Prefer using the static `create()` method or `requestBuilder()` function.
    */
+  // eslint-disable-next-line @typescript-eslint/no-empty-function -- Private constructor for static factory pattern
   private constructor() {}
 
   /**

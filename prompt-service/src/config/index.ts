@@ -104,17 +104,17 @@ type Config = z.infer<typeof configSchema> & {
 };
 
 function loadConfig(): Config {
-  const nodeEnv = process.env['NODE_ENV'] ?? 'development';
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
   const isProduction = nodeEnv === 'production';
 
   // Validate required production environment variables
   if (isProduction) {
-    if (!process.env['DATABASE_URL']) {
+    if (!process.env.DATABASE_URL) {
       throw new Error(
         'DATABASE_URL is required in production. Cannot use default dev.db in production environment.'
       );
     }
-    if (!process.env['SESSION_SECRET']) {
+    if (!process.env.SESSION_SECRET) {
       throw new Error(
         'SESSION_SECRET is required in production. Using ADMIN_API_KEY as fallback is a security risk - if the API key leaks, session cookies can be forged.'
       );
@@ -125,9 +125,9 @@ function loadConfig(): Config {
   // Note: JWT secrets are now required by Zod schema - no fallbacks allowed
   // Only check if both are defined (Zod will catch missing secrets)
   if (
-    process.env['JWT_ACCESS_SECRET'] &&
-    process.env['JWT_REFRESH_SECRET'] &&
-    process.env['JWT_ACCESS_SECRET'] === process.env['JWT_REFRESH_SECRET']
+    process.env.JWT_ACCESS_SECRET &&
+    process.env.JWT_REFRESH_SECRET &&
+    process.env.JWT_ACCESS_SECRET === process.env.JWT_REFRESH_SECRET
   ) {
     throw new Error(
       'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be different for security.'
@@ -135,8 +135,8 @@ function loadConfig(): Config {
   }
 
   // Warn in development if using ADMIN_API_KEY as SESSION_SECRET fallback
-  const sessionSecretRaw = process.env['SESSION_SECRET'];
-  const adminApiKeyRaw = process.env['ADMIN_API_KEY'];
+  const sessionSecretRaw = process.env.SESSION_SECRET;
+  const adminApiKeyRaw = process.env.ADMIN_API_KEY;
   if (!isProduction && !sessionSecretRaw && adminApiKeyRaw) {
     console.warn(
       '[CONFIG WARNING] SESSION_SECRET not set, falling back to ADMIN_API_KEY. Set a separate SESSION_SECRET for better security.'
@@ -152,54 +152,54 @@ function loadConfig(): Config {
   }
 
   // Warn in development if DATABASE_KEY is not set (database will be unencrypted)
-  if (!isProduction && !process.env['DATABASE_KEY']) {
+  if (!isProduction && !process.env.DATABASE_KEY) {
     console.warn(
       '[CONFIG WARNING] DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
     );
   }
 
   const result = configSchema.safeParse({
-    port: process.env['PORT'],
-    nodeEnv: process.env['NODE_ENV'],
-    databaseUrl: process.env['DATABASE_URL'],
-    databaseKey: process.env['DATABASE_KEY'],
-    corsOrigins: process.env['CORS_ORIGINS'],
-    logLevel: process.env['LOG_LEVEL'],
-    adminApiKey: process.env['ADMIN_API_KEY'],
-    sessionSecret: process.env['SESSION_SECRET'] ?? process.env['ADMIN_API_KEY'],
+    port: process.env.PORT,
+    nodeEnv: process.env.NODE_ENV,
+    databaseUrl: process.env.DATABASE_URL,
+    databaseKey: process.env.DATABASE_KEY,
+    corsOrigins: process.env.CORS_ORIGINS,
+    logLevel: process.env.LOG_LEVEL,
+    adminApiKey: process.env.ADMIN_API_KEY,
+    sessionSecret: process.env.SESSION_SECRET ?? process.env.ADMIN_API_KEY,
     // JWT Authentication
-    jwtAccessSecret: process.env['JWT_ACCESS_SECRET'],
-    jwtRefreshSecret: process.env['JWT_REFRESH_SECRET'],
-    jwtAccessExpiry: process.env['JWT_ACCESS_EXPIRY'],
-    jwtRefreshExpiry: process.env['JWT_REFRESH_EXPIRY'],
+    jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
+    jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
+    jwtAccessExpiry: process.env.JWT_ACCESS_EXPIRY,
+    jwtRefreshExpiry: process.env.JWT_REFRESH_EXPIRY,
     // Password Hashing
-    bcryptSaltRounds: process.env['BCRYPT_SALT_ROUNDS'],
+    bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS,
     // SMTP Email Configuration
-    smtpHost: process.env['SMTP_HOST'],
-    smtpPort: process.env['SMTP_PORT'],
-    smtpSecure: process.env['SMTP_SECURE'],
-    smtpUser: process.env['SMTP_USER'],
-    smtpPassword: process.env['SMTP_PASSWORD'],
-    smtpFrom: process.env['SMTP_FROM'],
+    smtpHost: process.env.SMTP_HOST,
+    smtpPort: process.env.SMTP_PORT,
+    smtpSecure: process.env.SMTP_SECURE,
+    smtpUser: process.env.SMTP_USER,
+    smtpPassword: process.env.SMTP_PASSWORD,
+    smtpFrom: process.env.SMTP_FROM,
     // Application URLs
-    appUrl: process.env['APP_URL'],
-    apiUrl: process.env['API_URL'],
+    appUrl: process.env.APP_URL,
+    apiUrl: process.env.API_URL,
     // Rate Limiting
     rateLimit: {
-      windowMs: process.env['RATE_LIMIT_WINDOW_MS'],
-      login: process.env['RATE_LIMIT_LOGIN'],
-      register: process.env['RATE_LIMIT_REGISTER'],
-      passwordReset: process.env['RATE_LIMIT_PASSWORD_RESET'],
-      forgotPassword: process.env['RATE_LIMIT_FORGOT_PASSWORD'],
-      tokenRefresh: process.env['RATE_LIMIT_TOKEN_REFRESH'],
-      userData: process.env['RATE_LIMIT_USER_DATA'],
-      profile: process.env['RATE_LIMIT_PROFILE'],
+      windowMs: process.env.RATE_LIMIT_WINDOW_MS,
+      login: process.env.RATE_LIMIT_LOGIN,
+      register: process.env.RATE_LIMIT_REGISTER,
+      passwordReset: process.env.RATE_LIMIT_PASSWORD_RESET,
+      forgotPassword: process.env.RATE_LIMIT_FORGOT_PASSWORD,
+      tokenRefresh: process.env.RATE_LIMIT_TOKEN_REFRESH,
+      userData: process.env.RATE_LIMIT_USER_DATA,
+      profile: process.env.RATE_LIMIT_PROFILE,
     },
     // Account Lockout
     lockout: {
-      maxAttempts: process.env['LOCKOUT_MAX_ATTEMPTS'],
-      initialDurationMins: process.env['LOCKOUT_INITIAL_DURATION_MINS'],
-      maxDurationMins: process.env['LOCKOUT_MAX_DURATION_MINS'],
+      maxAttempts: process.env.LOCKOUT_MAX_ATTEMPTS,
+      initialDurationMins: process.env.LOCKOUT_INITIAL_DURATION_MINS,
+      maxDurationMins: process.env.LOCKOUT_MAX_DURATION_MINS,
     },
   });
 

@@ -60,10 +60,10 @@ const JourneySection: FC = () => {
           <PhaseCard
             key={phase.number}
             phaseNumber={phase.number}
-            phaseName={t(`journey.phases.${phase.number}.name`)}
-            title={t(`journey.phases.${phase.number}.title`)}
-            description={t(`journey.phases.${phase.number}.description`)}
-            features={t(`journey.phases.${phase.number}.features`, { returnObjects: true }) as string[]}
+            phaseName={t(`journey.phases.${String(phase.number)}.name`)}
+            title={t(`journey.phases.${String(phase.number)}.title`)}
+            description={t(`journey.phases.${String(phase.number)}.description`)}
+            features={t(`journey.phases.${String(phase.number)}.features`, { returnObjects: true }) as string[]}
             isActive={phase.isActive}
             className={`md:col-span-1 ${gridPlacements[index]}`}
           />

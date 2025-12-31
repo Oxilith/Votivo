@@ -13,9 +13,8 @@
  * - shared/testing for mock fixtures
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { useAuthStore } from '../useAuthStore';
-import { createMockSafeUser, createMockAssessment, createMockAnalysis } from 'shared/testing';
+import { createMockSafeUser, createMockSavedAssessment, createMockSavedAnalysis } from 'shared/testing';
 
 describe('useAuthStore', () => {
   beforeEach(() => {
@@ -91,8 +90,8 @@ describe('useAuthStore', () => {
 
       // Set up authenticated state with cached lists
       setAuth(mockUser, 'token', 'csrf');
-      setAssessmentsList([createMockAssessment()]);
-      setAnalysesList([createMockAnalysis()]);
+      setAssessmentsList([createMockSavedAssessment()]);
+      setAnalysesList([createMockSavedAnalysis()]);
 
       // Clear auth
       clearAuth();
@@ -205,7 +204,7 @@ describe('useAuthStore', () => {
 
   describe('assessments list caching', () => {
     it('should set assessments list with timestamp', () => {
-      const mockAssessment = createMockAssessment();
+      const mockAssessment = createMockSavedAssessment();
       const { setAssessmentsList } = useAuthStore.getState();
 
       const beforeSet = Date.now();
@@ -219,7 +218,7 @@ describe('useAuthStore', () => {
     });
 
     it('should invalidate assessments list', () => {
-      const mockAssessment = createMockAssessment();
+      const mockAssessment = createMockSavedAssessment();
       const { setAssessmentsList, invalidateAssessmentsList } = useAuthStore.getState();
 
       setAssessmentsList([mockAssessment]);
@@ -240,14 +239,14 @@ describe('useAuthStore', () => {
     it('should report fresh immediately after setting', () => {
       const { setAssessmentsList, isAssessmentsListStale } = useAuthStore.getState();
 
-      setAssessmentsList([createMockAssessment()]);
+      setAssessmentsList([createMockSavedAssessment()]);
       expect(isAssessmentsListStale()).toBe(false);
     });
   });
 
   describe('analyses list caching', () => {
     it('should set analyses list with timestamp', () => {
-      const mockAnalysis = createMockAnalysis();
+      const mockAnalysis = createMockSavedAnalysis();
       const { setAnalysesList } = useAuthStore.getState();
 
       const beforeSet = Date.now();
@@ -261,7 +260,7 @@ describe('useAuthStore', () => {
     });
 
     it('should invalidate analyses list', () => {
-      const mockAnalysis = createMockAnalysis();
+      const mockAnalysis = createMockSavedAnalysis();
       const { setAnalysesList, invalidateAnalysesList } = useAuthStore.getState();
 
       setAnalysesList([mockAnalysis]);
@@ -282,7 +281,7 @@ describe('useAuthStore', () => {
     it('should report fresh immediately after setting', () => {
       const { setAnalysesList, isAnalysesListStale } = useAuthStore.getState();
 
-      setAnalysesList([createMockAnalysis()]);
+      setAnalysesList([createMockSavedAnalysis()]);
       expect(isAnalysesListStale()).toBe(false);
     });
   });

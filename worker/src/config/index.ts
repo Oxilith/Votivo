@@ -51,12 +51,12 @@ type Config = z.infer<typeof configSchema> & {
 };
 
 function loadConfig(): Config {
-  const nodeEnv = process.env['NODE_ENV'] ?? 'development';
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
   const isProduction = nodeEnv === 'production';
 
   // Validate required production environment variables
   if (isProduction) {
-    if (!process.env['DATABASE_URL']) {
+    if (!process.env.DATABASE_URL) {
       throw new Error(
         'DATABASE_URL is required in production. Cannot use default dev.db in production environment.'
       );
@@ -64,21 +64,21 @@ function loadConfig(): Config {
   }
 
   // Warn in development if DATABASE_KEY is not set (database will be unencrypted)
-  if (!isProduction && !process.env['DATABASE_KEY']) {
+  if (!isProduction && !process.env.DATABASE_KEY) {
     console.warn(
       '[CONFIG WARNING] DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
     );
   }
 
   const result = configSchema.safeParse({
-    nodeEnv: process.env['NODE_ENV'],
-    databaseUrl: process.env['DATABASE_URL'],
-    databaseKey: process.env['DATABASE_KEY'],
-    logLevel: process.env['LOG_LEVEL'],
+    nodeEnv: process.env.NODE_ENV,
+    databaseUrl: process.env.DATABASE_URL,
+    databaseKey: process.env.DATABASE_KEY,
+    logLevel: process.env.LOG_LEVEL,
     jobs: {
       tokenCleanup: {
-        enabled: process.env['JOB_TOKEN_CLEANUP_ENABLED'],
-        schedule: process.env['JOB_TOKEN_CLEANUP_SCHEDULE'],
+        enabled: process.env.JOB_TOKEN_CLEANUP_ENABLED,
+        schedule: process.env.JOB_TOKEN_CLEANUP_SCHEDULE,
       },
     },
   });

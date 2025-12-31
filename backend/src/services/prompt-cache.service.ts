@@ -240,8 +240,8 @@ export class PromptCacheService {
    * Used for dynamic cache recovery when circuit breaker closes
    * @returns Array of cached prompt identifiers with their thinking mode
    */
-  getCachedKeys(): Array<{ key: string; thinkingEnabled: boolean }> {
-    const keys: Array<{ key: string; thinkingEnabled: boolean }> = [];
+  getCachedKeys(): { key: string; thinkingEnabled: boolean }[] {
+    const keys: { key: string; thinkingEnabled: boolean }[] = [];
 
     for (const cacheKey of this.cache.keys()) {
       // Parse cache key format: "KEY:1" or "KEY:0"

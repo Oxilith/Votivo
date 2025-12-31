@@ -76,59 +76,59 @@ export const useUIStore = create<UIState>()((set) => ({
   error: null,
 
   // Actions
-  setView: (view) => set({ currentView: view }),
+  setView: (view) => { set({ currentView: view }); },
 
-  setPhase: (phase) => set({ currentPhase: phase, currentStep: 0 }),
+  setPhase: (phase) => { set({ currentPhase: phase, currentStep: 0 }); },
 
-  setStep: (step) => set({ currentStep: step }),
+  setStep: (step) => { set({ currentStep: step }); },
 
-  setPhaseAndStep: (phase, step) => set({ currentPhase: phase, currentStep: step }),
+  setPhaseAndStep: (phase, step) => { set({ currentPhase: phase, currentStep: step }); },
 
   goToSynthesis: () =>
-    set({
+    { set({
       currentPhase: SYNTHESIS_PHASE,
       currentStep: SYNTHESIS_STEP,
-    }),
+    }); },
 
   resetAssessment: () =>
-    set({
+    { set({
       currentView: 'landing',
       currentPhase: 0,
       currentStep: 0,
       startAtSynthesis: false,
       hasReachedSynthesis: false,
-    }),
+    }); },
 
   incrementAssessmentKey: () =>
-    set((state) => ({
+    { set((state) => ({
       assessmentKey: state.assessmentKey + 1,
-    })),
+    })); },
 
-  setStartAtSynthesis: (value) => set({ startAtSynthesis: value }),
+  setStartAtSynthesis: (value) => { set({ startAtSynthesis: value }); },
 
-  setHasReachedSynthesis: (value) => set({ hasReachedSynthesis: value }),
+  setHasReachedSynthesis: (value) => { set({ hasReachedSynthesis: value }); },
 
-  setPendingAuthReturn: (view) => set({ pendingAuthReturn: view }),
+  setPendingAuthReturn: (view) => { set({ pendingAuthReturn: view }); },
 
   // Read-only mode actions
   setReadOnlyMode: (resourceId, assessmentId) =>
-    set({
+    { set({
       isReadOnly: true,
       viewingResourceId: resourceId,
       viewingAssessmentId: assessmentId ?? null,
-    }),
+    }); },
 
   clearReadOnlyMode: () =>
-    set({
+    { set({
       isReadOnly: false,
       viewingResourceId: null,
       viewingAssessmentId: null,
-    }),
+    }); },
 
   // Loading/Error actions
-  setLoading: (loading) => set({ isLoading: loading }),
+  setLoading: (loading) => { set({ isLoading: loading }); },
 
-  setError: (error) => set({ error }),
+  setError: (error) => { set({ error }); },
 
-  clearError: () => set({ error: null }),
+  clearError: () => { set({ error: null }); },
 }));

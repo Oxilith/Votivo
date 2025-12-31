@@ -37,7 +37,7 @@ const InsightsPageHeader: FC<InsightsPageHeaderProps> = ({
 }) => {
   const { t } = useTranslation('header');
 
-  const hasExportOptions = onExportAnalysis || onExportAssessment;
+  const hasExportOptions = onExportAnalysis ?? onExportAssessment;
 
   return (
     <div className="fixed top-20 lg:top-24 left-4 right-4 lg:left-10 lg:right-10 z-40 flex items-center justify-between px-4 py-2 lg:px-6 bg-[var(--bg-secondary)]/90 backdrop-blur-[8px] border border-[var(--border)] transition-colors">

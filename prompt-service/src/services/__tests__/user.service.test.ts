@@ -19,11 +19,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { User, RefreshToken, PasswordResetToken, EmailVerifyToken, Assessment, Analysis } from '@prisma/client';
 
 // Define the return type for verifyRefreshToken mock
-type VerifyResult = {
+interface VerifyResult {
   success: boolean;
   payload: { userId: string; tokenId: string; type: 'refresh' } | null;
   error: 'invalid' | 'expired' | null;
-};
+}
 
 // Create mock functions with hoisting to ensure they're available before module loading
 const mockJwtFunctions = vi.hoisted(() => ({

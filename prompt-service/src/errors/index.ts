@@ -83,7 +83,7 @@ export class AuthenticationError extends AppError {
   readonly statusCode = 401;
   readonly code = 'AUTHENTICATION_FAILED';
 
-  constructor(message: string = 'Invalid email or password') {
+  constructor(message = 'Invalid email or password') {
     super(message);
   }
 }

@@ -231,3 +231,43 @@ export function createPhase2Assessment(
     identity_clarity: complete.identity_clarity,
   };
 }
+
+/**
+ * Frontend format for saved assessments (parsed JSON, ISO date strings).
+ * Use this type for frontend store tests where data is already parsed.
+ */
+export interface SavedAssessmentFrontend {
+  id: string;
+  userId: string;
+  responses: AssessmentResponses;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Creates a mock assessment in frontend format (parsed responses, ISO date strings).
+ * Use this for testing frontend stores where data has already been processed.
+ *
+ * @param options - Optional overrides for record fields
+ * @returns Mock assessment in frontend-ready format
+ *
+ * @example
+ * ```typescript
+ * const assessment = createMockSavedAssessment({ userId: 'user-123' });
+ * expect(assessment.responses.core_values).toBeDefined();
+ * ```
+ */
+export function createMockSavedAssessment(
+  options: MockAssessmentRecordOptions = {}
+): SavedAssessmentFrontend {
+  const responses = createCompleteAssessment(options.responses);
+  const now = new Date();
+
+  return {
+    id: options.id ?? faker.string.uuid(),
+    userId: options.userId ?? faker.string.uuid(),
+    responses,
+    createdAt: (options.createdAt ?? now).toISOString(),
+    updatedAt: (options.updatedAt ?? now).toISOString(),
+  };
+}

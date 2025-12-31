@@ -23,7 +23,7 @@ interface MultiSelectStepProps {
 }
 
 export const MultiSelectStep: React.FC<MultiSelectStepProps> = ({ step, value, onChange, isReadOnly = false }) => {
-  const selected = value ?? [];
+  const selected = value;
 
   const toggleOption = (optionId: string) => {
     if (isReadOnly) return;
@@ -47,7 +47,7 @@ export const MultiSelectStep: React.FC<MultiSelectStepProps> = ({ step, value, o
         {step.options.map((option: SelectOption) => (
           <button
             key={option.id}
-            onClick={() => toggleOption(option.id)}
+            onClick={() => { toggleOption(option.id); }}
             disabled={isReadOnly}
             className={`text-left p-4 border-2 rounded-sm transition-all ${
               selected.includes(option.id)

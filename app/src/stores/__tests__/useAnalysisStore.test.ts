@@ -13,7 +13,6 @@
  * - shared/testing for mock fixtures
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { useAnalysisStore } from '../useAnalysisStore';
 import { createMockAnalysisResult, createCompleteAssessment } from 'shared/testing';
 
@@ -141,7 +140,7 @@ describe('useAnalysisStore', () => {
       const responses = createCompleteAssessment();
       const { analyze } = useAnalysisStore.getState();
 
-      await analyze(responses, 'en');
+      await analyze(responses, 'english');
     });
 
     it('should call claudeService.analyze with correct parameters', async () => {
@@ -152,14 +151,14 @@ describe('useAnalysisStore', () => {
       });
 
       const responses = createCompleteAssessment();
-      const userProfile = { gender: 'male' as const, age: 30 };
+      const userProfile = { name: 'Test User', gender: 'male' as const, age: 30 };
       const { analyze } = useAnalysisStore.getState();
 
-      await analyze(responses, 'pl', userProfile);
+      await analyze(responses, 'polish', userProfile);
 
       expect(claudeService.analyze).toHaveBeenCalledWith({
         responses,
-        language: 'pl',
+        language: 'polish',
         userProfile,
       });
     });
@@ -174,7 +173,7 @@ describe('useAnalysisStore', () => {
       const responses = createCompleteAssessment();
       const { analyze } = useAnalysisStore.getState();
 
-      await analyze(responses, 'en');
+      await analyze(responses, 'english');
 
       const state = useAnalysisStore.getState();
       expect(state.analysis).toEqual(mockAnalysis);
@@ -195,7 +194,7 @@ describe('useAnalysisStore', () => {
       const responses = createCompleteAssessment();
       const { analyze } = useAnalysisStore.getState();
 
-      await analyze(responses, 'en');
+      await analyze(responses, 'english');
 
       expect(useAnalysisStore.getState().analysisError).toBeNull();
     });
@@ -208,7 +207,7 @@ describe('useAnalysisStore', () => {
       const responses = createCompleteAssessment();
       const { analyze } = useAnalysisStore.getState();
 
-      await analyze(responses, 'en');
+      await analyze(responses, 'english');
 
       const state = useAnalysisStore.getState();
       expect(state.analysisError).toBe('Rate limit exceeded');
@@ -226,7 +225,7 @@ describe('useAnalysisStore', () => {
       const responses = createCompleteAssessment();
       const { analyze } = useAnalysisStore.getState();
 
-      await analyze(responses, 'en');
+      await analyze(responses, 'english');
 
       const state = useAnalysisStore.getState();
       expect(state.analysisError).toBe('Network failure');
@@ -242,7 +241,7 @@ describe('useAnalysisStore', () => {
       const responses = createCompleteAssessment();
       const { analyze } = useAnalysisStore.getState();
 
-      await analyze(responses, 'en');
+      await analyze(responses, 'english');
 
       const state = useAnalysisStore.getState();
       expect(state.analysisError).toBe('Failed to analyze responses');

@@ -13,7 +13,6 @@
  * - PromptCacheService for service under test
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { PromptCacheService } from '@/services';
 import { createMockPromptConfig } from 'shared/testing';
 

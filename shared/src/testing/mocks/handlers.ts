@@ -16,7 +16,7 @@ import { http, HttpResponse, delay } from 'msw';
  */
 interface ClaudeMessageRequest {
   model: string;
-  messages: Array<{ role: string; content: string }>;
+  messages: { role: string; content: string }[];
   max_tokens?: number;
   temperature?: number;
   system?: string;
@@ -29,7 +29,7 @@ interface ClaudeMessageResponse {
   id: string;
   type: 'message';
   role: 'assistant';
-  content: Array<{ type: 'text'; text: string }>;
+  content: { type: 'text'; text: string }[];
   model: string;
   stop_reason: 'end_turn' | 'max_tokens' | 'stop_sequence';
   usage: {
@@ -62,8 +62,8 @@ const DEFAULT_MOCK_ANALYSIS = {
 function createClaudeResponse(
   model: string,
   content: string,
-  inputTokens: number = 100,
-  outputTokens: number = 500
+  inputTokens = 100,
+  outputTokens = 500
 ): ClaudeMessageResponse {
   return {
     id: `msg_mock_${Date.now()}`,
@@ -107,7 +107,7 @@ export const anthropicHandlers = [
  * await expect(service.analyze()).rejects.toThrow('Rate limit');
  * ```
  */
-export function createRateLimitHandler(retryAfter: number = 60) {
+export function createRateLimitHandler(retryAfter = 60) {
   return http.post('https://api.anthropic.com/v1/messages', () => {
     return HttpResponse.json(
       {
@@ -223,7 +223,7 @@ export function createCustomResponseHandler(
 export function createErrorHandler(
   errorType: string,
   message: string,
-  status: number = 400
+  status = 400
 ) {
   return http.post('https://api.anthropic.com/v1/messages', () => {
     return HttpResponse.json(

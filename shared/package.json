@@ -28,19 +28,11 @@
     "test:run": "vitest run"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.71.2",
-    "zod": "^3.23.0"
+    "@anthropic-ai/sdk": "^0.71.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
     "@faker-js/faker": "^10.1.0",
-    "@types/node": "^24.10.1",
-    "eslint": "^9.17.0",
     "msw": "^2.12.7",
-    "tsup": "^8.5.1",
-    "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.2",
-    "vitest": "^4.0.16",
     "vitest-mock-extended": "^3.1.0"
   }
 }

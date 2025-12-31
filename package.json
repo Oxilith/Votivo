@@ -22,7 +22,6 @@
     "verify:conventions": "./scripts/verify-conventions.sh",
     "verify:workspace": "./scripts/verify-workspace-setup.sh",
     "clear:packages": "find . -type d -name \"node_modules\" -prune -exec rm -rf {} + && find . -type f -name \"package-lock.json\" -delete",
-
     "db:migrate": "npm run db:migrate -w prompt-service",
     "db:generate": "npm run db:generate --workspaces --if-present",
     "db:seed": "npm run db:seed -w prompt-service",
@@ -30,5 +29,23 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^25.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.51.0",
+    "@typescript-eslint/parser": "^8.51.0",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/eslint-plugin": "^1.6.4",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.51.0",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.16"
   }
 }

@@ -11,7 +11,6 @@
  * - @/services/circuit-breaker.service
  */
 
-import { describe, it, expect, afterEach, vi } from 'vitest';
 import {
   createCircuitBreaker,
   isCircuitOpen,
