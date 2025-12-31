@@ -44,7 +44,7 @@ export function useAssessmentNavigation({
   const [currentStep, setCurrentStep] = useState(0);
 
   const currentPhaseData = phases[currentPhase] ?? phases[0];
-  const currentStepData = currentPhaseData?.steps[currentStep];
+  const currentStepData = currentPhaseData.steps[currentStep];
 
   const totalSteps = useMemo(
     () => phases.reduce((acc, phase) => acc + phase.steps.length, 0),

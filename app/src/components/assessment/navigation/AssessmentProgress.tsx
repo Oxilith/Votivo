@@ -52,7 +52,7 @@ export const AssessmentProgress: React.FC<AssessmentProgressProps> = ({
         <div className="h-1 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
           <div
             className="h-full bg-[var(--accent)] transition-all duration-300 rounded-full"
-            style={{ width: `${progressPercent}%` }}
+            style={{ width: `${String(progressPercent)}%` }}
           />
         </div>
       </div>

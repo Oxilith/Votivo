@@ -25,6 +25,7 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
 import { userService, type RequestContext } from '@/services';
 import {
   registerSchema,
@@ -93,7 +94,7 @@ export class UserAuthController {
   async register(req: Request, res: Response): Promise<void> {
     const body = registerSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -127,7 +128,7 @@ export class UserAuthController {
   async login(req: Request, res: Response): Promise<void> {
     const body = loginSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -253,7 +254,7 @@ export class UserAuthController {
   async requestPasswordReset(req: Request, res: Response): Promise<void> {
     const body = passwordResetRequestSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -289,7 +290,7 @@ export class UserAuthController {
   async confirmPasswordReset(req: Request, res: Response): Promise<void> {
     const body = passwordResetConfirmSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -318,7 +319,7 @@ export class UserAuthController {
   async verifyEmail(req: Request, res: Response): Promise<void> {
     const params = emailVerifyTokenParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -484,7 +485,7 @@ export class UserAuthController {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Validation failed',
         code: 'VALIDATION_ERROR',
-        details: parseResult.error.errors,
+        details: parseResult.error.issues,
       });
       return;
     }
@@ -525,7 +526,7 @@ export class UserAuthController {
       res.status(StatusCodes.BAD_REQUEST).json({
         error: 'Validation failed',
         code: 'VALIDATION_ERROR',
-        details: parseResult.error.errors,
+        details: parseResult.error.issues,
       });
       return;
     }

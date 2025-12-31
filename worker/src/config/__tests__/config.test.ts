@@ -22,12 +22,12 @@ describe('config', () => {
     // Reset environment to a clean state
     process.env = { ...originalEnv };
     // Clear any existing env vars that might affect tests
-    delete process.env['NODE_ENV'];
-    delete process.env['DATABASE_URL'];
-    delete process.env['DATABASE_KEY'];
-    delete process.env['LOG_LEVEL'];
-    delete process.env['JOB_TOKEN_CLEANUP_ENABLED'];
-    delete process.env['JOB_TOKEN_CLEANUP_SCHEDULE'];
+    delete process.env.NODE_ENV;
+    delete process.env.DATABASE_URL;
+    delete process.env.DATABASE_KEY;
+    delete process.env.LOG_LEVEL;
+    delete process.env.JOB_TOKEN_CLEANUP_ENABLED;
+    delete process.env.JOB_TOKEN_CLEANUP_SCHEDULE;
   });
 
   afterEach(() => {
@@ -37,7 +37,7 @@ describe('config', () => {
 
   describe('development defaults', () => {
     it('should use default database URL in development', async () => {
-      process.env['NODE_ENV'] = 'development';
+      process.env.NODE_ENV = 'development';
 
       const { config } = await import('@/config');
 
@@ -45,7 +45,7 @@ describe('config', () => {
     });
 
     it('should use default job schedule in development', async () => {
-      process.env['NODE_ENV'] = 'development';
+      process.env.NODE_ENV = 'development';
 
       const { config } = await import('@/config');
 
@@ -53,7 +53,7 @@ describe('config', () => {
     });
 
     it('should enable job by default', async () => {
-      process.env['NODE_ENV'] = 'development';
+      process.env.NODE_ENV = 'development';
 
       const { config } = await import('@/config');
 
@@ -61,7 +61,7 @@ describe('config', () => {
     });
 
     it('should use default log level', async () => {
-      process.env['NODE_ENV'] = 'development';
+      process.env.NODE_ENV = 'development';
 
       const { config } = await import('@/config');
 
@@ -71,7 +71,7 @@ describe('config', () => {
 
   describe('production validation', () => {
     it('should throw error if DATABASE_URL is missing in production', async () => {
-      process.env['NODE_ENV'] = 'production';
+      process.env.NODE_ENV = 'production';
 
       await expect(import('@/config')).rejects.toThrow(
         'DATABASE_URL is required in production'
@@ -79,9 +79,9 @@ describe('config', () => {
     });
 
     it('should not throw if DATABASE_URL is provided in production', async () => {
-      process.env['NODE_ENV'] = 'production';
-      process.env['DATABASE_URL'] = 'libsql://prod.db';
-      process.env['DATABASE_KEY'] = 'a'.repeat(32);
+      process.env.NODE_ENV = 'production';
+      process.env.DATABASE_URL = 'libsql://prod.db';
+      process.env.DATABASE_KEY = 'a'.repeat(32);
 
       const { config } = await import('@/config');
 
@@ -91,8 +91,8 @@ describe('config', () => {
 
   describe('job enabled transformation', () => {
     it('should transform "true" string to boolean true', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['JOB_TOKEN_CLEANUP_ENABLED'] = 'true';
+      process.env.NODE_ENV = 'development';
+      process.env.JOB_TOKEN_CLEANUP_ENABLED = 'true';
 
       const { config } = await import('@/config');
 
@@ -100,8 +100,8 @@ describe('config', () => {
     });
 
     it('should transform "false" string to boolean false', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['JOB_TOKEN_CLEANUP_ENABLED'] = 'false';
+      process.env.NODE_ENV = 'development';
+      process.env.JOB_TOKEN_CLEANUP_ENABLED = 'false';
 
       const { config } = await import('@/config');
 
@@ -109,8 +109,8 @@ describe('config', () => {
     });
 
     it('should treat any non-"false" value as true', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['JOB_TOKEN_CLEANUP_ENABLED'] = '1';
+      process.env.NODE_ENV = 'development';
+      process.env.JOB_TOKEN_CLEANUP_ENABLED = '1';
 
       const { config } = await import('@/config');
 
@@ -120,8 +120,8 @@ describe('config', () => {
 
   describe('custom schedule', () => {
     it('should use custom schedule when provided', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['JOB_TOKEN_CLEANUP_SCHEDULE'] = '*/30 * * * *';
+      process.env.NODE_ENV = 'development';
+      process.env.JOB_TOKEN_CLEANUP_SCHEDULE = '*/30 * * * *';
 
       const { config } = await import('@/config');
 
@@ -131,8 +131,8 @@ describe('config', () => {
 
   describe('log level validation', () => {
     it('should accept valid log levels', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['LOG_LEVEL'] = 'debug';
+      process.env.NODE_ENV = 'development';
+      process.env.LOG_LEVEL = 'debug';
 
       const { config } = await import('@/config');
 
@@ -140,8 +140,8 @@ describe('config', () => {
     });
 
     it('should throw error for invalid log level', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['LOG_LEVEL'] = 'invalid-level';
+      process.env.NODE_ENV = 'development';
+      process.env.LOG_LEVEL = 'invalid-level';
 
       await expect(import('@/config')).rejects.toThrow(
         'Configuration validation failed'
@@ -151,8 +151,8 @@ describe('config', () => {
 
   describe('DATABASE_KEY validation', () => {
     it('should warn in development if DATABASE_KEY is not set', async () => {
-      process.env['NODE_ENV'] = 'development';
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      process.env.NODE_ENV = 'development';
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
       await import('@/config');
 
@@ -162,9 +162,9 @@ describe('config', () => {
     });
 
     it('should not warn if DATABASE_KEY is set', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['DATABASE_KEY'] = 'a'.repeat(32);
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      process.env.NODE_ENV = 'development';
+      process.env.DATABASE_KEY = 'a'.repeat(32);
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
       await import('@/config');
 
@@ -172,8 +172,8 @@ describe('config', () => {
     });
 
     it('should throw error if DATABASE_KEY is too short', async () => {
-      process.env['NODE_ENV'] = 'development';
-      process.env['DATABASE_KEY'] = 'tooshort';
+      process.env.NODE_ENV = 'development';
+      process.env.DATABASE_KEY = 'tooshort';
 
       await expect(import('@/config')).rejects.toThrow(
         'Configuration validation failed'
@@ -183,7 +183,7 @@ describe('config', () => {
 
   describe('nodeEnv validation', () => {
     it('should accept development environment', async () => {
-      process.env['NODE_ENV'] = 'development';
+      process.env.NODE_ENV = 'development';
 
       const { config } = await import('@/config');
 
@@ -191,7 +191,7 @@ describe('config', () => {
     });
 
     it('should accept test environment', async () => {
-      process.env['NODE_ENV'] = 'test';
+      process.env.NODE_ENV = 'test';
 
       const { config } = await import('@/config');
 
@@ -199,9 +199,9 @@ describe('config', () => {
     });
 
     it('should accept production environment', async () => {
-      process.env['NODE_ENV'] = 'production';
-      process.env['DATABASE_URL'] = 'libsql://prod.db';
-      process.env['DATABASE_KEY'] = 'a'.repeat(32);
+      process.env.NODE_ENV = 'production';
+      process.env.DATABASE_URL = 'libsql://prod.db';
+      process.env.DATABASE_KEY = 'a'.repeat(32);
 
       const { config } = await import('@/config');
 
@@ -209,7 +209,7 @@ describe('config', () => {
     });
 
     it('should default to development when NODE_ENV is not set', async () => {
-      delete process.env['NODE_ENV'];
+      delete process.env.NODE_ENV;
 
       const { config } = await import('@/config');
 

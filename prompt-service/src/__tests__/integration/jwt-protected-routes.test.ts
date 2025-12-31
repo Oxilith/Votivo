@@ -2,6 +2,13 @@
  * @file prompt-service/src/__tests__/integration/jwt-protected-routes.test.ts
  * @purpose Integration tests for JWT-protected API routes
  * @description Verifies end-to-end that JWT middleware correctly protects routes:
+ * @functionality
+ * - Documents route protection matrix (protected vs public routes)
+ * - Verifies expected error response structures (NO_TOKEN, INVALID_TOKEN, TOKEN_EXPIRED)
+ * - Tests security properties (httpOnly cookies, no password in JWT)
+ * @dependencies
+ * - jsonwebtoken for token decoding
+ * - @/utils for JWT generation utilities (generateAccessToken, JwtConfig)
  *
  * Verification Steps (subtask-6-6):
  * 1. POST /api/user-auth/login - get access token
@@ -16,7 +23,6 @@
  * - POST /api/user-auth/resend-verification (requires authentication)
  */
 
-import { describe, it, expect } from 'vitest';
 
 /**
  * JWT Protected Routes Verification
@@ -54,6 +60,16 @@ import { describe, it, expect } from 'vitest';
  * [x] Token type validation prevents using refresh token as access token
  * [x] Separate secrets used for access and refresh tokens
  */
+
+import jwt from 'jsonwebtoken';
+import { generateAccessToken, type JwtConfig } from '@/utils';
+
+const testJwtConfig: JwtConfig = {
+  accessSecret: 'test-access-secret-1234567890abcdef',
+  refreshSecret: 'test-refresh-secret-0987654321fedcba',
+  accessExpiresIn: '15m',
+  refreshExpiresIn: '7d',
+};
 
 describe('JWT Protected Routes - Documentation', () => {
   describe('Route Protection Matrix', () => {
@@ -111,20 +127,6 @@ describe('JWT Protected Routes - Documentation', () => {
   });
 
   describe('Security Verification', () => {
-    it('should use separate secrets for access and refresh tokens', () => {
-      // This is verified in jwt.test.ts
-      // Access tokens use JWT_ACCESS_SECRET
-      // Refresh tokens use JWT_REFRESH_SECRET
-      expect(true).toBe(true);
-    });
-
-    it('should validate token type to prevent cross-usage', () => {
-      // Access tokens have type: 'access'
-      // Refresh tokens have type: 'refresh'
-      // Middleware validates type before accepting token
-      expect(true).toBe(true);
-    });
-
     it('should set httpOnly cookies for refresh tokens', () => {
       // Refresh tokens are stored in httpOnly cookies
       // This prevents XSS attacks from stealing tokens
@@ -136,10 +138,17 @@ describe('JWT Protected Routes - Documentation', () => {
       expect(cookieOptions.httpOnly).toBe(true);
     });
 
-    it('should not include password in JWT payload or responses', () => {
-      // JWT payload only contains userId and type
-      // User responses use SafeUser which excludes password
-      expect(true).toBe(true);
+    it('should not include password in JWT payload', () => {
+      // JWT payload should only contain userId, type, and standard claims
+      const token = generateAccessToken('test-user-id', testJwtConfig);
+      const decoded = jwt.decode(token) as Record<string, unknown>;
+
+      // Verify no password-related fields exist
+      expect(decoded).not.toHaveProperty('password');
+      expect(decoded).not.toHaveProperty('passwordHash');
+
+      // Verify only expected fields are present
+      expect(Object.keys(decoded).sort()).toEqual(['exp', 'iat', 'type', 'userId']);
     });
   });
 });

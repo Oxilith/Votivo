@@ -2,6 +2,7 @@
  * @file vitest.setup.ts
  * @purpose Set required environment variables before test execution
  * @functionality
+ * - Mocks dotenv to suppress promotional tips during tests
  * - Sets SESSION_SECRET to prevent config validation errors
  * - Sets JWT secrets for authentication tests
  * - Sets NODE_ENV to test mode
@@ -9,6 +10,11 @@
  * @dependencies
  * - Vitest setup mechanism
  */
+
+// Mock dotenv to suppress promotional tips during tests
+vi.mock('dotenv', () => ({
+  config: vi.fn(() => ({ parsed: process.env })),
+}));
 
 // Set required env vars before any module imports
 // This runs before test files load, preventing config validation errors

@@ -13,7 +13,7 @@
  * - @/utils/logger for structured logging
  */
 
-import cron from 'node-cron';
+import cron, { type ScheduledTask } from 'node-cron';
 import { generateTraceId, generateSpanId } from 'shared';
 import type { Job } from '@/jobs';
 import { logger } from '@/utils';
@@ -22,7 +22,7 @@ import { logger } from '@/utils';
  * Scheduler class for managing background jobs
  */
 export class Scheduler {
-  private tasks: Map<string, cron.ScheduledTask> = new Map();
+  private tasks = new Map<string, ScheduledTask>();
   private log = logger.child({ component: 'scheduler' });
 
   /**
@@ -99,10 +99,12 @@ export class Scheduler {
           }
         })();
       },
-      {
-        scheduled: false, // Don't start immediately, wait for start() call
-      }
+      { name: job.name }
     );
+
+    // Stop immediately - tasks start automatically in node-cron 4.x
+    // We'll start them explicitly via start() call
+    void task.stop();
 
     this.tasks.set(job.name, task);
     this.log.info({ job: job.name, schedule: job.schedule }, 'Job registered');
@@ -113,7 +115,7 @@ export class Scheduler {
    */
   start(): void {
     this.tasks.forEach((task, name) => {
-      task.start();
+      void task.start();
       this.log.info({ job: name }, 'Job started');
     });
     this.log.info({ jobCount: this.tasks.size }, 'Scheduler started');
@@ -124,7 +126,7 @@ export class Scheduler {
    */
   stop(): void {
     this.tasks.forEach((task, name) => {
-      task.stop();
+      void task.stop();
       this.log.info({ job: name }, 'Job stopped');
     });
     this.log.info('Scheduler stopped');

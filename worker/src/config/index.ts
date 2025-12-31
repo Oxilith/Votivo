@@ -31,19 +31,15 @@ const configSchema = z.object({
   logLevel: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   // Job Configuration
-  jobs: z
-    .object({
-      tokenCleanup: z
-        .object({
-          enabled: z
-            .string()
-            .transform((val) => val !== 'false')
-            .default('true'),
-          schedule: z.string().default('0 * * * *'), // Every hour by default
-        })
-        .default({}),
-    })
-    .default({}),
+  jobs: z.object({
+    tokenCleanup: z.object({
+      enabled: z
+        .string()
+        .default('true')
+        .transform((val) => val !== 'false'),
+      schedule: z.string().default('0 * * * *'), // Every hour by default
+    }),
+  }),
 });
 
 type Config = z.infer<typeof configSchema> & {
@@ -51,12 +47,12 @@ type Config = z.infer<typeof configSchema> & {
 };
 
 function loadConfig(): Config {
-  const nodeEnv = process.env['NODE_ENV'] ?? 'development';
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
   const isProduction = nodeEnv === 'production';
 
   // Validate required production environment variables
   if (isProduction) {
-    if (!process.env['DATABASE_URL']) {
+    if (!process.env.DATABASE_URL) {
       throw new Error(
         'DATABASE_URL is required in production. Cannot use default dev.db in production environment.'
       );
@@ -64,28 +60,28 @@ function loadConfig(): Config {
   }
 
   // Warn in development if DATABASE_KEY is not set (database will be unencrypted)
-  if (!isProduction && !process.env['DATABASE_KEY']) {
+  if (!isProduction && !process.env.DATABASE_KEY) {
     console.warn(
       '[CONFIG WARNING] DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
     );
   }
 
   const result = configSchema.safeParse({
-    nodeEnv: process.env['NODE_ENV'],
-    databaseUrl: process.env['DATABASE_URL'],
-    databaseKey: process.env['DATABASE_KEY'],
-    logLevel: process.env['LOG_LEVEL'],
+    nodeEnv: process.env.NODE_ENV,
+    databaseUrl: process.env.DATABASE_URL,
+    databaseKey: process.env.DATABASE_KEY,
+    logLevel: process.env.LOG_LEVEL,
     jobs: {
       tokenCleanup: {
-        enabled: process.env['JOB_TOKEN_CLEANUP_ENABLED'],
-        schedule: process.env['JOB_TOKEN_CLEANUP_SCHEDULE'],
+        enabled: process.env.JOB_TOKEN_CLEANUP_ENABLED,
+        schedule: process.env.JOB_TOKEN_CLEANUP_SCHEDULE,
       },
     },
   });
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+    const errors = result.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
     throw new Error(`Configuration validation failed:\n${errors}`);
   }

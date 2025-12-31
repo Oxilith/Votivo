@@ -11,14 +11,13 @@
  * - fetchWithTimeout for utility under test
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
 import { fetchWithTimeout } from '@/utils';
 
 // Store original fetch
 const originalFetch = globalThis.fetch;
 
 describe('fetchWithTimeout', () => {
-  let mockFetch: Mock;
+  let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.useFakeTimers();

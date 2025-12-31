@@ -81,7 +81,7 @@ export class AuthService implements IAuthService {
    * Register a new user account
    */
   async register(data: RegisterRequest): Promise<AuthResponse> {
-    const response = await this.client.post<AuthResponse, RegisterRequest>(
+    const response = await this.client.post<AuthResponse>(
       `${AUTH_BASE_PATH}/register`,
       data,
       { skipAuthRefresh: true }
@@ -93,7 +93,7 @@ export class AuthService implements IAuthService {
    * Login with email and password
    */
   async login(data: LoginRequest): Promise<AuthResponse> {
-    const response = await this.client.post<AuthResponse, LoginRequest>(
+    const response = await this.client.post<AuthResponse>(
       `${AUTH_BASE_PATH}/login`,
       data,
       { skipAuthRefresh: true }
@@ -105,7 +105,7 @@ export class AuthService implements IAuthService {
    * Logout current session (clears refresh token cookie)
    */
   async logout(): Promise<void> {
-    await this.client.post<MessageResponse, Record<string, never>>(
+    await this.client.post<MessageResponse>(
       `${AUTH_BASE_PATH}/logout`,
       {},
       this.getAuthConfig()
@@ -116,7 +116,7 @@ export class AuthService implements IAuthService {
    * Logout from all sessions
    */
   async logoutAll(): Promise<MessageResponse> {
-    const response = await this.client.post<MessageResponse, Record<string, never>>(
+    const response = await this.client.post<MessageResponse>(
       `${AUTH_BASE_PATH}/logout-all`,
       {},
       this.getAuthConfig()
@@ -128,7 +128,7 @@ export class AuthService implements IAuthService {
    * Refresh access token using httpOnly cookie
    */
   async refreshToken(): Promise<RefreshResponse> {
-    const response = await this.client.post<RefreshResponse, Record<string, never>>(
+    const response = await this.client.post<RefreshResponse>(
       `${AUTH_BASE_PATH}/refresh`,
       {},
       { skipAuthRefresh: true }
@@ -143,7 +143,7 @@ export class AuthService implements IAuthService {
    * Also sets the CSRF token for subsequent requests.
    */
   async refreshTokenWithUser(): Promise<RefreshWithUserResponse> {
-    const response = await this.client.post<RefreshWithUserResponse, Record<string, never>>(
+    const response = await this.client.post<RefreshWithUserResponse>(
       `${AUTH_BASE_PATH}/refresh-with-user`,
       {},
       { skipAuthRefresh: true }
@@ -166,7 +166,7 @@ export class AuthService implements IAuthService {
    * Update user profile
    */
   async updateProfile(data: ProfileUpdateRequest): Promise<SafeUser> {
-    const response = await this.client.put<SafeUser, ProfileUpdateRequest>(
+    const response = await this.client.put<SafeUser>(
       `${AUTH_BASE_PATH}/profile`,
       data,
       this.getAuthConfig()
@@ -178,7 +178,7 @@ export class AuthService implements IAuthService {
    * Change password
    */
   async changePassword(data: PasswordChangeRequest): Promise<MessageResponse> {
-    const response = await this.client.put<MessageResponse, PasswordChangeRequest>(
+    const response = await this.client.put<MessageResponse>(
       `${AUTH_BASE_PATH}/password`,
       data,
       this.getAuthConfig()
@@ -201,7 +201,7 @@ export class AuthService implements IAuthService {
    * Request password reset email
    */
   async requestPasswordReset(email: string): Promise<MessageResponse> {
-    const response = await this.client.post<MessageResponse, { email: string }>(
+    const response = await this.client.post<MessageResponse>(
       `${AUTH_BASE_PATH}/password-reset`,
       { email },
       { skipAuthRefresh: true }
@@ -216,10 +216,7 @@ export class AuthService implements IAuthService {
     token: string,
     newPassword: string
   ): Promise<MessageResponse> {
-    const response = await this.client.post<
-      MessageResponse,
-      { token: string; newPassword: string }
-    >(
+    const response = await this.client.post<MessageResponse>(
       `${AUTH_BASE_PATH}/password-reset/confirm`,
       { token, newPassword },
       { skipAuthRefresh: true }
@@ -242,7 +239,7 @@ export class AuthService implements IAuthService {
    * Resend verification email
    */
   async resendVerification(): Promise<MessageResponse> {
-    const response = await this.client.post<MessageResponse, Record<string, never>>(
+    const response = await this.client.post<MessageResponse>(
       `${AUTH_BASE_PATH}/resend-verification`,
       {},
       this.getAuthConfig()
@@ -254,10 +251,11 @@ export class AuthService implements IAuthService {
    * Save assessment data for authenticated user
    */
   async saveAssessment(responses: AssessmentResponses): Promise<SavedAssessment> {
-    const response = await this.client.post<
-      SavedAssessmentRaw,
-      { responses: AssessmentResponses }
-    >(`${AUTH_BASE_PATH}/assessment`, { responses }, this.getAuthConfig());
+    const response = await this.client.post<SavedAssessmentRaw>(
+      `${AUTH_BASE_PATH}/assessment`,
+      { responses },
+      this.getAuthConfig()
+    );
 
     // Parse and validate responses from JSON string
     return {
@@ -314,10 +312,7 @@ export class AuthService implements IAuthService {
     result: AIAnalysisResult,
     assessmentId?: string
   ): Promise<SavedAnalysis> {
-    const response = await this.client.post<
-      SavedAnalysisRaw,
-      { result: AIAnalysisResult; assessmentId?: string }
-    >(
+    const response = await this.client.post<SavedAnalysisRaw>(
       `${AUTH_BASE_PATH}/analysis`,
       { result, assessmentId },
       this.getAuthConfig()

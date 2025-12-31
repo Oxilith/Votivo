@@ -22,8 +22,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import AuthLayout from './AuthLayout';
 import { CheckIcon, LoadingSpinnerIcon, ErrorCircleIcon } from '@/components';
-import { useAuthStore } from '@/stores';
-import { authService } from '@/services';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { authService } from '@/services/api/AuthService';
 import { useRouting } from '@/hooks';
 
 /**
@@ -76,10 +76,10 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
       }
     };
 
-    verifyEmail();
+    void verifyEmail();
   }, [token, setUser]);
 
-  const handleResendVerification = async () => {
+  const handleResendVerificationAsync = async () => {
     setResendLoading(true);
     setResendSuccess(false);
     setResendError(null);
@@ -96,6 +96,10 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
     } finally {
       setResendLoading(false);
     }
+  };
+
+  const handleResendVerification = () => {
+    void handleResendVerificationAsync();
   };
 
   const handleNavigateToLanding = useCallback(() => {
@@ -155,7 +159,7 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
               {t('verifyEmail.error.title')}
             </h2>
             <p className="font-body text-[var(--text-secondary)] mb-6">
-              {errorMessage || t('verifyEmail.error.defaultMessage')}
+              {errorMessage ?? t('verifyEmail.error.defaultMessage')}
             </p>
             <div className="space-y-3">
               <button

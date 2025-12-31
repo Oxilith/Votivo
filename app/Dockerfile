@@ -1,5 +1,7 @@
 # Frontend Dockerfile
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
+
+RUN npm install -g @dotenvx/dotenvx
 
 WORKDIR /app
 
@@ -25,13 +27,14 @@ COPY app/index.html app/
 COPY app/tsconfig.json app/
 COPY app/tsconfig.app.json app/
 COPY app/tsconfig.node.json app/
+COPY app/tsconfig.test.json app/
 COPY app/vite.config.ts app/
 COPY app/postcss.config.* app/
 
 RUN npm run build -w app
 
 # Production
-FROM nginx:alpine
+FROM nginx:1.28.1-alpine
 
 RUN apk add --no-cache openssl && \
     mkdir -p /etc/nginx/ssl
@@ -45,4 +48,5 @@ COPY --from=builder /app/app/dist /usr/share/nginx/html
 EXPOSE 80 443
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
 CMD ["nginx", "-g", "daemon off;"]

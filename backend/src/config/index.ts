@@ -25,8 +25,8 @@ const configSchema = z.object({
   // HTTPS
   httpsEnabled: z
     .string()
-    .transform((val) => val === 'true')
-    .default('true'),
+    .default('true')
+    .transform((val) => val === 'true'),
   httpsKeyPath: z.string().default('../certs/localhost+2-key.pem'),
   httpsCertPath: z.string().default('../certs/localhost+2.pem'),
 
@@ -50,11 +50,11 @@ const configSchema = z.object({
   // Feature Flags
   thinkingEnabled: z
     .string()
-    .transform((val) => val === 'true')
-    .default('true'),
+    .default('true')
+    .transform((val) => val === 'true'),
 
   // Prompt Service
-  promptServiceUrl: z.string().url().default('http://localhost:3002'),
+  promptServiceUrl: z.url().default('http://localhost:3002'),
 
   // Circuit Breaker
   // Note: timeout should be 2x request timeout (5000ms) to account for network jitter
@@ -71,30 +71,30 @@ type Config = z.infer<typeof configSchema>;
 
 function loadConfig(): Config {
   const result = configSchema.safeParse({
-    port: process.env['PORT'],
-    nodeEnv: process.env['NODE_ENV'],
-    httpsEnabled: process.env['HTTPS_ENABLED'],
-    httpsKeyPath: process.env['HTTPS_KEY_PATH'],
-    httpsCertPath: process.env['HTTPS_CERT_PATH'],
-    anthropicApiKey: process.env['ANTHROPIC_API_KEY'],
-    corsOrigin: process.env['CORS_ORIGIN'],
-    rateLimitWindowMs: process.env['RATE_LIMIT_WINDOW_MS'],
-    rateLimitMaxRequests: process.env['RATE_LIMIT_MAX_REQUESTS'],
-    claudeRateLimitWindowMs: process.env['CLAUDE_RATE_LIMIT_WINDOW_MS'],
-    claudeRateLimitMaxRequests: process.env['CLAUDE_RATE_LIMIT_MAX_REQUESTS'],
-    logLevel: process.env['LOG_LEVEL'],
-    thinkingEnabled: process.env['THINKING_ENABLED'],
-    promptServiceUrl: process.env['PROMPT_SERVICE_URL'],
-    circuitBreakerTimeout: process.env['CIRCUIT_BREAKER_TIMEOUT'],
-    circuitBreakerResetTimeout: process.env['CIRCUIT_BREAKER_RESET_TIMEOUT'],
-    circuitBreakerErrorThreshold: process.env['CIRCUIT_BREAKER_ERROR_THRESHOLD'],
-    promptCacheTtlMs: process.env['PROMPT_CACHE_TTL_MS'],
-    promptStaleTtlMs: process.env['PROMPT_STALE_TTL_MS'],
+    port: process.env.BACKEND_PORT,
+    nodeEnv: process.env.NODE_ENV,
+    httpsEnabled: process.env.BACKEND_HTTPS_ENABLED,
+    httpsKeyPath: process.env.HTTPS_KEY_PATH,
+    httpsCertPath: process.env.HTTPS_CERT_PATH,
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+    corsOrigin: process.env.CORS_ORIGIN,
+    rateLimitWindowMs: process.env.RATE_LIMIT_WINDOW_MS,
+    rateLimitMaxRequests: process.env.RATE_LIMIT_MAX_REQUESTS,
+    claudeRateLimitWindowMs: process.env.CLAUDE_RATE_LIMIT_WINDOW_MS,
+    claudeRateLimitMaxRequests: process.env.CLAUDE_RATE_LIMIT_MAX_REQUESTS,
+    logLevel: process.env.LOG_LEVEL,
+    thinkingEnabled: process.env.THINKING_ENABLED,
+    promptServiceUrl: process.env.PROMPT_SERVICE_URL,
+    circuitBreakerTimeout: process.env.CIRCUIT_BREAKER_TIMEOUT,
+    circuitBreakerResetTimeout: process.env.CIRCUIT_BREAKER_RESET_TIMEOUT,
+    circuitBreakerErrorThreshold: process.env.CIRCUIT_BREAKER_ERROR_THRESHOLD,
+    promptCacheTtlMs: process.env.PROMPT_CACHE_TTL_MS,
+    promptStaleTtlMs: process.env.PROMPT_STALE_TTL_MS,
   });
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+    const errors = result.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
     throw new Error(`Configuration validation failed:\n${errors}`);
   }

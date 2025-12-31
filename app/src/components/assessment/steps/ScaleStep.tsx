@@ -8,7 +8,7 @@
  * - Highlights selected value with vermilion background
  * @dependencies
  * - React
- * - @/components (ScaleStep)
+ * - @/components types (ScaleStep - type definition)
  */
 
 import type { ScaleStep as ScaleStepType } from '@/components';
@@ -22,7 +22,7 @@ interface ScaleStepProps {
 }
 
 export const ScaleStep: React.FC<ScaleStepProps> = ({ step, value, onChange, isReadOnly = false }) => {
-  const currentValue = value ?? 3;
+  const currentValue = value;
 
   const handleClick = (num: number) => {
     if (isReadOnly) return;
@@ -48,7 +48,7 @@ export const ScaleStep: React.FC<ScaleStepProps> = ({ step, value, onChange, isR
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
-              onClick={() => handleClick(num)}
+              onClick={() => { handleClick(num); }}
               disabled={isReadOnly}
               className={`w-14 h-14 border-2 rounded-sm text-lg font-display font-medium transition-all ${
                 currentValue === num

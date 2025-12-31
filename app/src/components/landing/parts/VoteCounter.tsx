@@ -62,7 +62,7 @@ const VoteCounter: FC<VoteCounterProps> = ({ targetValue, duration = 2000, class
 
     observer.observe(element);
 
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); };
   }, [hasAnimated, animateCount]);
 
   const formatNumber = (num: number): string => {

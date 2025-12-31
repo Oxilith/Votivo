@@ -1,16 +1,25 @@
-/**
- * @file vitest.setup.ts
- * @purpose Set required environment variables before test execution
- * @functionality
- * - Sets ANTHROPIC_API_KEY to prevent config validation errors
- * - Sets NODE_ENV to test mode
- * - Sets LOG_LEVEL to error to reduce test output noise
- * @dependencies
- * - Vitest setup mechanism
- */
+// Backend test setup
+// No need to import vitest globals when globals: true in vitest.config.ts
 
-// Set required env vars before any module imports
-// This runs before test files load, preventing config validation errors
-process.env['ANTHROPIC_API_KEY'] = 'test-api-key-for-unit-tests';
-process.env['NODE_ENV'] = 'test';
-process.env['LOG_LEVEL'] = 'error';
+// Mock dotenv to suppress promotional tips during tests
+vi.mock('dotenv', () => ({
+  config: vi.fn(() => ({ parsed: process.env })),
+}));
+
+// Set test environment variables
+process.env.NODE_ENV = 'test';
+process.env.LOG_LEVEL = 'error';
+process.env.JWT_SECRET = 'test-jwt-secret';
+process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret';
+process.env.ANTHROPIC_API_KEY = 'test-anthropic-api-key';
+process.env.PROMPT_SERVICE_URL = 'http://prompt-service:3002';
+
+// Reset mocks after each test
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+// Restore mocks after all tests
+afterAll(() => {
+  vi.restoreAllMocks();
+});

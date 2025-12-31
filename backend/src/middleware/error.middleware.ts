@@ -97,7 +97,7 @@ export function notFoundHandler(req: Request, res: Response): void {
 export function createAppError(
   message: string,
   statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR,
-  code: string = 'INTERNAL_ERROR'
+  code = 'INTERNAL_ERROR'
 ): AppError {
   const error: AppError = new Error(message);
   error.statusCode = statusCode;

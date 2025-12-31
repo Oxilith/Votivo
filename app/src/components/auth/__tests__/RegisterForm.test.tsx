@@ -15,7 +15,6 @@
  * - RegisterForm component
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RegisterForm from '../forms/RegisterForm';
@@ -61,6 +60,7 @@ vi.mock('react-i18next', () => ({
       return translations[key] ?? key;
     },
   }),
+  withTranslation: () => (Component: React.ComponentType) => Component,
 }));
 
 // Mock authService

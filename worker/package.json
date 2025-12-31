@@ -11,36 +11,26 @@
     "start": "node dist/index.js",
     "db:generate": "prisma generate",
     "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
     "type-check": "tsc --noEmit",
     "test": "vitest --passWithNoTests",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@libsql/client": "^0.8.0",
-    "@prisma/adapter-libsql": "^5.22.0",
-    "@prisma/client": "^5.22.0",
-    "dotenv": "^16.4.0",
-    "node-cron": "^3.0.3",
-    "pino": "^9.0.0",
-    "shared": "*",
-    "zod": "^3.23.0"
+    "@libsql/client": "^0.15.15",
+    "@prisma/adapter-libsql": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "dotenv": "^17.2.3",
+    "node-cron": "^4.2.1",
+    "pino": "^10.1.0",
+    "shared": "*"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@types/node": "^24.10.1",
     "@types/node-cron": "^3.0.11",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "@vitest/coverage-v8": "^4.0.16",
-    "eslint": "^9.0.0",
-    "pino-pretty": "^11.0.0",
-    "prisma": "^5.22.0",
-    "tsup": "^8.5.1",
-    "tsx": "^4.15.0",
-    "typescript": "^5.5.0",
-    "typescript-eslint": "^8.50.1",
-    "vitest": "^4.0.16"
+    "pino-pretty": "^13.1.3",
+    "prisma": "^7.2.0",
+    "tsx": "^4.21.0"
   },
   "engines": {
     "node": ">=20.0.0"

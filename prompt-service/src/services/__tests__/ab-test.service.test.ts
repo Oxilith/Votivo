@@ -10,7 +10,6 @@
  * - ABTestService for service under test
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { ABTestService } from '@/services';
 import type { ABVariant, ABVariantConfig } from '@prisma/client';
 

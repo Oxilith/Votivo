@@ -1,7 +1,9 @@
 # Worker Dockerfile
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 RUN apk add --no-cache openssl
+
+RUN npm install -g @dotenvx/dotenvx
 
 WORKDIR /app
 
@@ -29,9 +31,10 @@ RUN npm run db:generate -w worker
 RUN npm run build -w worker
 
 # Production
-FROM node:22-alpine
+FROM node:24-alpine
 
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl && \
+    npm install -g @dotenvx/dotenvx
 
 WORKDIR /app
 ENV NODE_ENV=production
@@ -46,6 +49,7 @@ COPY --from=builder /app/shared/dist shared/dist
 COPY --from=builder /app/worker/dist worker/dist
 COPY --from=builder /app/worker/prisma worker/prisma
 COPY --from=builder /app/node_modules/.prisma node_modules/.prisma
+COPY .env worker/.env
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 appuser && \
@@ -54,4 +58,5 @@ RUN addgroup --system --gid 1001 nodejs && \
 USER appuser
 WORKDIR /app/worker
 
-CMD ["node", "dist/index.js"]
+
+CMD ["npx", "dotenvx", "run", "--", "node", "dist/index.js"]

@@ -3,5 +3,13 @@
     "stepOf": "{{current}} / {{total}}"
   },
   "createdAt": "Utworzono",
-  "viewOnly": "Tylko podgląd"
+  "viewOnly": "Tylko podgląd",
+  "chunkError": {
+    "title": "Nie udało się załadować",
+    "description": "Wystąpił problem podczas ładowania strony. Sprawdź połączenie i spróbuj ponownie.",
+    "unexpectedTitle": "Coś poszło nie tak",
+    "unexpectedDescription": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+    "retry": "Spróbuj ponownie",
+    "reload": "Odśwież stronę"
+  }
 }

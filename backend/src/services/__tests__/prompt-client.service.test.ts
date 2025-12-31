@@ -14,17 +14,14 @@
  * - Mock BackgroundRefreshManager for isolation
  */
 
-/* eslint-disable @typescript-eslint/unbound-method -- vitest mocks are safe to use unbound */
-
-import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
 import { PromptClientService, PromptServiceUnavailableError, promptCacheService } from '@/services';
-import type { PromptConfig } from 'shared';
+import { createMockPromptConfig } from 'shared/testing';
 
 // Cast to mocked type for type safety
 const mockCacheService = vi.mocked(promptCacheService);
 
 // Track scheduled refresh tasks for testing
-const mockScheduledTasks: Array<{ key: string; thinkingEnabled: boolean }> = [];
+const mockScheduledTasks: { key: string; thinkingEnabled: boolean }[] = [];
 
 // Mock BackgroundRefreshManager to isolate tests from async background operations
 vi.mock('@/utils/background-refresh-manager', () => ({
@@ -93,14 +90,14 @@ const originalFetch = globalThis.fetch;
 
 describe('PromptClientService', () => {
   let service: PromptClientService;
-  let mockFetch: Mock;
+  let mockFetch: ReturnType<typeof vi.fn>;
 
-  const mockPromptConfig: PromptConfig = {
+  const mockPromptConfig = createMockPromptConfig({
     prompt: 'Test prompt content',
     model: 'claude-sonnet-4-0',
     max_tokens: 1000,
     temperature: 0.7,
-  };
+  });
 
   const mockResolveResponse = {
     config: mockPromptConfig,
@@ -224,7 +221,7 @@ describe('PromptClientService', () => {
 
       // Create a new service with mocked open circuit
       const { createCircuitBreaker } = await import('@/services/circuit-breaker.service.js');
-      (createCircuitBreaker as Mock).mockImplementationOnce(() => ({
+      (createCircuitBreaker as ReturnType<typeof vi.fn>).mockImplementationOnce(() => ({
         fire: vi.fn(),
         opened: true,
         halfOpen: false,

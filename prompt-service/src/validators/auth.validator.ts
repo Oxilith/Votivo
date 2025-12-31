@@ -50,10 +50,9 @@ export const MAX_BIRTH_YEAR = new Date().getFullYear() - 13; // Minimum age 13
  */
 export const registerSchema = z.object({
   email: z
-    .string()
+    .email('Invalid email format')
     .min(1, 'Email is required')
-    .max(MAX_EMAIL_LENGTH, `Email must be at most ${MAX_EMAIL_LENGTH} characters`)
-    .email('Invalid email format'),
+    .max(MAX_EMAIL_LENGTH, `Email must be at most ${MAX_EMAIL_LENGTH} characters`),
   password: z
     .string()
     .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
@@ -77,10 +76,9 @@ export const registerSchema = z.object({
  */
 export const loginSchema = z.object({
   email: z
-    .string()
+    .email('Invalid email format')
     .min(1, 'Email is required')
-    .max(MAX_EMAIL_LENGTH)
-    .email('Invalid email format'),
+    .max(MAX_EMAIL_LENGTH),
   password: z
     .string()
     .min(1, 'Password is required')
@@ -93,10 +91,9 @@ export const loginSchema = z.object({
  */
 export const passwordResetRequestSchema = z.object({
   email: z
-    .string()
+    .email('Invalid email format')
     .min(1, 'Email is required')
-    .max(MAX_EMAIL_LENGTH)
-    .email('Invalid email format'),
+    .max(MAX_EMAIL_LENGTH),
 });
 
 /**
@@ -130,10 +127,9 @@ export const emailVerifyTokenParamSchema = z.object({
  */
 export const resendVerificationSchema = z.object({
   email: z
-    .string()
+    .email('Invalid email format')
     .min(1, 'Email is required')
-    .max(MAX_EMAIL_LENGTH)
-    .email('Invalid email format'),
+    .max(MAX_EMAIL_LENGTH),
 });
 
 /**

@@ -11,7 +11,8 @@
  * - @/components/shared/icons (LoadingSpinnerIcon)
  */
 
-import React, { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import React from 'react';
 import { LoadingSpinnerIcon } from '@/components';
 
 /**

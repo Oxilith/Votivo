@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Votive Hanko Seal - Japanese personal stamp inspired favicon -->
+  <!-- Rotated -3deg to match app logo aesthetic -->
+  <g transform="rotate(-3, 16, 16)">
+    <!-- Vermilion background with slightly rounded corners -->
+    <rect width="32" height="32" rx="3" fill="#C73E1D"/>
+    <!-- White "V" character - clean serif style approximating Shippori Mincho -->
+    <path
+      d="M8 8 L16 24 L24 8 L21 8 L16 19 L11 8 Z"
+      fill="white"
+    />
+  </g>
+</svg>

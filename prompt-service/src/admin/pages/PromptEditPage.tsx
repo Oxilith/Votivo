@@ -16,15 +16,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  usePrompt,
-  usePromptVersions,
-  promptApi,
-  colors,
-  shadows,
-  fonts,
-  CLAUDE_MODELS,
-} from '@/admin';
+import { usePrompt, usePromptVersions } from '@/admin/hooks';
+import { promptApi } from '@/admin/api';
+import { colors, shadows, fonts } from '@/admin/styles';
+import { CLAUDE_MODELS } from '@/admin/types';
 import type { UpdatePromptInput, PromptVariantDTO, PromptVersionDTO } from '@/admin';
 
 export function PromptEditPage() {
@@ -94,7 +89,7 @@ export function PromptEditPage() {
 
     try {
       await promptApi.delete(id);
-      navigate('/prompts');
+      await navigate('/prompts');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete prompt');
     }

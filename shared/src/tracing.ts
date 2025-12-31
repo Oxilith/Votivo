@@ -6,11 +6,10 @@
  * - Parses incoming traceparent headers
  * - Creates child spans with propagated trace IDs
  * - Provides utilities for trace ID and span ID generation
+ * - Uses Web Crypto API for isomorphic browser/Node.js support
  * @dependencies
- * - crypto for secure random ID generation
+ * - Web Crypto API (globalThis.crypto)
  */
-
-import crypto from 'crypto';
 
 /**
  * W3C Trace Context header names
@@ -43,17 +42,36 @@ export interface TraceInfo {
 }
 
 /**
+ * Convert Uint8Array to hex string
+ */
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/**
+ * Generate cryptographically secure random bytes
+ * Uses Web Crypto API (available in browsers and Node.js 15+)
+ */
+function getRandomBytes(length: number): Uint8Array {
+  const bytes = new Uint8Array(length);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytes;
+}
+
+/**
  * Generate a random trace ID (32 hex chars = 128 bits)
  */
 export function generateTraceId(): string {
-  return crypto.randomBytes(16).toString('hex');
+  return bytesToHex(getRandomBytes(16));
 }
 
 /**
  * Generate a random span ID (16 hex chars = 64 bits)
  */
 export function generateSpanId(): string {
-  return crypto.randomBytes(8).toString('hex');
+  return bytesToHex(getRandomBytes(8));
 }
 
 /**

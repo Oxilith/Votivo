@@ -14,6 +14,7 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
 import { abTestService } from '@/services';
 import {
   createABTestSchema,
@@ -40,7 +41,7 @@ export class ABTestController {
   async getById(req: Request, res: Response): Promise<void> {
     const params = abTestIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -59,7 +60,7 @@ export class ABTestController {
   async create(req: Request, res: Response): Promise<void> {
     const body = createABTestSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -73,13 +74,13 @@ export class ABTestController {
   async update(req: Request, res: Response): Promise<void> {
     const params = abTestIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
     const body = updateABTestSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -101,7 +102,7 @@ export class ABTestController {
   async delete(req: Request, res: Response): Promise<void> {
     const params = abTestIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -123,7 +124,7 @@ export class ABTestController {
   async activate(req: Request, res: Response): Promise<void> {
     const params = abTestIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -145,7 +146,7 @@ export class ABTestController {
   async deactivate(req: Request, res: Response): Promise<void> {
     const params = abTestIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -167,13 +168,13 @@ export class ABTestController {
   async addVariant(req: Request, res: Response): Promise<void> {
     const params = abTestIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
     const body = createABVariantSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -187,13 +188,13 @@ export class ABTestController {
   async updateVariant(req: Request, res: Response): Promise<void> {
     const params = variantIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
     const body = updateABVariantSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -215,7 +216,7 @@ export class ABTestController {
   async removeVariant(req: Request, res: Response): Promise<void> {
     const params = variantIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 

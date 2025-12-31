@@ -31,7 +31,7 @@ const ExportDropdown: FC<ExportDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const hasExportOptions = onExportAssessment || onExportAnalysis;
+  const hasExportOptions = onExportAssessment ?? onExportAnalysis;
 
   // Handle outside click to close dropdown
   useEffect(() => {
@@ -68,7 +68,7 @@ const ExportDropdown: FC<ExportDropdownProps> = ({
   return (
     <div ref={dropdownRef} className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { setIsOpen(!isOpen); }}
         className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors"
         aria-expanded={isOpen}
         aria-haspopup="true"

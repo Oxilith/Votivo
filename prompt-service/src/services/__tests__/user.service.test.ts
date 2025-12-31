@@ -15,15 +15,14 @@
  * - Email service mock for email sending
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { User, RefreshToken, PasswordResetToken, EmailVerifyToken, Assessment, Analysis } from '@prisma/client';
 
 // Define the return type for verifyRefreshToken mock
-type VerifyResult = {
+interface VerifyResult {
   success: boolean;
   payload: { userId: string; tokenId: string; type: 'refresh' } | null;
   error: 'invalid' | 'expired' | null;
-};
+}
 
 // Create mock functions with hoisting to ensure they're available before module loading
 const mockJwtFunctions = vi.hoisted(() => ({
@@ -224,7 +223,7 @@ describe('UserService', () => {
       const emailVerifyToken = { id: 'verify-id', userId: 'user-123', token: 'email_verify_token', expiresAt: new Date(), usedAt: null, createdAt: new Date() };
 
       // Mock transaction - the callback receives tx and returns the result
-      mockPrisma.$transaction.mockImplementation(async (callback) => {
+      mockPrisma.$transaction.mockImplementation(async (callback: (tx: unknown) => Promise<unknown>) => {
         const txMock = {
           user: { create: vi.fn().mockResolvedValue(newUser) },
           refreshToken: { create: vi.fn().mockResolvedValue(sampleRefreshToken) },
@@ -266,7 +265,7 @@ describe('UserService', () => {
       const newUser = { ...sampleUser, email: 'test@example.com' };
       const emailVerifyToken = { id: 'verify-id', userId: 'user-123', token: 'email_verify_token', expiresAt: new Date(), usedAt: null, createdAt: new Date() };
 
-      mockPrisma.$transaction.mockImplementation(async (callback) => {
+      mockPrisma.$transaction.mockImplementation(async (callback: (tx: unknown) => Promise<unknown>) => {
         const txMock = {
           user: { create: vi.fn().mockResolvedValue(newUser) },
           refreshToken: { create: vi.fn().mockResolvedValue(sampleRefreshToken) },
@@ -378,7 +377,7 @@ describe('UserService', () => {
         error: null,
       });
       // Mock $transaction to execute callback with tx mock
-      mockPrisma.$transaction.mockImplementation(async (callback) => {
+      mockPrisma.$transaction.mockImplementation(async (callback: (tx: unknown) => Promise<unknown>) => {
         const txMock = {
           refreshToken: {
             findUnique: vi.fn().mockResolvedValue(null),
@@ -399,7 +398,7 @@ describe('UserService', () => {
         error: null,
       });
       // Mock $transaction to execute callback with tx mock
-      mockPrisma.$transaction.mockImplementation(async (callback) => {
+      mockPrisma.$transaction.mockImplementation(async (callback: (tx: unknown) => Promise<unknown>) => {
         const txMock = {
           refreshToken: {
             findUnique: vi.fn().mockResolvedValue(sampleRefreshToken),
@@ -422,7 +421,7 @@ describe('UserService', () => {
       const expiredToken = { ...sampleRefreshToken, expiresAt: new Date(Date.now() - 1000) };
       const deleteMock = vi.fn().mockResolvedValue(expiredToken);
       // Mock $transaction to execute callback with tx mock
-      mockPrisma.$transaction.mockImplementation(async (callback) => {
+      mockPrisma.$transaction.mockImplementation(async (callback: (tx: unknown) => Promise<unknown>) => {
         const txMock = {
           refreshToken: {
             findUnique: vi.fn().mockResolvedValue(expiredToken),
@@ -539,7 +538,7 @@ describe('UserService', () => {
       mockPrisma.emailVerifyToken.findUnique.mockResolvedValue(validEmailToken);
       const verifiedUser = { ...sampleUser, emailVerified: true, emailVerifiedAt: new Date() };
 
-      mockPrisma.$transaction.mockImplementation(async (callback) => {
+      mockPrisma.$transaction.mockImplementation(async (callback: (tx: unknown) => Promise<unknown>) => {
         const txMock = {
           user: { update: vi.fn().mockResolvedValue(verifiedUser) },
           emailVerifyToken: { update: vi.fn().mockResolvedValue({ ...validEmailToken, usedAt: new Date() }) },

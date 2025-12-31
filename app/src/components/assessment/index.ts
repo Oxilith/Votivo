@@ -2,12 +2,11 @@
  * @file src/components/assessment/index.ts
  * @purpose Barrel export for assessment components
  * @functionality
- * - Exports main assessment page component
  * - Exports assessment page header component
  * - Exports assessment types
  * - Re-exports hooks, steps, and navigation sub-barrels
+ * - NOTE: IdentityFoundationsAssessment is NOT exported here - it's lazy-loaded in App.tsx for code splitting
  * @dependencies
- * - ./IdentityFoundationsAssessment
  * - ./AssessmentPageHeader
  * - ./types
  * - ./hooks
@@ -15,8 +14,7 @@
  * - ./navigation
  */
 
-// Main components
-export { default as IdentityFoundationsAssessment } from './IdentityFoundationsAssessment';
+// Main components (IdentityFoundationsAssessment is lazy-loaded in App.tsx)
 export { default as AssessmentPageHeader } from './AssessmentPageHeader';
 
 // Types

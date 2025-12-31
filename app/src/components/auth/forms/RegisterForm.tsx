@@ -25,8 +25,8 @@ import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormInput from './FormInput';
 import FormButton from './FormButton';
-import { authService } from '@/services';
-import { useAuthStore } from '@/stores';
+import { authService } from '@/services/api/AuthService';
+import { useAuthStore } from '@/stores/useAuthStore';
 import type { Gender } from '@/types';
 import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from 'shared';
 
@@ -130,7 +130,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmitAsync = async (e: FormEvent) => {
     e.preventDefault();
     setApiError(null);
 
@@ -161,6 +161,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   };
 
+  const handleSubmit = (e: FormEvent) => {
+    void handleSubmitAsync(e);
+  };
+
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
@@ -177,7 +181,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           label={t('register.name')}
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => { setName(e.target.value); }}
           error={errors.name}
           required
           autoComplete="name"
@@ -188,7 +192,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           label={t('register.email')}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); }}
           error={errors.email}
           required
           autoComplete="email"
@@ -199,7 +203,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           label={t('register.password')}
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => { setPassword(e.target.value); }}
           error={errors.password}
           required
           autoComplete="new-password"
@@ -210,7 +214,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           label={t('register.confirmPassword')}
           type="password"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={(e) => { setConfirmPassword(e.target.value); }}
           error={errors.confirmPassword}
           required
           autoComplete="new-password"
@@ -221,12 +225,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           label={t('register.birthYear')}
           type="number"
           value={birthYear}
-          onChange={(e) => setBirthYear(e.target.value)}
+          onChange={(e) => { setBirthYear(e.target.value); }}
           error={errors.birthYear}
           required
           min={minYear}
           max={maxYear}
-          placeholder={`e.g., ${currentYear - 25}`}
+          placeholder={`e.g., ${String(currentYear - 25)}`}
         />
 
         {/* Gender Select */}
@@ -240,7 +244,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <select
             id="gender"
             value={gender}
-            onChange={(e) => setGender(e.target.value as Gender)}
+            onChange={(e) => { setGender(e.target.value as Gender); }}
             className={`
               w-full p-3 font-body text-base
               bg-[var(--bg-primary)] text-[var(--text-primary)]

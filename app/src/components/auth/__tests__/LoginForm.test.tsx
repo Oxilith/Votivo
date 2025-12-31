@@ -15,7 +15,6 @@
  * - LoginForm component
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LoginForm from '../forms/LoginForm';
@@ -43,6 +42,7 @@ vi.mock('react-i18next', () => ({
       return translations[key] ?? key;
     },
   }),
+  withTranslation: () => (Component: React.ComponentType) => Component,
 }));
 
 // Mock authService

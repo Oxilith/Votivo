@@ -13,7 +13,6 @@
  * - @/utils/csrf for token utilities
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response, NextFunction } from 'express';
 import { csrfMiddleware, setCsrfToken, clearCsrfToken } from '@/middleware';
 import { CSRF_COOKIE, CSRF_HEADER, generateCsrfToken } from '@/utils';
@@ -42,7 +41,7 @@ describe('CSRF Middleware', () => {
 
   describe('csrfMiddleware', () => {
     describe('safe methods', () => {
-      it.each(['GET', 'HEAD', 'OPTIONS'])('should skip validation for %s requests', (method) => {
+      it.each(['GET', 'HEAD', 'OPTIONS'])('should skip validation for %s requests', (method: string) => {
         mockReq.method = method;
 
         csrfMiddleware(mockReq as Request, mockRes as Response, mockNext);
@@ -53,7 +52,7 @@ describe('CSRF Middleware', () => {
     });
 
     describe('state-changing methods', () => {
-      it.each(['POST', 'PUT', 'DELETE', 'PATCH'])('should require CSRF token for %s requests', (method) => {
+      it.each(['POST', 'PUT', 'DELETE', 'PATCH'])('should require CSRF token for %s requests', (method: string) => {
         mockReq.method = method;
         // No cookie, no header
 

@@ -14,7 +14,9 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { promptApi, colors, shadows, fonts, CLAUDE_MODELS } from '@/admin';
+import { promptApi } from '@/admin/api';
+import { colors, shadows, fonts } from '@/admin/styles';
+import { CLAUDE_MODELS } from '@/admin/types';
 import type { CreatePromptInput } from '@/admin';
 
 export function PromptCreatePage() {
@@ -48,7 +50,7 @@ export function PromptCreatePage() {
 
     try {
       await promptApi.create(formData);
-      navigate('/prompts');
+      await navigate('/prompts');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create prompt');
     } finally {

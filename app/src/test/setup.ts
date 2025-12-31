@@ -12,7 +12,6 @@
  */
 
 import '@testing-library/jest-dom/vitest';
-import { vi, afterEach } from 'vitest';
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

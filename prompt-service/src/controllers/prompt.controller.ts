@@ -14,6 +14,7 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
 import { promptService } from '@/services';
 import {
   createPromptSchema,
@@ -39,7 +40,7 @@ export class PromptController {
   async getById(req: Request, res: Response): Promise<void> {
     const params = promptIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -58,7 +59,7 @@ export class PromptController {
   async getByKey(req: Request, res: Response): Promise<void> {
     const params = promptKeyParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -77,7 +78,7 @@ export class PromptController {
   async create(req: Request, res: Response): Promise<void> {
     const body = createPromptSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -103,13 +104,13 @@ export class PromptController {
   async update(req: Request, res: Response): Promise<void> {
     const params = promptIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
     const body = updatePromptSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: body.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(body.error) });
       return;
     }
 
@@ -131,7 +132,7 @@ export class PromptController {
   async delete(req: Request, res: Response): Promise<void> {
     const params = promptIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -153,7 +154,7 @@ export class PromptController {
   async getVersions(req: Request, res: Response): Promise<void> {
     const params = promptIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 
@@ -167,7 +168,7 @@ export class PromptController {
   async restoreVersion(req: Request, res: Response): Promise<void> {
     const params = versionIdParamSchema.safeParse(req.params);
     if (!params.success) {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: params.error.format() });
+      res.status(StatusCodes.BAD_REQUEST).json({ error: z.treeifyError(params.error) });
       return;
     }
 

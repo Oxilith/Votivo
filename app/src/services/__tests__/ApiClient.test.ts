@@ -11,7 +11,6 @@
  * - @/services/api/ApiClient
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApiClient, ApiClientError } from '../api/ApiClient';
 
 // Mock fetch globally

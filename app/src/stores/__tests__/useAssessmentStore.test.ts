@@ -11,7 +11,6 @@
  * - @/stores/useAssessmentStore
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAssessmentStore } from '../useAssessmentStore';
 
 // Mock localStorage
@@ -23,7 +22,7 @@ const localStorageMock = (() => {
       store[key] = value;
     }),
     removeItem: vi.fn((key: string) => {
-      delete store[key];
+      Reflect.deleteProperty(store, key);
     }),
     clear: vi.fn(() => {
       store = {};

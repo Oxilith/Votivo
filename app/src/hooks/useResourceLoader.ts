@@ -10,6 +10,7 @@
  * - React (useEffect, useCallback, useState)
  * - @/stores (useAuthStore, useAssessmentStore, useAnalysisStore, useUIStore)
  * - @/services (authService)
+ * - @/utils (logger)
  * - ./useRouting
  * - @/types (AppView, ViewOnlyAssessment, ViewOnlyAnalysis)
  */
@@ -18,6 +19,7 @@ import { useEffect, useCallback, useState, useRef } from 'react';
 import { useAuthStore, useAuthInitialized, useAuthHydrated, useAssessmentStore, useAnalysisStore, useUIStore } from '@/stores';
 import { authService } from '@/services';
 import { useRouting } from './useRouting';
+import { logger } from '@/utils';
 import type { AppView, ViewOnlyAssessment, ViewOnlyAnalysis } from '@/types';
 
 // Re-export types for convenience
@@ -103,7 +105,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
   const loadMostRecentAssessment = useCallback(async (): Promise<string | undefined> => {
     try {
       const assessments = await authService.getAssessments();
-      if (assessments.length > 0) {
+      if (Array.isArray(assessments) && assessments.length > 0) {
         // Sort by createdAt descending and get most recent
         const sorted = [...assessments].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -128,7 +130,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
   > => {
     try {
       const analyses = await authService.getAnalyses();
-      if (analyses.length > 0) {
+      if (Array.isArray(analyses) && analyses.length > 0) {
         // Sort by createdAt descending and get most recent
         const sorted = [...analyses].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -152,13 +154,17 @@ export function useResourceLoader(): UseResourceLoaderResult {
    * Check if assessment store has meaningful data
    */
   const isAssessmentStoreEmpty = useCallback((): boolean => {
-    if (!responses) return true;
-    // Check if any responses have been filled out
-    const hasAnyResponses = Object.values(responses).some((value) => {
+    // Check if any responses have been filled out by iterating over keys
+    const responseKeys = Object.keys(responses) as (keyof typeof responses)[];
+    if (responseKeys.length === 0) return true;
+
+    const hasAnyResponses = responseKeys.some((key) => {
+      const value = responses[key];
+      if (value === undefined) return false;
       if (Array.isArray(value)) return value.length > 0;
       if (typeof value === 'string') return value.trim().length > 0;
       if (typeof value === 'number') return true; // Numbers are valid responses
-      return value !== null && value !== undefined;
+      return true;
     });
     return !hasAnyResponses;
   }, [responses]);
@@ -174,7 +180,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
    * Main effect for loading resources
    */
   useEffect(() => {
-    const loadResources = async () => {
+    const loadResourcesAsync = async () => {
       // Wait for auth store to hydrate and initialize before attempting to load resources
       // This prevents race conditions where we try to load before auth is ready
       if (!isAuthHydrated || !isAuthInitialized) {
@@ -245,7 +251,8 @@ export function useResourceLoader(): UseResourceLoaderResult {
             setViewOnlyAnalysis(null);
             clearReadOnlyMode();
           }
-        } else if (view === 'insights') {
+        } else {
+          // view === 'insights' at this point (early return handles other views)
           if (resourceId) {
             // Load specific analysis by ID for view-only (does NOT modify store)
             const analysisData = await loadAnalysisByIdViewOnly(resourceId);
@@ -276,7 +283,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
         setError(message);
         // Clear read-only mode if loading failed
         clearReadOnlyMode();
-        console.error('Resource loading error:', err);
+        logger.error('Resource loading error:', err);
       } finally {
         setIsLoading(false);
         setLoading(false);
@@ -284,7 +291,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
       }
     };
 
-    loadResources();
+    void loadResourcesAsync();
   }, [
     currentView,
     isAuthenticated,
