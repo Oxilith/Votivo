@@ -45,7 +45,7 @@ const configSchema = z.object({
   claudeRateLimitMaxRequests: z.coerce.number().default(5),
 
   // Logging
-  logLevel: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  logLevel: z.enum(['silent', 'fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   // Feature Flags
   thinkingEnabled: z

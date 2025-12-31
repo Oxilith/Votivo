@@ -7,12 +7,14 @@
  * - Exports custom Vitest matchers
  * - Exports test utility functions
  * - Exports database test utilities
+ * - Exports integration test setup utilities
  * @dependencies
  * - ./fixtures
  * - ./mocks
  * - ./matchers
  * - ./utils
  * - ./db
+ * - ./setup
  */
 
 // Fixtures - factory functions for creating test data
@@ -24,21 +26,8 @@ export * from './mocks'; // @allow-wildcard
 // Utils - async helpers and Express mocks
 export * from './utils'; // @allow-wildcard
 
-// Database utilities - test DB lifecycle management
-export {
-  setTestPrisma,
-  getTestPrisma,
-  hasTestPrisma,
-  cleanupTestDb,
-  cleanupTables,
-  disconnectTestDb,
-  setupTestDb,
-  withCleanup,
-  CLEANUP_TABLE_ORDER,
-  type PrismaLikeClient,
-  type TableName,
-  type CleanupOptions,
-} from './db';
+// Setup - integration test database setup utilities
+export * from './setup'; // @allow-wildcard
 
 // Custom matchers - must be imported for side effects (extends vitest)
 // Import this in your test setup file to register the matchers

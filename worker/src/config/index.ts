@@ -13,6 +13,7 @@
 
 import { config as dotenvConfig } from 'dotenv';
 import { z } from 'zod';
+import { bootstrapLogger } from '@/utils/bootstrap-logger';
 
 dotenvConfig();
 
@@ -28,7 +29,7 @@ const configSchema = z.object({
     .optional(),
 
   // Logging
-  logLevel: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  logLevel: z.enum(['silent', 'fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   // Job Configuration
   jobs: z.object({
@@ -61,8 +62,8 @@ function loadConfig(): Config {
 
   // Warn in development if DATABASE_KEY is not set (database will be unencrypted)
   if (!isProduction && !process.env.DATABASE_KEY) {
-    console.warn(
-      '[CONFIG WARNING] DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
+    bootstrapLogger.warn(
+      'DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
     );
   }
 
@@ -87,7 +88,8 @@ function loadConfig(): Config {
   }
 
   // Apply default database URL for non-production environments
-  const databaseUrl = result.data.databaseUrl ?? 'file:./dev.db';
+  // Worker shares database with prompt-service - use the same file in development
+  const databaseUrl = result.data.databaseUrl ?? 'file:../prompt-service/prisma/dev.db';
 
   return {
     ...result.data,

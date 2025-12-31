@@ -12,9 +12,13 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "type-check": "tsc --noEmit",
-    "test": "vitest --passWithNoTests",
-    "test:run": "vitest run --passWithNoTests",
-    "test:coverage": "vitest run --coverage --passWithNoTests"
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:unit": "vitest --project=unit",
+    "test:unit:run": "vitest run --project=unit",
+    "test:integration": "vitest --project=integration",
+    "test:integration:run": "vitest run --project=integration",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",

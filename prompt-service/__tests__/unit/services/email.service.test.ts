@@ -13,7 +13,7 @@
  * - nodemailer mock for email transport
  */
 
-// Create hoisted mocks for nodemailer
+// Create hoisted mocks for nodemailer and logger
 const mockTransporter = vi.hoisted(() => ({
   sendMail: vi.fn(),
   verify: vi.fn(),
@@ -22,11 +22,26 @@ const mockTransporter = vi.hoisted(() => ({
 
 const mockCreateTransport = vi.hoisted(() => vi.fn(() => mockTransporter));
 
+const mockLogger = vi.hoisted(() => ({
+  warn: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  debug: vi.fn(),
+}));
+
 vi.mock('nodemailer', () => ({
   default: {
     createTransport: mockCreateTransport,
   },
 }));
+
+vi.mock('@/utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/utils')>();
+  return {
+    ...actual,
+    logger: mockLogger,
+  };
+});
 
 import {
   EmailService,
@@ -237,14 +252,15 @@ describe('EmailService', () => {
     it('should handle send errors gracefully', async () => {
       mockTransporter.sendMail.mockRejectedValue(new Error('SMTP error'));
       const emailService = new EmailService(validSmtpConfig);
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
 
       const result = await emailService.sendPasswordResetEmail(resetEmailInput);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('SMTP error');
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.objectContaining({ to: resetEmailInput.to, err: 'SMTP error' }),
+        expect.stringContaining('Failed to send email')
+      );
     });
 
     it('should return skipped result in development mode without SMTP config', async () => {
@@ -253,7 +269,6 @@ describe('EmailService', () => {
         ...validSmtpConfig,
         host: '',
       });
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
       const result = await unconfiguredService.sendPasswordResetEmail(resetEmailInput);
 
@@ -261,8 +276,10 @@ describe('EmailService', () => {
       expect(result.skipped).toBe(true);
       expect(result.messageId).toBe('dev-mode-no-smtp');
       expect(result.error).toBe('Email not sent - SMTP not configured in development');
-      expect(consoleWarnSpy).toHaveBeenCalled();
-      consoleWarnSpy.mockRestore();
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ to: resetEmailInput.to }),
+        expect.stringContaining('Email service is not configured')
+      );
     });
 
     it('should return error in production mode without SMTP config', async () => {
@@ -341,13 +358,15 @@ describe('EmailService', () => {
     it('should handle send errors gracefully', async () => {
       mockTransporter.sendMail.mockRejectedValue(new Error('Connection refused'));
       const emailService = new EmailService(validSmtpConfig);
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
 
       const result = await emailService.sendEmailVerificationEmail(verifyEmailInput);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Connection refused');
-      consoleSpy.mockRestore();
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.objectContaining({ to: verifyEmailInput.to, err: 'Connection refused' }),
+        expect.stringContaining('Failed to send email')
+      );
     });
 
     it('should include HTML template with styled button', async () => {

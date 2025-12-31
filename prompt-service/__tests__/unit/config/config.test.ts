@@ -13,9 +13,19 @@
  * - vitest for testing framework
  */
 
+// Create hoisted mock for bootstrap logger
+const mockBootstrapLogger = vi.hoisted(() => ({
+  warn: vi.fn(),
+  error: vi.fn(),
+}));
+
 // Mock dotenv to prevent loading .env file values during tests
 vi.mock('dotenv', () => ({
   config: vi.fn(),
+}));
+
+vi.mock('@/utils/bootstrap-logger', () => ({
+  bootstrapLogger: mockBootstrapLogger,
 }));
 
 describe('config validation', () => {
@@ -161,7 +171,6 @@ describe('config validation', () => {
 
     it('should log a warning when using ADMIN_API_KEY as SESSION_SECRET fallback', async () => {
       // Arrange
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
       process.env.ADMIN_API_KEY = 'test-admin-api-key-at-least-32-characters-long';
       process.env.JWT_ACCESS_SECRET = 'test-jwt-access-secret-at-least-32-chars';
       process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret-at-least-32-chars';
@@ -171,11 +180,9 @@ describe('config validation', () => {
       await import('@/config');
 
       // Assert
-      expect(warnSpy).toHaveBeenCalledWith(
+      expect(mockBootstrapLogger.warn).toHaveBeenCalledWith(
         expect.stringContaining('SESSION_SECRET not set, falling back to ADMIN_API_KEY')
       );
-
-      warnSpy.mockRestore();
     });
 
     it('should reject SESSION_SECRET shorter than 32 characters', async () => {

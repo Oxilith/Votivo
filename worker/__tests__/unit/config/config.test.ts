@@ -14,6 +14,16 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
+// Create hoisted mock for bootstrap logger
+const mockBootstrapLogger = vi.hoisted(() => ({
+  warn: vi.fn(),
+  error: vi.fn(),
+}));
+
+vi.mock('@/utils/bootstrap-logger', () => ({
+  bootstrapLogger: mockBootstrapLogger,
+}));
+
 describe('config', () => {
   const originalEnv = process.env;
 
@@ -41,7 +51,8 @@ describe('config', () => {
 
       const { config } = await import('@/config');
 
-      expect(config.databaseUrl).toBe('file:./dev.db');
+      // Worker shares database with prompt-service
+      expect(config.databaseUrl).toBe('file:../prompt-service/prisma/dev.db');
     });
 
     it('should use default job schedule in development', async () => {
@@ -152,11 +163,10 @@ describe('config', () => {
   describe('DATABASE_KEY validation', () => {
     it('should warn in development if DATABASE_KEY is not set', async () => {
       process.env.NODE_ENV = 'development';
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 
       await import('@/config');
 
-      expect(warnSpy).toHaveBeenCalledWith(
+      expect(mockBootstrapLogger.warn).toHaveBeenCalledWith(
         expect.stringContaining('DATABASE_KEY not set')
       );
     });
@@ -164,11 +174,11 @@ describe('config', () => {
     it('should not warn if DATABASE_KEY is set', async () => {
       process.env.NODE_ENV = 'development';
       process.env.DATABASE_KEY = 'a'.repeat(32);
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
+      mockBootstrapLogger.warn.mockClear();
 
       await import('@/config');
 
-      expect(warnSpy).not.toHaveBeenCalled();
+      expect(mockBootstrapLogger.warn).not.toHaveBeenCalled();
     });
 
     it('should throw error if DATABASE_KEY is too short', async () => {

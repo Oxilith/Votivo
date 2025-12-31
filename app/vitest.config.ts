@@ -3,6 +3,7 @@
  * @purpose Vitest test configuration for React frontend
  * @functionality
  * - Configures test environment (jsdom)
+ * - Uses projects for unit test organization
  * - Sets up path aliases matching vite.config
  * - Configures coverage reporting with thresholds
  * - Sets up global test utilities
@@ -17,12 +18,13 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    include: ['__tests__/**/*.test.{ts,tsx}', '__tests__/**/*.flow.test.{ts,tsx}'],
-    exclude: ['node_modules', 'dist'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
@@ -30,8 +32,6 @@ export default defineConfig({
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'src/**/*.d.ts',
-        'src/**/*.test.{ts,tsx}',
-        'src/**/*.spec.{ts,tsx}',
         'src/test/**',
         'src/main.tsx',
         'src/vite-env.d.ts',
@@ -75,10 +75,18 @@ export default defineConfig({
         statements: 75,
       },
     },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'jsdom',
+          setupFiles: ['./src/test/setup.ts'],
+          include: ['__tests__/unit/**/*.test.{ts,tsx}'],
+          exclude: ['node_modules', 'dist'],
+          testTimeout: 10000,
+        },
+      },
+    ],
   },
 });

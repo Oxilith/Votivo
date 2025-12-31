@@ -14,7 +14,6 @@ export default tseslint.config(
     // Production code - strict type-checked rules
     {
         files: ['src/**/*.ts', 'src/**/*.tsx'],
-        ignores: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/**/__tests__/**/*.ts'],
         extends: [
             ...tseslint.configs.strictTypeChecked,
             ...tseslint.configs.stylisticTypeChecked,
@@ -44,7 +43,7 @@ export default tseslint.config(
 
     // Test files - strict rules without type-checking (vitest globals cause type issues)
     {
-        files: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/**/__tests__/**/*.ts', 'vitest.setup.ts'],
+        files: ['__tests__/**/*.ts', 'vitest.setup.ts'],
         extends: [
             ...tseslint.configs.strict,
             ...tseslint.configs.stylistic,

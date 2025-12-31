@@ -30,12 +30,20 @@ function createPrismaClient(): PrismaClient {
     encryptionKey,
   });
 
+  // Determine log level based on environment
+  // - Development: verbose logging for debugging
+  // - Test: no logging to keep test output clean
+  // - Production: error logging only
+  const logConfig =
+    process.env.NODE_ENV === 'development'
+      ? ['query', 'error', 'warn']
+      : process.env.NODE_ENV === 'test'
+        ? []
+        : ['error'];
+
   return new PrismaClient({
     adapter,
-    log:
-      process.env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
-        : ['error'],
+    log: logConfig as ('query' | 'info' | 'warn' | 'error')[],
   });
 }
 

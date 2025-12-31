@@ -1,5 +1,5 @@
 /**
- * @file shared/src/testing/db.ts
+ * @file shared/src/testing/setup/db.ts
  * @purpose Database test utilities with injectable Prisma client pattern
  * @functionality
  * - Provides setTestPrisma for injecting test database client
@@ -24,6 +24,7 @@ export interface PrismaLikeClient {
   $connect(): Promise<void>;
   $disconnect(): Promise<void>;
   $executeRawUnsafe(query: string): Promise<unknown>;
+  $queryRaw(query: TemplateStringsArray, ...values: unknown[]): Promise<unknown>;
 }
 
 // Module-level client storage

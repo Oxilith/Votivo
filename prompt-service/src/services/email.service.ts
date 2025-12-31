@@ -14,7 +14,7 @@
  */
 
 import nodemailer from 'nodemailer';
-import { escapeHtml } from '@/utils';
+import { escapeHtml, logger } from '@/utils';
 
 /**
  * SMTP configuration loaded from environment variables
@@ -131,9 +131,9 @@ export class EmailService {
       await transporter.verify();
       return true;
     } catch (error) {
-      console.error(
-        '[EmailService] SMTP verification failed:',
-        error instanceof Error ? error.message : 'Unknown error'
+      logger.error(
+        { err: error instanceof Error ? error.message : 'Unknown error' },
+        'SMTP verification failed'
       );
       return false;
     }
@@ -264,9 +264,10 @@ If you didn't create a Votive account, you can safely ignore this email.
       const errorMessage = 'Email service is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD environment variables.';
       // Log warning in development, return skipped result
       if (process.env.NODE_ENV === 'development') {
-        console.warn(`[EmailService] ${errorMessage}`);
-        console.warn(`[EmailService] Would have sent email to: ${options.to}`);
-        console.warn(`[EmailService] Subject: ${options.subject}`);
+        logger.warn(
+          { to: options.to, subject: options.subject },
+          `${errorMessage} Would have sent email.`
+        );
         // Return with skipped flag to indicate email was not actually sent
         return {
           success: false,
@@ -298,7 +299,7 @@ If you didn't create a Votive account, you can safely ignore this email.
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown email error';
       // Log the error but don't crash - spec says "graceful handling"
-      console.error(`[EmailService] Failed to send email to ${options.to}: ${errorMessage}`);
+      logger.error({ to: options.to, err: errorMessage }, 'Failed to send email');
 
       return {
         success: false,

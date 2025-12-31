@@ -3,6 +3,7 @@
  * @purpose Vitest test configuration for shared types and utilities package
  * @functionality
  * - Configures test environment for Node.js
+ * - Uses projects for unit test organization
  * - Sets up coverage reporting with thresholds
  * - Excludes testing utilities from coverage (they are infrastructure, not business logic)
  * - Configures path aliases
@@ -21,9 +22,6 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'node',
-    include: ['__tests__/**/*.test.ts', '__tests__/**/*.flow.test.ts'],
-    exclude: ['node_modules', 'dist'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
@@ -31,8 +29,6 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       exclude: [
         'src/**/*.d.ts',
-        'src/**/*.test.ts',
-        'src/**/*.spec.ts',
         'src/**/*.types.ts', // Type definitions only, no executable code
         'src/testing/**', // Testing utilities are infrastructure, not business logic
         'src/validators/**', // Zod schema definitions are declarative, not business logic
@@ -46,5 +42,17 @@ export default defineConfig({
         statements: 80,
       },
     },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'node',
+          include: ['__tests__/unit/**/*.test.ts'],
+          exclude: ['node_modules', 'dist'],
+          testTimeout: 10000,
+        },
+      },
+    ],
   },
 });

@@ -26,3 +26,12 @@ export {
 } from './express.utils';
 
 export { RequestBuilder, requestBuilder } from './request-builder';
+
+export {
+  createTestApp,
+  createTestRequest,
+  createTestAgent,
+  createAuthenticatedRequest,
+  type TestAppOptions,
+  type AuthenticatedRequestBuilder,
+} from './test-app.utils';

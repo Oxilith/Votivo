@@ -12,7 +12,7 @@
 
 import express, { type Express, type RequestHandler, type ErrorRequestHandler } from 'express';
 import cookieParser from 'cookie-parser';
-import type { SuperTest, Test } from 'supertest';
+import type { Test } from 'supertest';
 import request from 'supertest';
 
 export interface TestAppOptions {
@@ -89,14 +89,14 @@ export function createTestApp(options: TestAppOptions = {}): Express {
 /**
  * Creates a supertest request instance for an Express app.
  */
-export function createTestRequest(app: Express): SuperTest<Test> {
+export function createTestRequest(app: Express) {
   return request(app);
 }
 
 /**
  * Creates a supertest agent that maintains cookies between requests.
  */
-export function createTestAgent(app: Express): SuperTest<Test> {
+export function createTestAgent(app: Express) {
   return request.agent(app);
 }
 
@@ -104,11 +104,11 @@ export function createTestAgent(app: Express): SuperTest<Test> {
  * Authenticated request builder for protected endpoints.
  */
 export interface AuthenticatedRequestBuilder {
-  get(url: string): Test;
-  post(url: string): Test;
-  put(url: string): Test;
-  delete(url: string): Test;
-  patch(url: string): Test;
+  get: (url: string) => Test;
+  post: (url: string) => Test;
+  put: (url: string) => Test;
+  delete: (url: string) => Test;
+  patch: (url: string) => Test;
 }
 
 /**
@@ -132,10 +132,10 @@ export function createAuthenticatedRequest(
   };
 
   return {
-    get: (url: string) => withAuth(agent.get(url)),
-    post: (url: string) => withAuth(agent.post(url)),
-    put: (url: string) => withAuth(agent.put(url)),
-    delete: (url: string) => withAuth(agent.delete(url)),
-    patch: (url: string) => withAuth(agent.patch(url)),
+    get: (url: string): Test => withAuth(agent.get(url)),
+    post: (url: string): Test => withAuth(agent.post(url)),
+    put: (url: string): Test => withAuth(agent.put(url)),
+    delete: (url: string): Test => withAuth(agent.delete(url)),
+    patch: (url: string): Test => withAuth(agent.patch(url)),
   };
 }

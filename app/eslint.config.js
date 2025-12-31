@@ -16,7 +16,7 @@ export default tseslint.config(
     // Production code - strict type-checked rules with React
     {
         files: ['src/**/*.{ts,tsx}'],
-        ignores: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.spec.ts', 'src/**/*.spec.tsx', 'src/test/**'],
+        ignores: ['src/test/**'],
         extends: [
             ...tseslint.configs.strictTypeChecked,
             ...tseslint.configs.stylisticTypeChecked,
@@ -50,7 +50,7 @@ export default tseslint.config(
 
     // Test files - strict rules without type-checking (vitest globals cause type issues)
     {
-        files: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.spec.ts', 'src/**/*.spec.tsx', 'src/test/**/*.{ts,tsx}'],
+        files: ['__tests__/**/*.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
         extends: [
             ...tseslint.configs.strict,
             ...tseslint.configs.stylistic,

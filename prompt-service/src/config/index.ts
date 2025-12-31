@@ -16,6 +16,7 @@
 
 import { config as dotenvConfig } from 'dotenv';
 import { z } from 'zod';
+import { bootstrapLogger } from '@/utils/bootstrap-logger';
 
 dotenvConfig();
 
@@ -39,7 +40,7 @@ const configSchema = z.object({
     .transform((val) => val.split(',').map((origin) => origin.trim())),
 
   // Logging
-  logLevel: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  logLevel: z.enum(['silent', 'fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   // Admin Authentication
   adminApiKey: z.string().optional(),
@@ -134,8 +135,8 @@ function loadConfig(): Config {
   const sessionSecretRaw = process.env.SESSION_SECRET;
   const adminApiKeyRaw = process.env.ADMIN_API_KEY;
   if (!isProduction && !sessionSecretRaw && adminApiKeyRaw) {
-    console.warn(
-      '[CONFIG WARNING] SESSION_SECRET not set, falling back to ADMIN_API_KEY. Set a separate SESSION_SECRET for better security.'
+    bootstrapLogger.warn(
+      'SESSION_SECRET not set, falling back to ADMIN_API_KEY. Set a separate SESSION_SECRET for better security.'
     );
   }
 
@@ -149,8 +150,8 @@ function loadConfig(): Config {
 
   // Warn in development if DATABASE_KEY is not set (database will be unencrypted)
   if (!isProduction && !process.env.DATABASE_KEY) {
-    console.warn(
-      '[CONFIG WARNING] DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
+    bootstrapLogger.warn(
+      'DATABASE_KEY not set - database will not be encrypted. Set DATABASE_KEY for encryption.'
     );
   }
 
@@ -207,7 +208,8 @@ function loadConfig(): Config {
   }
 
   // Apply default database URL for non-production environments
-  const databaseUrl = result.data.databaseUrl ?? 'file:./dev.db';
+  // Points to database created by prisma migrate in the prisma directory
+  const databaseUrl = result.data.databaseUrl ?? 'file:./prisma/dev.db';
 
   return {
     ...result.data,

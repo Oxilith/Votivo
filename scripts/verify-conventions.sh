@@ -281,6 +281,7 @@ fi
 #   - // @barrel-exceptions (file-level, place at top of file)
 #   - Code-splitting sensitive paths: @/stores/*, @/services/api/* (Vite chunking)
 #   - Admin pages importing from submodules (circular dependency prevention)
+#   - Bootstrap logger imports (circular dependency with config)
 # ============================================================================
 echo ""
 echo -e "${BLUE}[9/13] Checking for deep imports bypassing barrels...${NC}"
@@ -298,6 +299,7 @@ DEEP_IMPORTS=$(grep -rn "from ['\"]@/[^'\"]*/[^'\"]*['\"]" --include="*.ts" --in
     | grep -v "@/stores/use" \
     | grep -v "@/services/api/" \
     | grep -v "admin/pages/.*@/admin/" \
+    | grep -v "@/utils/bootstrap-logger" \
     || true)
 
 if [ -n "$DEEP_IMPORTS" ]; then
