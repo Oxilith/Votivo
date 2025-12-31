@@ -73,7 +73,7 @@ dotenvx set ANTHROPIC_API_KEY "sk-ant-..."
 
 The `.env` file is encrypted and committed - only `.env.keys` (the private key) must stay secret.
 
-See [docs/docker-hub.md](../docs/docker-hub.md) for complete workflow documentation.
+See [docs/docker-hub.md](docs/docker-hub.md) for complete workflow documentation.
 
 ### HTTPS Certificates (Required for Docker)
 ```bash
@@ -83,7 +83,7 @@ mkdir -p certs && cd certs && mkcert localhost 127.0.0.1 ::1
 
 ## Code Standards
 
-**Full coding conventions**: See [docs/AI-Agent-Codebase-Instructions.md](../docs/AI-Agent-Codebase-Instructions.md) for comprehensive module system, import, and build documentation.
+**Full coding conventions**: See [docs/AI-Agent-Codebase-Instructions.md](docs/AI-Agent-Codebase-Instructions.md) for comprehensive module system, import, and build documentation.
 
 ### Environment Files
 - **NEVER read or edit `.env` files** - these contain secrets and should not be accessed
@@ -291,7 +291,7 @@ Frontend (Zustand) → ApiClient → Backend (Express) → Claude API
 
 ## Environment Variables
 
-See [docs/production-deployment.md](../docs/production-deployment.md#environment-variables) for complete reference.
+See [docs/production-deployment.md](docs/production-deployment.md#environment-variables) for complete reference.
 
 Key variables:
 - `VITE_API_URL` - Frontend build-time (leave empty for Docker)
@@ -303,7 +303,8 @@ Key variables:
 
 ## Testing
 
-- All packages use Vitest with 80% coverage thresholds (75% branches)
+- All packages use Vitest with coverage thresholds (75% lines/functions/statements, 65% branches)
+- `shared` package has adjusted thresholds (80% lines/statements, 70% functions, 10% branches)
 - Frontend: React Testing Library + MSW for mocking
 - Backend: Supertest for API tests
 - Test files: `**/__tests__/*.test.ts` or `**/*.test.tsx`
@@ -336,7 +337,7 @@ Browser → nginx (HTTPS :443) → backend (HTTP :3001)
 
 ### Design System
 
-**Ink & Stone Design System**: See [docs/votive-ink-design-system.md](../docs/votive-ink-design-system.md) for the complete visual language including:
+**Ink & Stone Design System**: See [docs/votive-ink-design-system.md](docs/votive-ink-design-system.md) for the complete visual language including:
 - Japanese minimalism aesthetic (wabi-sabi, ma)
 - Color system (Rice Paper light / Night Ink dark themes)
 - Typography (Shippori Mincho, IBM Plex Sans/Mono)
