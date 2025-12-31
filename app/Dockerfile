@@ -1,6 +1,8 @@
 # Frontend Dockerfile
 FROM node:24-alpine AS builder
 
+RUN npm install -g @dotenvx/dotenvx
+
 WORKDIR /app
 
 # Copy workspace config
@@ -25,6 +27,7 @@ COPY app/index.html app/
 COPY app/tsconfig.json app/
 COPY app/tsconfig.app.json app/
 COPY app/tsconfig.node.json app/
+COPY app/tsconfig.test.json app/
 COPY app/vite.config.ts app/
 COPY app/postcss.config.* app/
 
@@ -45,4 +48,5 @@ COPY --from=builder /app/app/dist /usr/share/nginx/html
 EXPOSE 80 443
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
 CMD ["nginx", "-g", "daemon off;"]

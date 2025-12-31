@@ -15,10 +15,10 @@ coverage
 *.md
 !README.md
 
-# Environment files (build-time only)
-.env
-.env.local
-.env.*.local
+# Environment files - allow encrypted .env for dotenvx
+# Block .env.keys (private keys) and .env.local variants
+.env.keys
+**/.env.keys
 
 # Logs
 *.log

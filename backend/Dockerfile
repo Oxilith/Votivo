@@ -1,6 +1,8 @@
 # Backend Dockerfile
 FROM node:24-alpine AS builder
 
+RUN npm install -g @dotenvx/dotenvx
+
 WORKDIR /app
 
 # Copy workspace config
@@ -27,10 +29,11 @@ RUN npm run build -w backend
 # Production
 FROM node:24-alpine
 
+RUN apk add --no-cache wget && \
+    npm install -g @dotenvx/dotenvx
+
 WORKDIR /app
 ENV NODE_ENV=production
-
-RUN apk add --no-cache wget
 
 COPY package.json package-lock.json ./
 COPY shared/package.json shared/
@@ -40,6 +43,7 @@ RUN npm ci --workspaces --include-workspace-root --omit=dev
 
 COPY --from=builder /app/shared/dist shared/dist
 COPY --from=builder /app/backend/dist backend/dist
+COPY .env backend/.env
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 appuser && \
@@ -53,4 +57,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget -q --spider http://localhost:3001/health || exit 1
 
-CMD ["node", "dist/index.js"]
+CMD ["npx", "dotenvx", "run", "--", "node", "dist/index.js"]

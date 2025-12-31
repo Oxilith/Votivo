@@ -155,7 +155,7 @@ function loadConfig(): Config {
   }
 
   const result = configSchema.safeParse({
-    port: process.env.PORT,
+    port: process.env.PROMPT_SERVICE_PORT,
     nodeEnv: process.env.NODE_ENV,
     databaseUrl: process.env.DATABASE_URL,
     databaseKey: process.env.DATABASE_KEY,

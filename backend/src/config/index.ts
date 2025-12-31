@@ -71,9 +71,9 @@ type Config = z.infer<typeof configSchema>;
 
 function loadConfig(): Config {
   const result = configSchema.safeParse({
-    port: process.env.PORT,
+    port: process.env.BACKEND_PORT,
     nodeEnv: process.env.NODE_ENV,
-    httpsEnabled: process.env.HTTPS_ENABLED,
+    httpsEnabled: process.env.BACKEND_HTTPS_ENABLED,
     httpsKeyPath: process.env.HTTPS_KEY_PATH,
     httpsCertPath: process.env.HTTPS_CERT_PATH,
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,

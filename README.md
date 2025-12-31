@@ -66,25 +66,16 @@ cd ..
 
 ### Quick Start
 
+Votive uses [dotenvx](https://dotenvx.com) for encrypted environment variable management. The `.env` file is encrypted and committed to the repository - you only need the decryption key to run.
+
 Run the full stack using Docker:
 
 ```bash
 # macOS/Linux
-ANTHROPIC_API_KEY=<YOUR_KEY> \
-DATABASE_KEY=<32+_CHAR_SECRET> \
-ADMIN_API_KEY=<32+_CHAR_SECRET> \
-SESSION_SECRET=<32+_CHAR_SECRET> \
-JWT_ACCESS_SECRET=<32+_CHAR_SECRET> \
-JWT_REFRESH_SECRET=<32+_CHAR_SECRET> \
-  docker compose up --build
+DOTENV_PRIVATE_KEY=<your-private-key> docker compose up --build
 
 # Windows (PowerShell)
-$env:ANTHROPIC_API_KEY="<YOUR_KEY>"
-$env:DATABASE_KEY="<32+_CHAR_SECRET>"
-$env:ADMIN_API_KEY="<32+_CHAR_SECRET>"
-$env:SESSION_SECRET="<32+_CHAR_SECRET>"
-$env:JWT_ACCESS_SECRET="<32+_CHAR_SECRET>"
-$env:JWT_REFRESH_SECRET="<32+_CHAR_SECRET>"
+$env:DOTENV_PRIVATE_KEY="<your-private-key>"
 docker compose up --build
 ```
 
@@ -96,8 +87,25 @@ Once running:
 For pre-built images (faster startup):
 
 ```bash
-docker compose -f oci://oxilith/votive-oci:latest up
+DOTENV_PRIVATE_KEY=<your-private-key> docker compose -f oci://oxilith/votive-oci:latest up
 ```
+
+### Managing Environment Variables
+
+To add or update environment variables:
+
+```bash
+# Boolean/numeric values
+dotenvx set THINKING_ENABLED true
+
+# String values (use quotes)
+dotenvx set ANTHROPIC_API_KEY "sk-ant-..."
+
+# View current values (requires private key)
+DOTENV_PRIVATE_KEY=<key> dotenvx get
+```
+
+Changes to `.env` are automatically encrypted. Commit the updated `.env` file (never commit `.env.keys`).
 
 See [Docker Hub Workflow](docs/docker-hub.md) for complete documentation including:
 - Local build instructions

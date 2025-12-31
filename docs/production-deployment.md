@@ -10,8 +10,8 @@ This guide covers security considerations and configuration requirements for dep
 |----------|----------|---------|-------------|
 | `ANTHROPIC_API_KEY` | Yes | - | Anthropic API key for Claude |
 | `NODE_ENV` | Yes | development | Set to `production` |
-| `PORT` | No | 3001 | Server port |
-| `HTTPS_ENABLED` | No | true | Enable HTTPS |
+| `BACKEND_PORT` | No | 3001 | Server port |
+| `BACKEND_HTTPS_ENABLED` | No | true | Enable HTTPS |
 | `HTTPS_KEY_PATH` | No | ../certs/localhost+2-key.pem | Path to SSL key file |
 | `HTTPS_CERT_PATH` | No | ../certs/localhost+2.pem | Path to SSL certificate file |
 | `CORS_ORIGIN` | Yes | - | Allowed frontend origin |
@@ -31,7 +31,7 @@ This guide covers security considerations and configuration requirements for dep
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `NODE_ENV` | Yes | development | Set to `production` |
-| `PORT` | No | 3002 | Server port |
+| `PROMPT_SERVICE_PORT` | No | 3002 | Server port |
 | `DATABASE_URL` | Yes | - | SQLite database path |
 | `DATABASE_KEY` | Yes | - | 32+ char encryption key for SQLCipher |
 | `ADMIN_API_KEY` | Yes | - | 32+ char admin authentication key |
@@ -70,61 +70,24 @@ The worker service handles background jobs like token cleanup. It shares the dat
 
 ## Docker Compose Configuration
 
-The `docker-compose.yml` expects the following environment variables to be set:
+Votive uses [dotenvx](https://dotenvx.com) for encrypted environment variable management. The `.env` file is encrypted and committed to the repository - you only need the decryption key to run.
+
+### Running with Docker Compose
 
 ```bash
-# Required for backend
-export ANTHROPIC_API_KEY="sk-ant-..."
-
-# Required for prompt-service
-export DATABASE_KEY="$(openssl rand -hex 32)"
-export ADMIN_API_KEY="$(openssl rand -hex 32)"
-export SESSION_SECRET="$(openssl rand -hex 32)"
+# Pass the decryption key - all other secrets are in the encrypted .env
+DOTENV_PRIVATE_KEY=<your-private-key> docker compose up --build
 ```
 
-### Docker Secrets (Recommended for Production)
+### How It Works
 
-For production deployments, use Docker secrets instead of environment variables:
+| File | Description | Commit to Git? |
+|------|-------------|----------------|
+| `.env` | Encrypted secrets | Yes (safe) |
+| `.env.keys` | Private decryption key | **Never** |
+| `DOTENV_PRIVATE_KEY` | Runtime decryption | Pass via env/secrets manager |
 
-```yaml
-# docker-compose.secrets.yml
-version: '3.8'
-
-services:
-  prompt-service:
-    secrets:
-      - database_key
-      - admin_api_key
-      - session_secret
-    environment:
-      - DATABASE_KEY_FILE=/run/secrets/database_key
-      - ADMIN_API_KEY_FILE=/run/secrets/admin_api_key
-      - SESSION_SECRET_FILE=/run/secrets/session_secret
-
-  backend:
-    secrets:
-      - anthropic_api_key
-    environment:
-      - ANTHROPIC_API_KEY_FILE=/run/secrets/anthropic_api_key
-
-secrets:
-  database_key:
-    external: true
-  admin_api_key:
-    external: true
-  session_secret:
-    external: true
-  anthropic_api_key:
-    external: true
-```
-
-Create secrets:
-```bash
-echo "your-database-key" | docker secret create database_key -
-echo "your-admin-key" | docker secret create admin_api_key -
-echo "your-session-secret" | docker secret create session_secret -
-echo "sk-ant-..." | docker secret create anthropic_api_key -
-```
+At container startup, dotenvx decrypts the `.env` file using the private key and injects all variables into the process environment.
 
 ## Rate Limiting
 

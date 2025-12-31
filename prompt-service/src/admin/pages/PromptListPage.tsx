@@ -14,7 +14,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { usePrompts, colors, shadows, fonts } from '@/admin';
+import { usePrompts } from '@/admin/hooks';
+import { colors, shadows, fonts } from '@/admin/styles';
 import type { PromptDTO } from '@/admin';
 
 export function PromptListPage() {

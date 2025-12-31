@@ -26,28 +26,4 @@ export default defineConfig({
             }
             : undefined,
     },
-    build: {
-        rollupOptions: {
-            output: {
-                manualChunks(id) {
-                    // React core + scheduler - rarely changes
-                    if (id.includes('node_modules/react-dom') ||
-                        id.includes('node_modules/react/') ||
-                        id.includes('node_modules/scheduler')) {
-                        return 'vendor-react';
-                    }
-                    // i18n - moderate size, stable
-                    if (id.includes('node_modules/i18next') ||
-                        id.includes('node_modules/react-i18next')) {
-                        return 'vendor-i18n';
-                    }
-                    // State management - small, stable
-                    if (id.includes('node_modules/zustand') ||
-                        id.includes('node_modules/use-sync-external-store')) {
-                        return 'vendor-state';
-                    }
-                },
-            },
-        },
-    },
 })

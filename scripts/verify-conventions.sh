@@ -280,6 +280,7 @@ fi
 #   - // @allow-deep-import (line-level)
 #   - // @barrel-exceptions (file-level, place at top of file)
 #   - Code-splitting sensitive paths: @/stores/*, @/services/api/* (Vite chunking)
+#   - Admin pages importing from submodules (circular dependency prevention)
 # ============================================================================
 echo ""
 echo -e "${BLUE}[9/13] Checking for deep imports bypassing barrels...${NC}"
@@ -296,6 +297,7 @@ DEEP_IMPORTS=$(grep -rn "from ['\"]@/[^'\"]*/[^'\"]*['\"]" --include="*.ts" --in
     | grep -v "// @allow-deep-import" \
     | grep -v "@/stores/use" \
     | grep -v "@/services/api/" \
+    | grep -v "admin/pages/.*@/admin/" \
     || true)
 
 if [ -n "$DEEP_IMPORTS" ]; then
@@ -528,9 +530,10 @@ echo -e "  • // @barrel-exceptions   → Allow deep imports in file (file-leve
 echo -e "  • // @allow-wildcard      → Allow export * from"
 echo -e "  • // @allow-require       → Allow require()"
 echo -e ""
-echo -e "${BLUE}Auto-Excluded Patterns (code-splitting):${NC}"
-echo -e "  • @/stores/use*           → Store direct imports"
-echo -e "  • @/services/api/*        → API service direct imports"
+echo -e "${BLUE}Auto-Excluded Patterns:${NC}"
+echo -e "  • @/stores/use*           → Store direct imports (code-splitting)"
+echo -e "  • @/services/api/*        → API service direct imports (code-splitting)"
+echo -e "  • admin/pages → @/admin/* → Admin page submodule imports (circular dep prevention)"
 echo ""
 
 if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then

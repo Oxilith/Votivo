@@ -16,14 +16,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  useABTest,
-  abTestApi,
-  colors,
-  shadows,
-  fonts,
-  CLAUDE_MODELS,
-} from '@/admin';
+import { useABTest } from '@/admin/hooks';
+import { abTestApi } from '@/admin/api';
+import { colors, shadows, fonts } from '@/admin/styles';
+import { CLAUDE_MODELS } from '@/admin/types';
 import type { UpdateABTestInput, CreateABVariantInput, ABVariantDTO } from '@/admin';
 
 export function ABTestEditPage() {

@@ -14,13 +14,9 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  abTestApi,
-  usePrompts,
-  colors,
-  shadows,
-  fonts,
-} from '@/admin';
+import { abTestApi } from '@/admin/api';
+import { usePrompts } from '@/admin/hooks';
+import { colors, shadows, fonts } from '@/admin/styles';
 import type { CreateABTestInput, PromptDTO } from '@/admin';
 
 export function ABTestCreatePage() {
