@@ -99,7 +99,7 @@ export function ABTestEditPage() {
 
     try {
       await abTestApi.delete(id);
-      navigate('/ab-tests');
+      await navigate('/ab-tests');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete A/B test');
     }

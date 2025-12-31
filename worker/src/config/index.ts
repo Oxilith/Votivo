@@ -31,19 +31,15 @@ const configSchema = z.object({
   logLevel: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   // Job Configuration
-  jobs: z
-    .object({
-      tokenCleanup: z
-        .object({
-          enabled: z
-            .string()
-            .transform((val) => val !== 'false')
-            .default('true'),
-          schedule: z.string().default('0 * * * *'), // Every hour by default
-        })
-        .default({}),
-    })
-    .default({}),
+  jobs: z.object({
+    tokenCleanup: z.object({
+      enabled: z
+        .string()
+        .default('true')
+        .transform((val) => val !== 'false'),
+      schedule: z.string().default('0 * * * *'), // Every hour by default
+    }),
+  }),
 });
 
 type Config = z.infer<typeof configSchema> & {
@@ -84,8 +80,8 @@ function loadConfig(): Config {
   });
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+    const errors = result.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
     throw new Error(`Configuration validation failed:\n${errors}`);
   }

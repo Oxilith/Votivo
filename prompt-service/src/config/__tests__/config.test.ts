@@ -107,10 +107,10 @@ describe('config validation', () => {
       // Provide cookie secret so we're specifically testing JWT validation
       process.env.SESSION_SECRET = 'test-session-secret-at-least-32-characters-long';
 
-      // Act & Assert - Zod reports required fields as "Required" when missing
+      // Act & Assert - Zod 4 reports "Invalid input: expected string, received undefined" for missing fields
       await expect(async () => {
         await import('..');
-      }).rejects.toThrow(/jwtAccessSecret: Required/);
+      }).rejects.toThrow(/jwtAccessSecret:.*expected string/i);
     });
 
     it('should not throw an error when SESSION_SECRET is set', async () => {
@@ -184,10 +184,10 @@ describe('config validation', () => {
       process.env.JWT_ACCESS_SECRET = 'test-jwt-access-secret-at-least-32-chars';
       process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret-at-least-32-chars';
 
-      // Act & Assert
+      // Act & Assert - Zod 4 uses "Too small" for min length violations
       await expect(async () => {
         await import('..');
-      }).rejects.toThrow(/at least 32 character/i);
+      }).rejects.toThrow(/sessionSecret:.*>=32 characters/i);
     });
   });
 

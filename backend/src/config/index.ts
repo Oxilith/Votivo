@@ -25,8 +25,8 @@ const configSchema = z.object({
   // HTTPS
   httpsEnabled: z
     .string()
-    .transform((val) => val === 'true')
-    .default('true'),
+    .default('true')
+    .transform((val) => val === 'true'),
   httpsKeyPath: z.string().default('../certs/localhost+2-key.pem'),
   httpsCertPath: z.string().default('../certs/localhost+2.pem'),
 
@@ -50,11 +50,11 @@ const configSchema = z.object({
   // Feature Flags
   thinkingEnabled: z
     .string()
-    .transform((val) => val === 'true')
-    .default('true'),
+    .default('true')
+    .transform((val) => val === 'true'),
 
   // Prompt Service
-  promptServiceUrl: z.string().url().default('http://localhost:3002'),
+  promptServiceUrl: z.url().default('http://localhost:3002'),
 
   // Circuit Breaker
   // Note: timeout should be 2x request timeout (5000ms) to account for network jitter
@@ -93,8 +93,8 @@ function loadConfig(): Config {
   });
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+    const errors = result.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
     throw new Error(`Configuration validation failed:\n${errors}`);
   }

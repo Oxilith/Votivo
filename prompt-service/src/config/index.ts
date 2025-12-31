@@ -35,8 +35,8 @@ const configSchema = z.object({
   // CORS
   corsOrigins: z
     .string()
-    .transform((val) => val.split(',').map((origin) => origin.trim()))
-    .default('http://localhost:3000,http://localhost:3001'),
+    .default('http://localhost:3000,http://localhost:3001')
+    .transform((val) => val.split(',').map((origin) => origin.trim())),
 
   // Logging
   logLevel: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
@@ -65,38 +65,34 @@ const configSchema = z.object({
   smtpPort: z.coerce.number().default(587),
   smtpSecure: z
     .string()
-    .transform((val) => val === 'true')
-    .default('false'),
+    .default('false')
+    .transform((val) => val === 'true'),
   smtpUser: z.string().optional(),
   smtpPassword: z.string().optional(),
   smtpFrom: z.string().optional(),
 
   // Application URLs (for email links)
-  appUrl: z.string().url().optional(),
-  apiUrl: z.string().url().optional(),
+  appUrl: z.url().optional(),
+  apiUrl: z.url().optional(),
 
   // Rate Limiting Configuration
-  rateLimit: z
-    .object({
-      windowMs: z.coerce.number().default(60_000), // 1 minute
-      login: z.coerce.number().default(5), // 5 req/min - brute force protection
-      register: z.coerce.number().default(5), // 5 req/min - account spam prevention
-      passwordReset: z.coerce.number().default(3), // 3 req/min - email abuse prevention
-      forgotPassword: z.coerce.number().default(3), // 3 req/min - email abuse prevention
-      tokenRefresh: z.coerce.number().default(20), // 20 req/min - normal auth flow
-      userData: z.coerce.number().default(30), // 30 req/min - assessment/analysis
-      profile: z.coerce.number().default(15), // 15 req/min - profile operations
-    })
-    .default({}),
+  rateLimit: z.object({
+    windowMs: z.coerce.number().default(60_000), // 1 minute
+    login: z.coerce.number().default(5), // 5 req/min - brute force protection
+    register: z.coerce.number().default(5), // 5 req/min - account spam prevention
+    passwordReset: z.coerce.number().default(3), // 3 req/min - email abuse prevention
+    forgotPassword: z.coerce.number().default(3), // 3 req/min - email abuse prevention
+    tokenRefresh: z.coerce.number().default(20), // 20 req/min - normal auth flow
+    userData: z.coerce.number().default(30), // 30 req/min - assessment/analysis
+    profile: z.coerce.number().default(15), // 15 req/min - profile operations
+  }),
 
   // Account Lockout Configuration (progressive lockout after failed login attempts)
-  lockout: z
-    .object({
-      maxAttempts: z.coerce.number().default(15), // Lock after 15 failures
-      initialDurationMins: z.coerce.number().default(15), // First lockout: 15 minutes
-      maxDurationMins: z.coerce.number().default(1440), // Max lockout: 24 hours
-    })
-    .default({}),
+  lockout: z.object({
+    maxAttempts: z.coerce.number().default(15), // Lock after 15 failures
+    initialDurationMins: z.coerce.number().default(15), // First lockout: 15 minutes
+    maxDurationMins: z.coerce.number().default(1440), // Max lockout: 24 hours
+  }),
 });
 
 type Config = z.infer<typeof configSchema> & {
@@ -204,8 +200,8 @@ function loadConfig(): Config {
   });
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+    const errors = result.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
     throw new Error(`Configuration validation failed:\n${errors}`);
   }

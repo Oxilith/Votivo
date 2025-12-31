@@ -48,7 +48,7 @@ export function PromptCreatePage() {
 
     try {
       await promptApi.create(formData);
-      navigate('/prompts');
+      await navigate('/prompts');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create prompt');
     } finally {

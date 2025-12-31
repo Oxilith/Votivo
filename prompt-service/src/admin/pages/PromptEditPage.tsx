@@ -94,7 +94,7 @@ export function PromptEditPage() {
 
     try {
       await promptApi.delete(id);
-      navigate('/prompts');
+      await navigate('/prompts');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete prompt');
     }

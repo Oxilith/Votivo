@@ -33,8 +33,8 @@ export async function analyze(
     const validationResult = analyzeRequestSchema.safeParse(req.body);
 
     if (!validationResult.success) {
-      const errorMessages = validationResult.error.errors
-        .map((e) => `${e.path.join('.')}: ${e.message}`)
+      const errorMessages = validationResult.error.issues
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
         .join('; ');
 
       next(

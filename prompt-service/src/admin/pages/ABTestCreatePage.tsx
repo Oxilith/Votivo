@@ -42,7 +42,7 @@ export function ABTestCreatePage() {
 
     try {
       const created = await abTestApi.create(formData);
-      navigate(`/ab-tests/${created.id}`);
+      await navigate(`/ab-tests/${created.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create A/B test');
     } finally {

@@ -38,7 +38,7 @@ export function LoginPage() {
     const result = await login(apiKey.trim());
 
     if (result.success) {
-      navigate('/prompts');
+      await navigate('/prompts');
     } else {
       setError(result.error ?? 'Login failed');
       setIsLoading(false);

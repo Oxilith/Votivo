@@ -15,6 +15,7 @@
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
 import { promptResolverService, abTestService } from '@/services';
 import { resolvePromptSchema, resolveVariantIdParamSchema as variantIdParamSchema } from '@/validators';
 import { isAppError } from '@/errors';
@@ -29,7 +30,7 @@ export class ResolveController {
     if (!body.success) {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Invalid request body', details: body.error.format() },
+        error: { code: 'VALIDATION_ERROR', message: 'Invalid request body', details: z.treeifyError(body.error) },
       });
       return;
     }
@@ -57,7 +58,7 @@ export class ResolveController {
     if (!params.success) {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Invalid variant ID', details: params.error.format() },
+        error: { code: 'VALIDATION_ERROR', message: 'Invalid variant ID', details: z.treeifyError(params.error) },
       });
       return;
     }
