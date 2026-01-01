@@ -7,5 +7,5 @@ export default defineConfig({
     clean: true,
     sourcemap: true,
     splitting: false,
-    external: ['vitest', 'msw', 'msw/node', '@faker-js/faker', 'vitest-mock-extended'],
+    external: ['vitest', 'msw', 'msw/node', '@faker-js/faker', 'vitest-mock-extended', 'zod', '@prisma/client/runtime/client'],
 });
