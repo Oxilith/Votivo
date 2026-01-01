@@ -226,7 +226,10 @@ describe('JWT Protection Integration Tests', () => {
         .get(`/api/user-auth/assessment/${assessmentId}`)
         .set('Authorization', `Bearer ${token2}`);
 
-      // Should get 404 (not found) or 403 (forbidden)
+      // Cross-user access prevention:
+      // - 404: Assessment not found for this user (ownership check filters it out)
+      // - 403: Explicit forbidden if authorization check runs before ownership filter
+      // Both are valid security responses that prevent data leakage
       expect([403, 404]).toContain(response.status);
     });
   });

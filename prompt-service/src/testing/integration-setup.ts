@@ -320,7 +320,12 @@ export function extractCsrfToken(
 
   for (const cookie of cookies) {
     if (cookie.startsWith('csrf-token=')) {
-      return cookie.split(';')[0].split('=')[1];
+      // Use regex to handle tokens containing '=' (common in base64)
+      const tokenPart = cookie.split(';')[0];
+      // RegExp.prototype.exec is preferred by ESLint over String.prototype.match
+      const csrfRegex = /csrf-token=(.+)/;
+      const match = csrfRegex.exec(tokenPart);
+      return match?.[1];
     }
   }
 
