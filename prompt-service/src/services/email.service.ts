@@ -262,8 +262,8 @@ If you didn't create a Votive account, you can safely ignore this email.
     // Check if email service is configured
     if (!this.isConfigured()) {
       const errorMessage = 'Email service is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD environment variables.';
-      // Log warning in development, return skipped result
-      if (process.env.NODE_ENV === 'development') {
+      // Log warning in development/test, return skipped result
+      if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
         logger.warn(
           { to: options.to, subject: options.subject },
           `${errorMessage} Would have sent email.`
@@ -273,7 +273,7 @@ If you didn't create a Votive account, you can safely ignore this email.
           success: false,
           skipped: true,
           messageId: 'dev-mode-no-smtp',
-          error: 'Email not sent - SMTP not configured in development',
+          error: 'Email not sent - SMTP not configured in development/test',
         };
       }
       return {

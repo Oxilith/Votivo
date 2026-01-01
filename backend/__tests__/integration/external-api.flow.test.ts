@@ -207,8 +207,8 @@ describe('External API Integration Tests', () => {
           language: 'english',
         });
 
-      // Should return error status (500 for generic errors)
-      expect([408, 500, 504]).toContain(response.status);
+      // TimeoutError without statusCode is mapped to 500 by error handler
+      expect(response.status).toBe(500);
     });
   });
 
@@ -230,8 +230,8 @@ describe('External API Integration Tests', () => {
           language: 'english',
         });
 
-      // Should handle gracefully (may use fallback or return error)
-      expect([200, 500, 502, 503]).toContain(response.status);
+      // Backend has no fallback config - fails with 503 when prompt service unavailable
+      expect(response.status).toBe(503);
     });
   });
 

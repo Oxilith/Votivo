@@ -4,6 +4,8 @@
  * @functionality
  * - Exports integration test setup and helpers
  * - Exports test app factory and authenticated request builders
+ * - Exports CSRF token extraction helper
+ * - Exports shared test fixtures (validAssessmentResponses)
  * - Re-exports shared fixtures (MOCK_PASSWORD)
  * @dependencies
  * - ./integration-setup
@@ -18,6 +20,8 @@ export {
   integrationTestHooks,
   registerTestUser,
   loginTestUser,
+  extractCsrfToken,
+  validAssessmentResponses,
   prisma,
   type AuthenticatedRequestBuilder,
 } from './integration-setup';

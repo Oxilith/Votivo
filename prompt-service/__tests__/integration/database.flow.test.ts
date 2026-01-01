@@ -16,44 +16,13 @@ import request from 'supertest';
 import {
   createAuthenticatedRequest,
   createIntegrationTestApp,
-  integrationTestHooks,
   MOCK_PASSWORD,
   registerTestUser,
+  validAssessmentResponses,
 } from '@/testing';
 
 describe('Database Flow Integration Tests', () => {
   const app = createIntegrationTestApp();
-
-  beforeAll(async () => {
-    await integrationTestHooks.setup();
-  });
-
-  beforeEach(async () => {
-    await integrationTestHooks.cleanup();
-  });
-
-  afterAll(async () => {
-    await integrationTestHooks.teardown();
-  });
-
-  const validAssessmentResponses = {
-    peak_energy_times: ['mid_morning', 'afternoon'],
-    low_energy_times: ['evening'],
-    energy_consistency: 4,
-    energy_drains: 'Back-to-back meetings',
-    energy_restores: 'Nature walks and reading',
-    mood_triggers_negative: ['overwhelm', 'conflict'],
-    motivation_reliability: 3,
-    willpower_pattern: 'start_stop',
-    identity_statements: 'I am a creative problem solver',
-    others_describe: 'Thoughtful and reliable',
-    automatic_behaviors: 'Checking phone first thing',
-    keystone_behaviors: 'Morning exercise routine',
-    core_values: ['growth', 'authenticity', 'connection'],
-    natural_strengths: 'Pattern recognition',
-    resistance_patterns: 'Perfectionism leading to procrastination',
-    identity_clarity: 4,
-  };
 
   describe('Assessment CRUD', () => {
     it('should create assessment successfully', async () => {

@@ -303,8 +303,16 @@ Key variables:
 
 ## Testing
 
-- All packages use Vitest with coverage thresholds (75% lines/functions/statements, 65% branches)
-- `shared` package has adjusted thresholds (80% lines/statements, 70% functions, 10% branches)
+Coverage thresholds vary by package:
+
+| Package | Lines | Functions | Branches | Statements |
+|---------|-------|-----------|----------|------------|
+| app | 75% | 75% | 75% | 75% |
+| backend | 85% | 85% | 80% | 85% |
+| prompt-service | 75% | 75% | 65% | 75% |
+| shared | 80% | 70% | 10% | 80% |
+| worker | 85% | 85% | 85% | 85% |
+
 - Frontend: React Testing Library + MSW for mocking
 - Backend: Supertest for API tests
 - Test files: `**/__tests__/*.test.ts` or `**/*.test.tsx`

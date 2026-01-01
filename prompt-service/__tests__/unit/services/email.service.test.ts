@@ -275,7 +275,7 @@ describe('EmailService', () => {
       expect(result.success).toBe(false);
       expect(result.skipped).toBe(true);
       expect(result.messageId).toBe('dev-mode-no-smtp');
-      expect(result.error).toBe('Email not sent - SMTP not configured in development');
+      expect(result.error).toBe('Email not sent - SMTP not configured in development/test');
       expect(mockLogger.warn).toHaveBeenCalledWith(
         expect.objectContaining({ to: resetEmailInput.to }),
         expect.stringContaining('Email service is not configured')

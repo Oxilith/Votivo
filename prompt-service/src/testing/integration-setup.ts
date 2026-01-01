@@ -7,6 +7,8 @@
  * - Provides requireDatabase() hook that fails tests with migration instructions
  * - Creates authenticated request builders with JWT tokens
  * - Manages test user creation and cleanup
+ * - Extracts CSRF tokens from response cookies
+ * - Provides shared test fixtures (validAssessmentResponses)
  * - Gracefully skips tests when database unavailable (via setup())
  * @dependencies
  * - express for app creation
@@ -302,8 +304,9 @@ export async function loginTestUser(
 /**
  * Extracts CSRF token from Set-Cookie header(s).
  * Logs debug info if token is not found to aid test troubleshooting.
+ * Exported for use in tests that need to extract tokens manually.
  */
-function extractCsrfToken(
+export function extractCsrfToken(
   setCookieHeader: string | string[] | undefined
 ): string | undefined {
   if (!setCookieHeader) {
@@ -324,5 +327,29 @@ function extractCsrfToken(
   console.debug('[extractCsrfToken] csrf-token not found in cookies:', cookies);
   return undefined;
 }
+
+/**
+ * Valid assessment responses for testing.
+ * Uses exact enum values from shared/validation.ts.
+ * Shared between backend and prompt-service integration tests.
+ */
+export const validAssessmentResponses = {
+  peak_energy_times: ['mid_morning', 'afternoon'],
+  low_energy_times: ['evening'],
+  energy_consistency: 4,
+  energy_drains: 'Back-to-back meetings',
+  energy_restores: 'Nature walks and reading',
+  mood_triggers_negative: ['overwhelm', 'conflict'],
+  motivation_reliability: 3,
+  willpower_pattern: 'start_stop',
+  identity_statements: 'I am a creative problem solver',
+  others_describe: 'Thoughtful and reliable',
+  automatic_behaviors: 'Checking phone first thing',
+  keystone_behaviors: 'Morning exercise routine',
+  core_values: ['growth', 'authenticity', 'connection'],
+  natural_strengths: 'Pattern recognition',
+  resistance_patterns: 'Perfectionism leading to procrastination',
+  identity_clarity: 4,
+};
 
 export { prisma };

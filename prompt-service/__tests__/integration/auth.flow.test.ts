@@ -16,6 +16,7 @@
 import request from 'supertest';
 import {
   createIntegrationTestApp,
+  extractCsrfToken,
   integrationTestHooks,
   MOCK_PASSWORD,
   registerTestUser,
@@ -222,14 +223,7 @@ describe('Auth Flow Integration Tests', () => {
         });
 
       const accessToken = registerResponse.body.accessToken;
-
-      // Extract CSRF token
-      const cookies = registerResponse.headers['set-cookie'];
-      const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
-      const csrfCookie = cookieArray.find((c: string) =>
-        c.startsWith('csrf-token=')
-      );
-      const csrfToken = csrfCookie?.split(';')[0].split('=')[1];
+      const csrfToken = extractCsrfToken(registerResponse.headers['set-cookie']);
 
       // Logout with CSRF token
       const logoutResponse = await agent
@@ -261,14 +255,7 @@ describe('Auth Flow Integration Tests', () => {
         });
 
       const accessToken = registerResponse.body.accessToken;
-
-      // Extract CSRF token
-      const cookies = registerResponse.headers['set-cookie'];
-      const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
-      const csrfCookie = cookieArray.find((c: string) =>
-        c.startsWith('csrf-token=')
-      );
-      const csrfToken = csrfCookie?.split(';')[0].split('=')[1];
+      const csrfToken = extractCsrfToken(registerResponse.headers['set-cookie']);
 
       // Logout all sessions
       const logoutResponse = await agent
@@ -359,10 +346,12 @@ describe('Auth Flow Integration Tests', () => {
         .set('x-csrf-token', csrfToken || '')
         .set('Cookie', `csrf-token=${csrfToken}`);
 
-      // Possible responses based on implementation state:
-      // 200 = success, 400 = already verified, 429 = rate limited
-      // 500 = email service not configured (acceptable in test environment)
-      expect([200, 400, 429, 500]).toContain(response.status);
+      // Valid responses based on user state:
+      // 200 = success (email sent)
+      // 400 = already verified (no email needed)
+      // 429 = rate limited (too many requests)
+      // Note: 500 is NOT acceptable - indicates misconfiguration or bug
+      expect([200, 400, 429]).toContain(response.status);
     });
   });
 });

@@ -130,9 +130,9 @@ describe('JWT Protection Integration Tests', () => {
         .put('/api/user-auth/profile')
         .send({ name: 'New Name' });
 
-      // CSRF middleware runs first and rejects with 403
-      // before JWT authentication middleware can return 401
-      expect([401, 403]).toContain(response.status);
+      // Middleware order for PUT /profile: csrfMiddleware → jwtAuthMiddleware
+      // CSRF middleware runs first and rejects with 403 (missing CSRF token)
+      expect(response.status).toBe(403);
     });
   });
 
