@@ -192,7 +192,7 @@ describe('JWT Protection Integration Tests', () => {
         .post('/api/user-auth/assessment')
         .send({
           responses: {
-            peak_energy_times: ['morning'],
+            peak_energy_times: ['mid_morning'],
             low_energy_times: ['evening'],
             energy_consistency: 3,
             energy_drains: 'Meetings',

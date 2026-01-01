@@ -911,10 +911,16 @@ describe('UserService', () => {
 
     describe('saveAnalysis', () => {
       it('should save analysis with assessment reference', async () => {
+        // Mock assessment ownership check
+        mockPrisma.assessment.findFirst.mockResolvedValue({ id: 'assessment-123' });
         mockPrisma.analysis.create.mockResolvedValue(sampleAnalysis);
 
         const result = await userService.saveAnalysis('user-123', '{"pattern":"result"}', 'assessment-123');
 
+        expect(mockPrisma.assessment.findFirst).toHaveBeenCalledWith({
+          where: { id: 'assessment-123', userId: 'user-123' },
+          select: { id: true },
+        });
         expect(result).toMatchObject({
           id: 'analysis-123',
           assessmentId: 'assessment-123',
@@ -927,7 +933,16 @@ describe('UserService', () => {
 
         const result = await userService.saveAnalysis('user-123', '{"pattern":"result"}');
 
+        expect(mockPrisma.assessment.findFirst).not.toHaveBeenCalled();
         expect(result.assessmentId).toBeNull();
+      });
+
+      it('should throw NotFoundError if assessmentId not found or not owned', async () => {
+        mockPrisma.assessment.findFirst.mockResolvedValue(null);
+
+        await expect(
+          userService.saveAnalysis('user-123', '{"pattern":"result"}', 'non-existent-id')
+        ).rejects.toThrow('Assessment not found');
       });
     });
 

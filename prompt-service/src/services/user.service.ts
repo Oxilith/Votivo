@@ -1309,6 +1309,18 @@ export class UserService {
    * @returns Saved analysis
    */
   async saveAnalysis(userId: string, result: string, assessmentId?: string): Promise<SavedAnalysis> {
+    // Validate assessmentId ownership if provided
+    if (assessmentId) {
+      const assessment = await prisma.assessment.findFirst({
+        where: { id: assessmentId, userId },
+        select: { id: true },
+      });
+
+      if (!assessment) {
+        throw new NotFoundError('Assessment not found');
+      }
+    }
+
     const analysis = await prisma.analysis.create({
       data: {
         userId,

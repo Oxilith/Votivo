@@ -37,7 +37,7 @@ describe('Database Flow Integration Tests', () => {
   });
 
   const validAssessmentResponses = {
-    peak_energy_times: ['morning', 'afternoon'],
+    peak_energy_times: ['mid_morning', 'afternoon'],
     low_energy_times: ['evening'],
     energy_consistency: 4,
     energy_drains: 'Back-to-back meetings',
@@ -72,7 +72,7 @@ describe('Database Flow Integration Tests', () => {
       expect(response.body).toHaveProperty('id');
       // API returns responses as JSON string, parse it to verify content
       const responses = JSON.parse(response.body.responses);
-      expect(responses.peak_energy_times).toEqual(['morning', 'afternoon']);
+      expect(responses.peak_energy_times).toEqual(['mid_morning', 'afternoon']);
     });
 
     it('should list user assessments', async () => {
@@ -126,7 +126,7 @@ describe('Database Flow Integration Tests', () => {
       expect(getResponse.body.id).toBe(assessmentId);
       // API returns responses as JSON string, parse it to verify content
       const responses = JSON.parse(getResponse.body.responses);
-      expect(responses.peak_energy_times).toEqual(['morning', 'afternoon']);
+      expect(responses.peak_energy_times).toEqual(['mid_morning', 'afternoon']);
     });
 
     it('should return 404 for non-existent assessment', async () => {
@@ -387,7 +387,7 @@ describe('Database Flow Integration Tests', () => {
         .send({
           responses: {
             // Partial fields - API accepts any structure
-            peak_energy_times: ['morning'],
+            peak_energy_times: ['mid_morning'],
           },
         });
 
@@ -424,9 +424,9 @@ describe('Database Flow Integration Tests', () => {
           },
         });
 
-      // Database FK constraint violation returns 500 (not 404)
-      // Note: Could be improved to validate assessmentId first and return 404
-      expect(response.status).toBe(500);
+      // AssessmentId ownership is validated before save - returns 404 if not found/owned
+      expect(response.status).toBe(404);
+      expect(response.body.error).toMatch(/assessment.*not found/i);
     });
   });
 });
