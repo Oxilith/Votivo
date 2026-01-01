@@ -14,6 +14,7 @@
 import express, { Router, type Express } from 'express';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import type { AssessmentResponses } from '@votive/shared';
 import { analyze } from '@/controllers';
 import healthRoutes from '@/routes/health.routes';
 import { tracingMiddleware, notFoundHandler, errorHandler } from '@/middleware';
@@ -155,7 +156,7 @@ export function createMswServer() {
  * Valid assessment responses for testing.
  * Uses exact enum values from shared/validation.ts.
  */
-export const validAssessmentResponses = {
+export const validAssessmentResponses: AssessmentResponses = {
   peak_energy_times: ['mid_morning', 'afternoon'],
   low_energy_times: ['evening'],
   energy_consistency: 4,

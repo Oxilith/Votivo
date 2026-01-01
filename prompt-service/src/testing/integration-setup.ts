@@ -25,6 +25,7 @@ import express, { type Express, type ErrorRequestHandler } from 'express';
 import cookieParser from 'cookie-parser';
 import type { Test } from 'supertest';
 import request from 'supertest';
+import type { AssessmentResponses } from '@votive/shared';
 import { apiRouter } from '@/routes';
 import { tracingMiddleware } from '@/middleware';
 import {
@@ -338,7 +339,7 @@ export function extractCsrfToken(
  * Uses exact enum values from shared/validation.ts.
  * Shared between backend and prompt-service integration tests.
  */
-export const validAssessmentResponses = {
+export const validAssessmentResponses: AssessmentResponses = {
   peak_energy_times: ['mid_morning', 'afternoon'],
   low_energy_times: ['evening'],
   energy_consistency: 4,

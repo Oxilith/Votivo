@@ -45,6 +45,9 @@ describe('External API Integration Tests', () => {
   const app = createBackendTestApp();
   const server = createMswServer();
 
+  // MSW server lifecycle - beforeAll/afterAll pair ensures server starts fresh
+  // and closes cleanly. Server is NOT shared across test files to prevent
+  // handler pollution. Use 'bypass' to allow unmocked requests through.
   beforeAll(() => {
     server.listen({ onUnhandledRequest: 'bypass' });
   });
