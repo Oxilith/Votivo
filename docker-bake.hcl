@@ -13,6 +13,13 @@ group "default" {
   targets = ["backend", "app", "prompt-service", "worker"]
 }
 
+variable "VERSION" {
+      validation {
+        condition = VERSION != ""
+        error_message = "The variable 'VERSION' must not be empty."
+      }
+    }
+
 target "backend" {
   context    = "."
   dockerfile = "backend/Dockerfile"

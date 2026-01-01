@@ -20,7 +20,7 @@ import http from 'node:http';
 async function makeRequest(
   port: number,
   path: string
-): Promise<{ status: number; body: unknown }> {
+): Promise<{ status: number | undefined; body: unknown }> {
   return new Promise((resolve, reject) => {
     const req = http.request(
       {
