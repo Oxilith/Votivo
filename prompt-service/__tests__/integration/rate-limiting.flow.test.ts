@@ -5,6 +5,7 @@
  * - Tests login rate limiting (2 requests per 100ms window)
  * - Tests register rate limiting (2 requests per 100ms window)
  * - Tests password reset rate limiting (2 requests per 100ms window)
+ * - Tests rate limit window reset behavior
  * - Verifies 429 status and error messages when limits exceeded
  * @dependencies
  * - vitest for testing framework
@@ -121,6 +122,35 @@ describe('Rate Limiting Integration Tests', () => {
 
       expect(response.status).toBe(429);
       expect(response.body.error).toMatch(/too many.*password reset/i);
+    });
+  });
+
+  describe('Rate Limit Window Reset', () => {
+    it('should allow requests after rate limit window expires', async () => {
+      // Hit the rate limit
+      for (let i = 0; i < 2; i++) {
+        await request(app)
+          .post(AUTH_ENDPOINTS.login)
+          .send({ email: `windowreset${i}@example.com`, password: MOCK_PASSWORD });
+      }
+
+      // Verify we're rate limited
+      const limitedResponse = await request(app)
+        .post(AUTH_ENDPOINTS.login)
+        .send({ email: 'limited@example.com', password: MOCK_PASSWORD });
+      expect(limitedResponse.status).toBe(429);
+
+      // Wait for window to expire (1s window + 100ms buffer)
+      await new Promise((resolve) => setTimeout(resolve, 1100));
+
+      // Next request should succeed (not 429)
+      const response = await request(app)
+        .post(AUTH_ENDPOINTS.login)
+        .send({ email: 'afterreset@example.com', password: MOCK_PASSWORD });
+
+      // Should get auth error (401) not rate limit (429)
+      expect(response.status).not.toBe(429);
+      expect(response.status).toBe(401); // Invalid credentials expected
     });
   });
 });

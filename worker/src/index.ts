@@ -3,6 +3,7 @@
  * @purpose Entry point for the background worker microservice
  * @functionality
  * - Initializes the scheduler with registered jobs
+ * - Starts health check HTTP server for Docker monitoring
  * - Handles graceful shutdown on SIGTERM/SIGINT
  * - Logs worker startup and shutdown events
  * @dependencies
@@ -10,12 +11,22 @@
  * - @/jobs for job definitions
  * - @/utils/logger for structured logging
  * - @/prisma/client for database connection
+ * - @/health for health checks and HTTP server
+ * - @/config for configuration
  */
 
 import { Scheduler } from './scheduler';
 import { tokenCleanupJob } from './jobs';
 import { logger } from './utils';
 import { prisma } from './prisma/client';
+import {
+  healthService,
+  startHealthServer,
+  stopHealthServer,
+  createDatabaseCheck,
+  createSchedulerCheck,
+} from './health';
+import { config } from './config';
 
 const log = logger.child({ component: 'main' });
 
@@ -43,10 +54,18 @@ async function main(): Promise<void> {
   // Start the scheduler
   scheduler.start();
 
+  // Register health checks
+  healthService.register(createDatabaseCheck());
+  healthService.register(createSchedulerCheck(scheduler));
+
+  // Start health server
+  startHealthServer(config.healthPort);
+
   log.info(
     {
       jobs: scheduler.jobNames,
       jobCount: scheduler.jobCount,
+      healthPort: config.healthPort,
     },
     'Worker started successfully'
   );
@@ -60,6 +79,9 @@ async function shutdown(signal: string): Promise<void> {
 
   // Stop the scheduler
   scheduler.stop();
+
+  // Stop health server
+  await stopHealthServer();
 
   // Disconnect from database
   await prisma.$disconnect();

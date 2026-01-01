@@ -6,6 +6,7 @@
  * - Validates required configuration values
  * - Provides typed configuration object for application use
  * - Configures job-specific settings (enabled/schedule)
+ * - Configures health server port (default: 3003)
  * @dependencies
  * - dotenv for environment variable loading
  * - zod for schema validation
@@ -30,6 +31,9 @@ const configSchema = z.object({
 
   // Logging
   logLevel: z.enum(['silent', 'fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+
+  // Health check server port
+  healthPort: z.coerce.number().int().positive().default(3003),
 
   // Job Configuration
   jobs: z.object({
@@ -72,6 +76,7 @@ function loadConfig(): Config {
     databaseUrl: process.env.DATABASE_URL,
     databaseKey: process.env.DATABASE_KEY,
     logLevel: process.env.LOG_LEVEL,
+    healthPort: process.env.WORKER_HEALTH_PORT,
     jobs: {
       tokenCleanup: {
         enabled: process.env.JOB_TOKEN_CLEANUP_ENABLED,

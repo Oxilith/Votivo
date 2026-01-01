@@ -10,7 +10,7 @@
  * - i18next
  * - react-i18next (initReactI18next)
  * - i18next-browser-languagedetector
- * - Feature-specific translation files (landing, header, assessment, insights, auth, profile, common)
+ * - Feature-specific translation files (landing, header, assessment, insights, auth, profile, notFound, common)
  */
 
 import i18n from 'i18next';
@@ -25,6 +25,7 @@ import enAssessment from '@/i18n/resources/en/assessment.json';
 import enInsights from '@/i18n/resources/en/insights.json';
 import enAuth from '@/i18n/resources/en/auth.json';
 import enProfile from '@/i18n/resources/en/profile.json';
+import enNotFound from '@/i18n/resources/en/notFound.json';
 
 // Polish translations
 import plCommon from '@/i18n/resources/pl/common.json';
@@ -34,6 +35,7 @@ import plAssessment from '@/i18n/resources/pl/assessment.json';
 import plInsights from '@/i18n/resources/pl/insights.json';
 import plAuth from '@/i18n/resources/pl/auth.json';
 import plProfile from '@/i18n/resources/pl/profile.json';
+import plNotFound from '@/i18n/resources/pl/notFound.json';
 
 export const SUPPORTED_LANGUAGES = ['en', 'pl'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
@@ -47,6 +49,7 @@ const resources = {
     insights: enInsights,
     auth: enAuth,
     profile: enProfile,
+    notFound: enNotFound,
   },
   pl: {
     common: plCommon,
@@ -56,6 +59,7 @@ const resources = {
     insights: plInsights,
     auth: plAuth,
     profile: plProfile,
+    notFound: plNotFound,
   },
 };
 
@@ -66,7 +70,7 @@ void i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'landing', 'header', 'assessment', 'insights', 'auth', 'profile'],
+    ns: ['common', 'landing', 'header', 'assessment', 'insights', 'auth', 'profile', 'notFound'],
     interpolation: {
       escapeValue: false,
     },

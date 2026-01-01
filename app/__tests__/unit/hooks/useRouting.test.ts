@@ -132,14 +132,14 @@ describe('useRouting utilities', () => {
     });
 
     describe('unknown routes', () => {
-      it('should default to landing for unknown routes', () => {
+      it('should return not-found for unknown routes', () => {
         const result = parseRoute('/unknown-page', '', '');
-        expect(result.view).toBe('landing');
+        expect(result.view).toBe('not-found');
       });
 
-      it('should default to landing for nested unknown routes', () => {
+      it('should return not-found for nested unknown routes', () => {
         const result = parseRoute('/foo/bar/baz', '', '');
-        expect(result.view).toBe('landing');
+        expect(result.view).toBe('not-found');
       });
     });
   });

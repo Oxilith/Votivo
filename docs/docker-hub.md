@@ -80,14 +80,12 @@ Build from source instead of using pre-built images:
 git clone https://github.com/Oxilith/votive.git
 cd votive
 
-# Build and run (requires all 6 environment variables)
-ANTHROPIC_API_KEY=<KEY> \
-DATABASE_KEY=<SECRET> \
-ADMIN_API_KEY=<SECRET> \
-SESSION_SECRET=<SECRET> \
-JWT_ACCESS_SECRET=<SECRET> \
-JWT_REFRESH_SECRET=<SECRET> \
-  docker compose up --build
+# macOS/Linux
+DOTENV_PRIVATE_KEY=<your-private-key> docker compose up --build
+
+# Windows (PowerShell)
+$env:DOTENV_PRIVATE_KEY="<your-private-key>"
+docker compose up --build
 ```
 
 ### Development vs Production
@@ -122,13 +120,7 @@ mkcert localhost 127.0.0.1 ::1
 cd ..
 
 # Run with trusted certs (auto-detected from ./certs)
-ANTHROPIC_API_KEY=<KEY> \
-DATABASE_KEY=<SECRET> \
-ADMIN_API_KEY=<SECRET> \
-SESSION_SECRET=<SECRET> \
-JWT_ACCESS_SECRET=<SECRET> \
-JWT_REFRESH_SECRET=<SECRET> \
-  docker compose -f oci://oxilith/votive-oci:latest up
+DOTENV_PRIVATE_KEY=<your-private-key> docker compose -f oci://oxilith/votive-oci:latest up
 ```
 
 For security architecture details, see [Architecture > Security](architecture.md#security-architecture).
@@ -151,7 +143,7 @@ docker rmi oxilith/votive-worker:latest 2>/dev/null
 docker buildx prune -f
 
 # Build and push all images (linux/amd64 + linux/arm64)
-docker buildx bake --push --no-cache
+VERSION=X.Y.Z docker buildx bake --push --no-cache
 ```
 
 The `docker-bake.hcl` file defines build targets for all four services.

@@ -24,6 +24,7 @@ import { logger } from '@/utils';
 export class Scheduler {
   private tasks = new Map<string, ScheduledTask>();
   private log = logger.child({ component: 'scheduler' });
+  private _isRunning = false;
 
   /**
    * Register a job with the scheduler
@@ -118,6 +119,7 @@ export class Scheduler {
       void task.start();
       this.log.info({ job: name }, 'Job started');
     });
+    this._isRunning = true;
     this.log.info({ jobCount: this.tasks.size }, 'Scheduler started');
   }
 
@@ -129,7 +131,15 @@ export class Scheduler {
       void task.stop();
       this.log.info({ job: name }, 'Job stopped');
     });
+    this._isRunning = false;
     this.log.info('Scheduler stopped');
+  }
+
+  /**
+   * Check if the scheduler is running
+   */
+  get isRunning(): boolean {
+    return this._isRunning;
   }
 
   /**

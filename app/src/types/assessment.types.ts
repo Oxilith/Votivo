@@ -80,5 +80,5 @@ export interface InsightsProps {
   viewOnlyAnalysis?: ViewOnlyAnalysis | null;
 }
 
-// App state - includes auth views
-export type AppView = 'landing' | 'assessment' | 'insights' | 'auth' | 'profile' | 'verify-email' | 'reset-password';
+// App state - includes auth views and error pages
+export type AppView = 'landing' | 'assessment' | 'insights' | 'auth' | 'profile' | 'verify-email' | 'reset-password' | 'not-found';

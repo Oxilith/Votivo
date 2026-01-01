@@ -46,6 +46,7 @@ const AuthPage = lazy(() => import('@/components/auth/AuthPage'));
 const EmailVerificationPage = lazy(() => import('@/components/auth/EmailVerificationPage'));
 const PasswordResetPage = lazy(() => import('@/components/auth/PasswordResetPage'));
 const ProfilePage = lazy(() => import('@/components/profile/ProfilePage'));
+const NotFoundPage = lazy(() => import('@/components/not-found/NotFoundPage'));
 
 function App() {
   // Zustand stores
@@ -264,6 +265,19 @@ function App() {
         <ChunkErrorBoundary>
           <Suspense fallback={<LoadingFallback />}>
             <PasswordResetPage token={routeParams.token} />
+          </Suspense>
+        </ChunkErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
+  // 404 Not Found page
+  if (currentView === 'not-found') {
+    return (
+      <ThemeProvider>
+        <ChunkErrorBoundary>
+          <Suspense fallback={<LoadingFallback />}>
+            <NotFoundPage />
           </Suspense>
         </ChunkErrorBoundary>
       </ThemeProvider>

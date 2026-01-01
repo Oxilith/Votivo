@@ -11,21 +11,25 @@
  * - Provides shared test fixtures (validAssessmentResponses)
  * - Gracefully skips tests when database unavailable (via setup())
  * - Exports AUTH_ENDPOINTS, AUTH_HEADERS, and bearerToken() for test constants
+ * - Provides 404 handler for unknown routes
+ * - Uses type-safe error handling with isAppError type guard
  * @dependencies
  * - express for app creation
  * - cookie-parser for signed cookies
  * - @/routes for API routes
  * - @/middleware for tracing
+ * - @/errors for isAppError type guard
  * - shared/testing for database utilities
  */
  
-import express, { type Express, type ErrorRequestHandler } from 'express';
+import express, { type Express, type ErrorRequestHandler, type RequestHandler } from 'express';
 import cookieParser from 'cookie-parser';
 import type { Test } from 'supertest';
 import request from 'supertest';
 import type { AssessmentResponses } from '@votive/shared';
 import { apiRouter } from '@/routes';
 import { tracingMiddleware } from '@/middleware';
+import { isAppError } from '@/errors';
 import {
   cleanupTestDb,
   setTestPrisma,
@@ -126,19 +130,33 @@ export function createIntegrationTestApp(): Express {
   // Mount API routes (without rate limiting for tests)
   app.use('/api', apiRouter);
 
-  // Error handler
+  // 404 handler - must be after all routes, before error handler
+  const notFoundHandler: RequestHandler = (_req, res) => {
+    res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });
+  };
+
+  app.use(notFoundHandler);
+
+  // Error handler with type-safe error detection
   const errorHandler: ErrorRequestHandler = (
-    err: Error,
+    err: unknown,
     _req: express.Request,
     res: express.Response,
     _next: express.NextFunction
   ) => {
-    const statusCode = 'statusCode' in err && typeof err.statusCode === 'number'
-      ? err.statusCode
-      : 500;
-    res.status(statusCode).json({
-      error: err.message,
-      code: 'code' in err ? err.code : undefined,
+    // Use type guard for AppError instances
+    if (isAppError(err)) {
+      res.status(err.statusCode).json({
+        error: err.message,
+        code: err.code,
+      });
+      return;
+    }
+
+    // Fallback for generic errors
+    const genericErr = err instanceof Error ? err : new Error('Unknown error');
+    res.status(500).json({
+      error: genericErr.message,
     });
   };
 

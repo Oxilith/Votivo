@@ -77,6 +77,7 @@ const VIEW_TO_PATH: Record<AppView, string> = {
   profile: '/profile',
   'verify-email': '/verify-email',
   'reset-password': '/reset-password',
+  'not-found': '/404',
 };
 
 /**
@@ -116,8 +117,8 @@ export function parseRoute(pathname: string, search: string, hash: string): Rout
     };
   }
 
-  // Default to landing for unknown routes
-  return { view: 'landing' };
+  // Show 404 page for unknown routes
+  return { view: 'not-found' };
 }
 
 /**
