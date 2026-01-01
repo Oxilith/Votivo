@@ -1,5 +1,5 @@
 /**
- * @file controllers/__tests__/prompt.controller.test.ts
+ * @file prompt-service/__tests__/unit/controllers/prompt.controller.test.ts
  * @purpose Unit tests for Prompt controller endpoints
  * @functionality
  * - Tests getAll returns all prompts

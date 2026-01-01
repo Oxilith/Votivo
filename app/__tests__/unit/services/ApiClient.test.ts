@@ -1,5 +1,5 @@
 /**
- * @file services/__tests__/ApiClient.test.ts
+ * @file app/__tests__/unit/services/ApiClient.test.ts
  * @purpose Unit tests for API client with mocked fetch
  * @functionality
  * - Tests successful GET/POST/PUT/DELETE requests

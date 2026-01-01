@@ -1,5 +1,5 @@
 /**
- * @file controllers/__tests__/claude.controller.test.ts
+ * @file backend/__tests__/unit/controllers/claude.controller.test.ts
  * @purpose Unit tests for Claude controller endpoint
  * @functionality
  * - Tests valid request returns 200 with analysis result

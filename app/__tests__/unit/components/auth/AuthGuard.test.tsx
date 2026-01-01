@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/AuthGuard.test.tsx
+ * @file app/__tests__/unit/components/auth/AuthGuard.test.tsx
  * @purpose Unit tests for AuthGuard component
  * @functionality
  * - Tests rendering children when authenticated

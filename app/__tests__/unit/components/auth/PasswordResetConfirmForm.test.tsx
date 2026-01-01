@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/PasswordResetConfirmForm.test.tsx
+ * @file app/__tests__/unit/components/auth/PasswordResetConfirmForm.test.tsx
  * @purpose Unit tests for PasswordResetConfirmForm component
  * @functionality
  * - Tests form rendering

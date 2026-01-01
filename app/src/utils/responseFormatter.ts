@@ -1,6 +1,6 @@
 /**
  * @file src/utils/responseFormatter.ts
- * @purpose Re-exports shared response formatting utilities for frontend use
+ * @purpose Re-exports shared response formatting utilities for app use
  * @functionality
  * - Re-exports formatResponsesForPrompt from shared
  * - Re-exports label mappings for use in components

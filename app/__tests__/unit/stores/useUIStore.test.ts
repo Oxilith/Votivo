@@ -1,5 +1,5 @@
 /**
- * @file stores/__tests__/useUIStore.test.ts
+ * @file app/__tests__/unit/stores/useUIStore.test.ts
  * @purpose Unit tests for UI state management store
  * @functionality
  * - Tests initial state values

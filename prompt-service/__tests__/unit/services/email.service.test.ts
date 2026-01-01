@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/services/__tests__/email.service.test.ts
+ * @file prompt-service/__tests__/unit/services/email.service.test.ts
  * @purpose Unit tests for EmailService email delivery functionality
  * @functionality
  * - Tests SMTP configuration handling from environment variables
@@ -35,8 +35,8 @@ vi.mock('nodemailer', () => ({
   },
 }));
 
-vi.mock('@/utils', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/utils')>();
+vi.mock('@/utils', async (importOriginal: () => Promise<typeof import('@/utils')>) => {
+  const actual = await importOriginal();
   return {
     ...actual,
     logger: mockLogger,

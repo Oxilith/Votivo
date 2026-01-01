@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/services/__tests__/user.service.test.ts
+ * @file prompt-service/__tests__/unit/services/user.service.test.ts
  * @purpose Unit tests for UserService authentication and user management
  * @functionality
  * - Tests user registration with timing-safe enumeration protection

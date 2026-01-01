@@ -1,5 +1,5 @@
 /**
- * @file components/insights/__tests__/IdentityInsightsAI.test.tsx
+ * @file app/__tests__/unit/components/insights/IdentityInsightsAI.test.tsx
  * @purpose Unit tests for IdentityInsightsAI component
  * @functionality
  * - Tests no assessment data state

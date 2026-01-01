@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/config/__tests__/config.test.ts
+ * @file prompt-service/__tests__/unit/config/config.test.ts
  * @purpose Unit tests for config validation, specifically cookie signing secret requirements
  * @functionality
  * - Tests that development mode requires SESSION_SECRET or ADMIN_API_KEY

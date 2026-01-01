@@ -1,5 +1,5 @@
 /**
- * @file controllers/__tests__/ab-test.controller.test.ts
+ * @file prompt-service/__tests__/unit/controllers/ab-test.controller.test.ts
  * @purpose Unit tests for A/B Test controller endpoints
  * @functionality
  * - Tests getAll returns all A/B tests

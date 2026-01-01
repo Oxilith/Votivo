@@ -1,5 +1,5 @@
 /**
- * @file stores/__tests__/useAnalysisStore.test.ts
+ * @file app/__tests__/unit/stores/useAnalysisStore.test.ts
  * @purpose Unit tests for AI analysis state management store
  * @functionality
  * - Tests initial state values

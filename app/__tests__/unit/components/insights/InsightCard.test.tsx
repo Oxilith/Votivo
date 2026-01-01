@@ -1,5 +1,5 @@
 /**
- * @file components/insights/__tests__/InsightCard.test.tsx
+ * @file app/__tests__/unit/components/insights/InsightCard.test.tsx
  * @purpose Unit tests for InsightCard component
  * @functionality
  * - Tests rendering of different insight types (patterns, contradictions, blind spots, leverage points, risks)

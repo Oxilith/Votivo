@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/LoginForm.test.tsx
+ * @file app/__tests__/unit/components/auth/LoginForm.test.tsx
  * @purpose Unit tests for LoginForm component
  * @functionality
  * - Tests form rendering (title, inputs, buttons, links)

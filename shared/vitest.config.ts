@@ -28,6 +28,7 @@ export default defineConfig({
       reportsDirectory: './coverage',
       include: ['src/**/*.ts'],
       exclude: [
+        'src/generated/**',// Prisma generated files.
         'src/**/*.d.ts',
         'src/**/*.types.ts', // Type definitions only, no executable code
         'src/testing/**', // Testing utilities are infrastructure, not business logic

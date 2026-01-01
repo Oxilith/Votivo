@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/EmailVerificationPage.test.tsx
+ * @file app/__tests__/unit/components/auth/EmailVerificationPage.test.tsx
  * @purpose Unit tests for EmailVerificationPage component
  * @functionality
  * - Tests loading state when token is present

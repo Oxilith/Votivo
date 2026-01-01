@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/__tests__/TextareaStep.test.tsx
+ * @file app/__tests__/unit/components/assessment/steps/TextareaStep.test.tsx
  * @purpose Unit tests for TextareaStep component
  * @functionality
  * - Tests rendering question, context, and placeholder

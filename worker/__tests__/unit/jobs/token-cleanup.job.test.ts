@@ -1,5 +1,5 @@
 /**
- * @file src/jobs/__tests__/token-cleanup.job.test.ts
+ * @file worker/__tests__/unit/jobs/token-cleanup.job.test.ts
  * @purpose Unit tests for the token cleanup job
  * @functionality
  * - Tests successful deletion of expired refresh tokens

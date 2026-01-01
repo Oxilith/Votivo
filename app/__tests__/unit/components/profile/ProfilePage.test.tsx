@@ -1,5 +1,5 @@
 /**
- * @file components/profile/__tests__/ProfilePage.test.tsx
+ * @file app/__tests__/unit/components/profile/ProfilePage.test.tsx
  * @purpose Unit tests for ProfilePage component
  * @functionality
  * - Tests tab navigation between profile sections

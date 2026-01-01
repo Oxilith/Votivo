@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/navigation/__tests__/NavigationControls.test.tsx
+ * @file app/__tests__/unit/components/assessment/navigation/NavigationControls.test.tsx
  * @purpose Unit tests for NavigationControls component
  * @functionality
  * - Tests back button rendering and state

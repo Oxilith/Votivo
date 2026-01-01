@@ -1,6 +1,6 @@
 /**
  * @file shared/src/api.types.ts
- * @purpose Shared API type definitions for frontend and backend
+ * @purpose Shared API type definitions for app and backend
  * @functionality
  * - Exports AnalysisLanguage type for language selection
  * - Exports SUPPORTED_LANGUAGES const array for validation

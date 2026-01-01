@@ -1,5 +1,5 @@
 /**
- * @file services/__tests__/circuit-breaker.service.test.ts
+ * @file backend/__tests__/unit/services/circuit-breaker.service.test.ts
  * @purpose Unit tests for circuit breaker service wrapper
  * @functionality
  * - Tests circuit breaker creation with default and custom configs

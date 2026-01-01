@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/services/__tests__/ab-test.service.test.ts
+ * @file prompt-service/__tests__/unit/services/ab-test.service.test.ts
  * @purpose Unit tests for ABTestService variant selection logic
  * @functionality
  * - Tests weighted random variant selection

@@ -1,5 +1,5 @@
 /**
- * @file services/__tests__/ClaudeService.test.ts
+ * @file app/__tests__/unit/services/ClaudeService.test.ts
  * @purpose Unit tests for Claude AI analysis service
  * @functionality
  * - Tests successful analysis returns transformed response

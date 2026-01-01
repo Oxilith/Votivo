@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/hooks/__tests__/useAssessmentNavigation.test.ts
+ * @file app/__tests__/unit/components/assessment/hooks/useAssessmentNavigation.test.ts
  * @purpose Unit tests for assessment navigation hook
  * @functionality
  * - Tests initial state at phase 0, step 0

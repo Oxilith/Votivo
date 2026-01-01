@@ -1,5 +1,5 @@
 /**
- * @file stores/__tests__/useAuthStore.test.ts
+ * @file app/__tests__/unit/stores/useAuthStore.test.ts
  * @purpose Unit tests for authentication state management store
  * @functionality
  * - Tests initial state values

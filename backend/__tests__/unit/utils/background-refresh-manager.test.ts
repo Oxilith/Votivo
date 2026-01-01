@@ -1,5 +1,5 @@
 /**
- * @file __tests__/utils/background-refresh-manager.test.ts
+ * @file backend/__tests__/unit/utils/background-refresh-manager.test.ts
  * @purpose Unit tests for BackgroundRefreshManager utility
  * @functionality
  * - Tests queue operations (add, process, size limits)

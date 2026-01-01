@@ -4,7 +4,7 @@
  * @functionality
  * - Validates CSRF token from header against httpOnly cookie
  * - Sets CSRF token in httpOnly cookie and returns token in response body
- * - Frontend stores token from response body, not from reading cookie
+ * - App stores token from response body, not from reading cookie
  * - Skips validation for safe HTTP methods (GET, HEAD, OPTIONS)
  * - Provides defense-in-depth alongside SameSite cookie protection
  * @dependencies
@@ -19,7 +19,7 @@ import { CSRF_COOKIE, CSRF_HEADER, generateCsrfToken, validateCsrfToken } from '
  * CSRF cookie options
  *
  * Security: httpOnly is TRUE for defense-in-depth.
- * The frontend gets the CSRF token from the response body (login/register/refresh),
+ * The App gets the CSRF token from the response body (login/register/refresh),
  * stores it in memory, and sends it in the X-CSRF-Token header.
  * The browser automatically sends the httpOnly cookie, and the server compares both.
  *

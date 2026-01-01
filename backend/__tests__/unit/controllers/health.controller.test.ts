@@ -1,5 +1,5 @@
 /**
- * @file controllers/__tests__/health.controller.test.ts
+ * @file backend/__tests__/unit/controllers/health.controller.test.ts
  * @purpose Unit tests for health controller endpoints
  * @functionality
  * - Tests liveness returns 200 with version and uptime

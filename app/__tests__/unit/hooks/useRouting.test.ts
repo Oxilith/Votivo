@@ -1,5 +1,5 @@
 /**
- * @file hooks/__tests__/useRouting.test.ts
+ * @file app/__tests__/unit/hooks/useRouting.test.ts
  * @purpose Unit tests for routing hook and utilities
  * @functionality
  * - Tests parseRoute extracts correct view from paths

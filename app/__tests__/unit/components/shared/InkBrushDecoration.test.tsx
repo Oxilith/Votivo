@@ -1,5 +1,5 @@
 /**
- * @file components/shared/__tests__/InkBrushDecoration.test.tsx
+ * @file app/__tests__/unit/components/shared/InkBrushDecoration.test.tsx
  * @purpose Unit tests for InkBrushDecoration component
  * @functionality
  * - Tests SVG rendering with correct attributes

@@ -1,5 +1,5 @@
 /**
- * @file services/__tests__/prompt-cache.service.test.ts
+ * @file backend/__tests__/unit/services/prompt-cache.service.test.ts
  * @purpose Unit tests for PromptCacheService cache operations
  * @functionality
  * - Tests get/set operations with correct cache key generation

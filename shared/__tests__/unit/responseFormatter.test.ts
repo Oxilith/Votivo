@@ -1,5 +1,5 @@
 /**
- * @file shared/src/__tests__/responseFormatter.test.ts
+ * @file shared/__tests__/unit/responseFormatter.test.ts
  * @purpose Unit tests for formatResponsesForPrompt function
  * @functionality
  * - Tests that responses are formatted correctly

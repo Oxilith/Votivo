@@ -79,7 +79,7 @@ export {
   type MockAssessmentResponsesOptions,
   type MockAssessmentRecordOptions,
   type MockAssessmentRecord,
-  type SavedAssessmentFrontend,
+  type SavedAssessmentApp,
 } from './assessment.fixture';
 
 // Analysis fixtures
@@ -98,7 +98,7 @@ export {
   type MockAnalysisRecordOptions,
   type MockAnalysisRecord,
   type MockSavedAnalysisOptions,
-  type SavedAnalysisFrontend,
+  type SavedAnalysisApp,
 } from './analysis.fixture';
 
 // Prompt fixtures

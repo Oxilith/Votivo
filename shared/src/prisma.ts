@@ -14,7 +14,7 @@
  * - ./generated/prisma/commonInputTypes for filter/sort types
  *
  * NOTE: This file contains Node.js-specific code and should NOT be imported
- * in browser/frontend code. Use the main 'shared' import for browser-safe types.
+ * in browser/app code. Use the main 'shared' import for browser-safe types.
  */
 
 // Prisma Client (server-side only - contains Node.js runtime)

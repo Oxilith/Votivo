@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/middleware/__tests__/admin-auth.middleware.test.ts
+ * @file prompt-service/__tests__/unit/middleware/admin-auth.middleware.test.ts
  * @purpose Unit tests for admin authentication middleware
  * @functionality
  * - Tests HttpOnly cookie authentication (primary method)

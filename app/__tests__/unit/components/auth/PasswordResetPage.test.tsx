@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/PasswordResetPage.test.tsx
+ * @file app/__tests__/unit/components/auth/PasswordResetPage.test.tsx
  * @purpose Unit tests for PasswordResetPage component
  * @functionality
  * - Tests rendering form when token is present

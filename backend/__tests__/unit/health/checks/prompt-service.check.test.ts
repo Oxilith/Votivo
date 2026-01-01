@@ -1,5 +1,5 @@
 /**
- * @file health/checks/__tests__/prompt-service.check.test.ts
+ * @file backend/__tests__/unit/health/checks/prompt-service.check.test.ts
  * @purpose Unit tests for Prompt Service health check
  * @functionality
  * - Tests healthy response when service is reachable

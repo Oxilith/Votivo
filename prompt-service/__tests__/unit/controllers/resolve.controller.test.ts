@@ -1,5 +1,5 @@
 /**
- * @file controllers/__tests__/resolve.controller.test.ts
+ * @file prompt-service/__tests__/unit/controllers/resolve.controller.test.ts
  * @purpose Unit tests for Resolve controller endpoints
  * @functionality
  * - Tests resolve returns config successfully

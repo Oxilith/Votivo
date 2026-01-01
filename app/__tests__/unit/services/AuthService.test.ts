@@ -1,5 +1,5 @@
 /**
- * @file services/__tests__/AuthService.test.ts
+ * @file app/__tests__/unit/services/AuthService.test.ts
  * @purpose Unit tests for AuthService with mocked API client
  * @functionality
  * - Tests authentication methods (login, register, logout)

@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/services/__tests__/prompt-resolver.service.test.ts
+ * @file prompt-service/__tests__/unit/services/prompt-resolver.service.test.ts
  * @purpose Unit tests for PromptResolverService and custom error types
  * @functionality
  * - Tests NotFoundError, ValidationError, and ConflictError types

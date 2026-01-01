@@ -1,5 +1,5 @@
 /**
- * @file utils/__tests__/fileUtils.test.ts
+ * @file app/__tests__/unit/utils/fileUtils.test.ts
  * @purpose Unit tests for file import/export utilities
  * @functionality
  * - Tests exportToJson creates downloadable file

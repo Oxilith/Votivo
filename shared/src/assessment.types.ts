@@ -1,6 +1,6 @@
 /**
  * @file shared/src/assessment.types.ts
- * @purpose Single source of truth for assessment type definitions shared between frontend and backend
+ * @purpose Single source of truth for assessment type definitions shared between app and backend
  * @functionality
  * - Defines TimeOfDay type union for energy time selections
  * - Defines MoodTrigger type union for negative mood trigger selections

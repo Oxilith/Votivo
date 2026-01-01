@@ -285,10 +285,10 @@ export function createEmptyAnalysisResult(): AIAnalysisResult {
 }
 
 /**
- * Frontend format for saved analyses (parsed JSON, ISO date strings).
- * Use this type for frontend store tests where data is already parsed.
+ * App format for saved analyses (parsed JSON, ISO date strings).
+ * Use this type for app store tests where data is already parsed.
  */
-export interface SavedAnalysisFrontend {
+export interface SavedAnalysisApp {
   id: string;
   userId: string;
   assessmentId: string | null;
@@ -299,7 +299,7 @@ export interface SavedAnalysisFrontend {
 }
 
 /**
- * Extended options for creating a mock saved analysis (frontend format)
+ * Extended options for creating a mock saved analysis (app format)
  */
 export interface MockSavedAnalysisOptions extends MockAnalysisRecordOptions {
   language?: string;
@@ -307,11 +307,11 @@ export interface MockSavedAnalysisOptions extends MockAnalysisRecordOptions {
 }
 
 /**
- * Creates a mock analysis in frontend format (parsed result, ISO date strings).
- * Use this for testing frontend stores where data has already been processed.
+ * Creates a mock analysis in app format (parsed result, ISO date strings).
+ * Use this for testing app stores where data has already been processed.
  *
  * @param options - Optional overrides for record fields
- * @returns Mock analysis in frontend-ready format
+ * @returns Mock analysis in app-ready format
  *
  * @example
  * ```typescript
@@ -321,7 +321,7 @@ export interface MockSavedAnalysisOptions extends MockAnalysisRecordOptions {
  */
 export function createMockSavedAnalysis(
   options: MockSavedAnalysisOptions = {}
-): SavedAnalysisFrontend {
+): SavedAnalysisApp {
   const now = new Date();
 
   return {

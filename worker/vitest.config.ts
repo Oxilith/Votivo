@@ -34,10 +34,10 @@ export default defineConfig({
         'src/jobs/index.ts',
       ],
       thresholds: {
-        lines: 75,
-        functions: 75,
-        branches: 65,
-        statements: 75,
+        lines: 85,
+        functions: 85,
+        branches: 85,
+        statements: 85,
       },
     },
     projects: [

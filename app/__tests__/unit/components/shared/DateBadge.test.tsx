@@ -1,5 +1,5 @@
 /**
- * @file components/shared/__tests__/DateBadge.test.tsx
+ * @file app/__tests__/unit/components/shared/DateBadge.test.tsx
  * @purpose Unit tests for DateBadge component
  * @functionality
  * - Tests date formatting for English locale

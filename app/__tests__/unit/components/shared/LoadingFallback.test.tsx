@@ -1,5 +1,5 @@
 /**
- * @file components/shared/__tests__/LoadingFallback.test.tsx
+ * @file app/__tests__/unit/components/shared/LoadingFallback.test.tsx
  * @purpose Unit tests for LoadingFallback component
  * @functionality
  * - Tests fullscreen variant (default)

@@ -1,5 +1,5 @@
 /**
- * @file src/scheduler/__tests__/scheduler.test.ts
+ * @file worker/__tests__/unit/scheduler/scheduler.test.ts
  * @purpose Unit tests for the Scheduler class
  * @functionality
  * - Tests job registration with enabled/disabled flags
@@ -121,7 +121,7 @@ describe('Scheduler', () => {
     });
 
     it('should skip jobs with invalid cron expressions and log error', () => {
-      (cron.validate as Mock).mockReturnValueOnce(false);
+      (cron.validate as ReturnType<typeof vi.fn>).mockReturnValueOnce(false);
       const job = createMockJob({ schedule: 'invalid-cron' });
 
       scheduler.register(job);

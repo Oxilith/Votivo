@@ -1,5 +1,5 @@
 /**
- * @file hooks/__tests__/useResourceLoader.test.ts
+ * @file app/__tests__/unit/hooks/useResourceLoader.test.ts
  * @purpose Unit tests for resource loading hook behaviors
  * @functionality
  * - Tests skipping load when auth not ready

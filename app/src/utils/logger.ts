@@ -1,6 +1,6 @@
 /**
  * @file src/utils/logger.ts
- * @purpose Simple frontend logging utility with environment-aware filtering
+ * @purpose Simple app logging utility with environment-aware filtering
  * @functionality
  * - Provides log level filtering (debug, info, warn, error)
  * - Suppresses debug/info logs in production

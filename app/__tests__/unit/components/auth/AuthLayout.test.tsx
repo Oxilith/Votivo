@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/AuthLayout.test.tsx
+ * @file app/__tests__/unit/components/auth/AuthLayout.test.tsx
  * @purpose Unit tests for AuthLayout component
  * @functionality
  * - Tests rendering of children content

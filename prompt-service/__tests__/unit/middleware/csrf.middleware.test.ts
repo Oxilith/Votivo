@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/__tests__/middleware/csrf.middleware.test.ts
+ * @file prompt-service/__tests__/unit/middleware/csrf.middleware.test.ts
  * @purpose Unit tests for CSRF protection middleware
  * @functionality
  * - Tests CSRF token validation for state-changing requests

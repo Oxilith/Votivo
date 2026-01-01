@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/__tests__/ScaleStep.test.tsx
+ * @file app/__tests__/unit/components/assessment/steps/ScaleStep.test.tsx
  * @purpose Unit tests for ScaleStep component
  * @functionality
  * - Tests rendering question, context, and labels

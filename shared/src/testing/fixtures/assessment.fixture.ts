@@ -233,10 +233,10 @@ export function createPhase2Assessment(
 }
 
 /**
- * Frontend format for saved assessments (parsed JSON, ISO date strings).
- * Use this type for frontend store tests where data is already parsed.
+ * App format for saved assessments (parsed JSON, ISO date strings).
+ * Use this type for app store tests where data is already parsed.
  */
-export interface SavedAssessmentFrontend {
+export interface SavedAssessmentApp {
   id: string;
   userId: string;
   responses: AssessmentResponses;
@@ -245,11 +245,11 @@ export interface SavedAssessmentFrontend {
 }
 
 /**
- * Creates a mock assessment in frontend format (parsed responses, ISO date strings).
- * Use this for testing frontend stores where data has already been processed.
+ * Creates a mock assessment in app format (parsed responses, ISO date strings).
+ * Use this for testing app stores where data has already been processed.
  *
  * @param options - Optional overrides for record fields
- * @returns Mock assessment in frontend-ready format
+ * @returns Mock assessment in app-ready format
  *
  * @example
  * ```typescript
@@ -259,7 +259,7 @@ export interface SavedAssessmentFrontend {
  */
 export function createMockSavedAssessment(
   options: MockAssessmentRecordOptions = {}
-): SavedAssessmentFrontend {
+): SavedAssessmentApp {
   const responses = createCompleteAssessment(options.responses);
   const now = new Date();
 

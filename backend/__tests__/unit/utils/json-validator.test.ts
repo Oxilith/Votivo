@@ -1,5 +1,5 @@
 /**
- * @file utils/__tests__/json-validator.test.ts
+ * @file backend/__tests__/unit/utils/json-validator.test.ts
  * @purpose Unit tests for JSON parsing and validation utilities
  * @functionality
  * - Tests stripMarkdownCodeBlocks removes json blocks

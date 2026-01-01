@@ -1,5 +1,5 @@
 /**
- * @file components/shared/__tests__/LanguageToggle.test.tsx
+ * @file app/__tests__/unit/components/shared/LanguageToggle.test.tsx
  * @purpose Unit tests for LanguageToggle component
  * @functionality
  * - Tests rendering of EN/PL buttons

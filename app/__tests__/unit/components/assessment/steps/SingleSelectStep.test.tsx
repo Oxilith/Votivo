@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/__tests__/SingleSelectStep.test.tsx
+ * @file app/__tests__/unit/components/assessment/steps/SingleSelectStep.test.tsx
  * @purpose Unit tests for SingleSelectStep component
  * @functionality
  * - Tests rendering question, context, and options

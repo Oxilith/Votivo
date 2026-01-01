@@ -1,5 +1,5 @@
 /**
- * @file services/__tests__/prompt-client.service.test.ts
+ * @file backend/__tests__/unit/services/prompt-client.service.test.ts
  * @purpose Unit tests for PromptClientService HTTP client operations
  * @functionality
  * - Tests successful resolve operations with cache integration

@@ -72,15 +72,15 @@ services:
     networks:
       - app-network
 
-  frontend:
-    image: oxilith/votive-frontend:latest
+  app:
+    image: oxilith/votive-app:latest
     build:
       context: .
       dockerfile: app/Dockerfile
       platforms:
         - linux/amd64
         - linux/arm64
-    container_name: votive-frontend
+    container_name: votive-app
     environment:
       - DOTENV_PRIVATE_KEY=${DOTENV_PRIVATE_KEY}
     ports:

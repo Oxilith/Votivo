@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/RegisterForm.test.tsx
+ * @file app/__tests__/unit/components/auth/RegisterForm.test.tsx
  * @purpose Unit tests for RegisterForm component
  * @functionality
  * - Tests form rendering (title, all inputs, submit button, links)

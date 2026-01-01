@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/__tests__/SynthesisStep.test.tsx
+ * @file app/__tests__/unit/components/assessment/steps/SynthesisStep.test.tsx
  * @purpose Unit tests for SynthesisStep component
  * @functionality
  * - Tests rendering of synthesis sections

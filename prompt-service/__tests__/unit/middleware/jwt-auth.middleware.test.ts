@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/__tests__/middleware/jwt-auth.middleware.test.ts
+ * @file prompt-service/__tests__/unit/middleware/jwt-auth.middleware.test.ts
  * @purpose Unit tests for JWT authentication middleware
  * @description Tests that JWT middleware correctly protects routes by:
  * - Returning 401 when no token is provided

@@ -10,7 +10,7 @@
  */
 
 group "default" {
-  targets = ["backend", "frontend", "prompt-service"]
+  targets = ["backend", "app", "prompt-service", "worker"]
 }
 
 target "backend" {
@@ -20,10 +20,10 @@ target "backend" {
   platforms  = ["linux/amd64", "linux/arm64"]
 }
 
-target "frontend" {
+target "app" {
   context    = "."
   dockerfile = "app/Dockerfile"
-  tags       = ["oxilith/votive-frontend:latest"]
+  tags       = ["oxilith/votive-app:latest"]
   platforms  = ["linux/amd64", "linux/arm64"]
 }
 
@@ -31,5 +31,12 @@ target "prompt-service" {
   context    = "."
   dockerfile = "prompt-service/Dockerfile"
   tags       = ["oxilith/votive-prompt-service:latest"]
+  platforms  = ["linux/amd64", "linux/arm64"]
+}
+
+target "worker" {
+  context    = "."
+  dockerfile = "worker/Dockerfile"
+  tags       = ["oxilith/votive-worker:latest"]
   platforms  = ["linux/amd64", "linux/arm64"]
 }

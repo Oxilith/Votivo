@@ -373,7 +373,7 @@ describe('Database Flow Integration Tests', () => {
   describe('Validation errors', () => {
     it('should accept partial assessment responses (server stores as-is)', async () => {
       // Note: The API currently does not validate assessment response structure
-      // It stores whatever is sent and relies on frontend validation
+      // It stores whatever is sent and relies on app validation
       const { accessToken, csrfToken } = await registerTestUser(app, {
         email: 'partialassess@example.com',
         password: 'ValidPass123',

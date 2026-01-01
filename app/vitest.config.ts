@@ -1,6 +1,6 @@
 /**
  * @file vitest.config.ts
- * @purpose Vitest test configuration for React frontend
+ * @purpose Vitest test configuration for React app
  * @functionality
  * - Configures test environment (jsdom)
  * - Uses projects for unit test organization
@@ -71,7 +71,7 @@ export default defineConfig({
       thresholds: {
         lines: 75,
         functions: 75,
-        branches: 65,
+        branches: 75,
         statements: 75,
       },
     },

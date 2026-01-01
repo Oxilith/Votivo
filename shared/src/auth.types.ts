@@ -1,6 +1,6 @@
 /**
  * @file shared/src/auth.types.ts
- * @purpose Shared authentication types used across frontend and backend
+ * @purpose Shared authentication types used across app and backend
  * @functionality
  * - Provides Gender type for user profiles
  * - Provides SafeUserResponse for API responses (with serialized dates)

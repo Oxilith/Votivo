@@ -1,14 +1,13 @@
 {
-  "name": "votive-frontend",
+  "name": "@votive/app",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "tsc -b && vite build",
     "build:analyze": "ANALYZE=true npm run build",
     "clean": "rm -rf dist",
-    "lint": "eslint .",
+    "lint": "eslint src/ __tests__/",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc -b",
     "preview": "vite preview",

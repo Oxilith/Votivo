@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/services/__tests__/prompt.service.test.ts
+ * @file prompt-service/__tests__/unit/services/prompt.service.test.ts
  * @purpose Unit tests for PromptService input validation
  * @functionality
  * - Tests prompt key validation format

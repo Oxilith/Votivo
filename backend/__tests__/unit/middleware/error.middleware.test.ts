@@ -1,5 +1,5 @@
 /**
- * @file middleware/__tests__/error.middleware.test.ts
+ * @file backend/__tests__/unit/middleware/error.middleware.test.ts
  * @purpose Unit tests for error handling middleware
  * @functionality
  * - Tests PromptServiceUnavailableError returns 503 with retry hint

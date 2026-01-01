@@ -1,5 +1,5 @@
 /**
- * @file middleware/__tests__/tracing.middleware.test.ts
+ * @file prompt-service/__tests__/unit/middleware/tracing.middleware.test.ts
  * @purpose Unit tests for W3C Trace Context middleware
  * @functionality
  * - Tests trace extraction from existing headers

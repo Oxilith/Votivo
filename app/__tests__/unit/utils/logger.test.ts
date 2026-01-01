@@ -1,6 +1,6 @@
 /**
- * @file utils/__tests__/logger.test.ts
- * @purpose Unit tests for frontend logging utility
+ * @file app/__tests__/unit/utils/logger.test.ts
+ * @purpose Unit tests for app logging utility
  * @functionality
  * - Tests log level filtering with different minLevel configs
  * - Tests each log method (debug, info, warn, error)

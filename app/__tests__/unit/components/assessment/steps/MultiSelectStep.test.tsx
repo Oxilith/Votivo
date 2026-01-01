@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/__tests__/MultiSelectStep.test.tsx
+ * @file app/__tests__/unit/components/assessment/steps/MultiSelectStep.test.tsx
  * @purpose Unit tests for MultiSelectStep component
  * @functionality
  * - Tests rendering options with labels

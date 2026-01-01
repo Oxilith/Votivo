@@ -1,5 +1,5 @@
 /**
- * @file prompt-service/src/__tests__/utils/jwt.test.ts
+ * @file prompt-service/__tests__/unit/utils/jwt.test.ts
  * @purpose Unit tests for JWT token generation and verification utilities
  * @description Tests that JWT utilities correctly:
  * - Generate access tokens with proper payload and expiry

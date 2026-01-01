@@ -1,5 +1,5 @@
 /**
- * @file services/__tests__/claude.service.test.ts
+ * @file backend/__tests__/unit/services/claude.service.test.ts
  * @purpose Unit tests for Claude service API integration
  * @functionality
  * - Tests successful analysis with valid responses

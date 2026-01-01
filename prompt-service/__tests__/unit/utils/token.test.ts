@@ -1,5 +1,5 @@
 /**
- * @file utils/__tests__/token.test.ts
+ * @file prompt-service/__tests__/unit/utils/token.test.ts
  * @purpose Unit tests for token generation utilities
  * @functionality
  * - Tests generateSecureToken produces cryptographically random tokens

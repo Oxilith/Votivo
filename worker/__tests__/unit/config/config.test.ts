@@ -1,5 +1,5 @@
 /**
- * @file src/config/__tests__/config.test.ts
+ * @file worker/__tests__/unit/config/config.test.ts
  * @purpose Unit tests for configuration loading and validation
  * @functionality
  * - Tests default development configuration values

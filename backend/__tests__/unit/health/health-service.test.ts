@@ -1,5 +1,5 @@
 /**
- * @file health/__tests__/health-service.test.ts
+ * @file backend/__tests__/unit/health/health-service.test.ts
  * @purpose Unit tests for HealthService core functionality
  * @functionality
  * - Tests check registration

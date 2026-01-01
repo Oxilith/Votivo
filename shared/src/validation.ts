@@ -6,7 +6,7 @@
  * - Exports REQUIRED_FIELDS array for completion validation
  * - Exports field categorization (array, number, string fields)
  * - Exports password validation constants and utilities
- * - Ensures backend and frontend validation stays in sync
+ * - Ensures backend and app validation stays in sync
  * @dependencies
  * - ./assessment.types for AssessmentResponses type
  */

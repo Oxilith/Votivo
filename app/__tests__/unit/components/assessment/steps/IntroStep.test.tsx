@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/__tests__/IntroStep.test.tsx
+ * @file app/__tests__/unit/components/assessment/steps/IntroStep.test.tsx
  * @purpose Unit tests for IntroStep component
  * @functionality
  * - Tests rendering of heading, subheading, description

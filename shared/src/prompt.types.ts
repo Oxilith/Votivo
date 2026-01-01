@@ -6,7 +6,7 @@
  * - Uses ThinkingConfigParam from official Anthropic SDK
  * - Defines PromptConfig interface for prompt settings
  * - Defines PromptConfigKey type for prompt identifiers
- * - Provides type safety for AI API calls across frontend and backend
+ * - Provides type safety for AI API calls across app and backend
  * @dependencies
  * - @anthropic-ai/sdk for ThinkingConfigParam type
  */

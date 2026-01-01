@@ -1,5 +1,5 @@
 /**
- * @file health/checks/__tests__/prompt-cache.check.test.ts
+ * @file backend/__tests__/unit/health/checks/prompt-cache.check.test.ts
  * @purpose Unit tests for Prompt Cache health check
  * @functionality
  * - Tests healthy response with cache statistics

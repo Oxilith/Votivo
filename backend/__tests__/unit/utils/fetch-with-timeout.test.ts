@@ -1,5 +1,5 @@
 /**
- * @file __tests__/utils/fetch-with-timeout.test.ts
+ * @file backend/__tests__/unit/utils/fetch-with-timeout.test.ts
  * @purpose Unit tests for fetchWithTimeout utility
  * @functionality
  * - Tests successful fetch operations

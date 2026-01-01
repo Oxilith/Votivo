@@ -1,5 +1,5 @@
 /**
- * @file stores/__tests__/useAssessmentStore.test.ts
+ * @file app/__tests__/unit/stores/useAssessmentStore.test.ts
  * @purpose Unit tests for assessment responses store
  * @functionality
  * - Tests initial state values

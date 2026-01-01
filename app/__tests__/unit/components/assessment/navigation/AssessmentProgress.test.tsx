@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/navigation/__tests__/AssessmentProgress.test.tsx
+ * @file app/__tests__/unit/components/assessment/navigation/AssessmentProgress.test.tsx
  * @purpose Unit tests for AssessmentProgress component
  * @functionality
  * - Tests phase title and subtitle display

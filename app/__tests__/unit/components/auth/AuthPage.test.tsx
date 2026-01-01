@@ -1,5 +1,5 @@
 /**
- * @file components/auth/__tests__/AuthPage.test.tsx
+ * @file app/__tests__/unit/components/auth/AuthPage.test.tsx
  * @purpose Unit tests for AuthPage component
  * @functionality
  * - Tests mode switching between login, register, forgot-password

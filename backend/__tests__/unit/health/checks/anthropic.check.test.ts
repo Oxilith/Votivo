@@ -1,5 +1,5 @@
 /**
- * @file health/checks/__tests__/anthropic.check.test.ts
+ * @file backend/__tests__/unit/health/checks/anthropic.check.test.ts
  * @purpose Unit tests for Anthropic health check
  * @functionality
  * - Tests healthy response when API is reachable

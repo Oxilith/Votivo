@@ -1,5 +1,5 @@
 /**
- * @file utils/__tests__/password.test.ts
+ * @file prompt-service/__tests__/unit/utils/password.test.ts
  * @purpose Unit tests for password hashing utilities
  * @functionality
  * - Tests createPasswordConfig with default and custom salt rounds

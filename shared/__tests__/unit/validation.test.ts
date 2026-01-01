@@ -1,5 +1,5 @@
 /**
- * @file shared/src/__tests__/validation.test.ts
+ * @file shared/__tests__/unit/validation.test.ts
  * @purpose Unit tests for validation constants and field metadata
  * @functionality
  * - Tests that all enum value arrays are defined and non-empty
