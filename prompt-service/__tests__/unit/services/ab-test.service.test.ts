@@ -1,20 +1,49 @@
 /**
  * @file prompt-service/__tests__/unit/services/ab-test.service.test.ts
- * @purpose Unit tests for ABTestService variant selection logic
+ * @purpose Unit tests for ABTestService CRUD and variant selection logic
  * @functionality
  * - Tests weighted random variant selection
  * - Tests edge cases (single variant, empty array)
+ * - Tests getAll, getById service methods
  * - Verifies weight distribution is statistically reasonable
  * @dependencies
  * - vitest for testing framework
+ * - Prisma client mock for database operations
  * - ABTestService for service under test
  */
 
-import { ABTestService } from '@/services';
-import type { ABVariant, ABVariantConfig } from '@votive/shared/prisma';
+import type { ABTest, ABVariant, ABVariantConfig } from '@votive/shared/prisma';
 
-// Create a test instance without database dependency
-const abTestService = new ABTestService();
+// Create mock Prisma object with hoisting
+const mockPrismaObj = vi.hoisted(() => ({
+  aBTest: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    updateMany: vi.fn(),
+    delete: vi.fn(),
+  },
+  aBVariant: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    updateMany: vi.fn(),
+    delete: vi.fn(),
+  },
+  $transaction: vi.fn(),
+  $executeRaw: vi.fn(),
+}));
+
+// Mock modules
+vi.mock('@/prisma', () => ({
+  prisma: mockPrismaObj,
+}));
+
+// Import after mocking
+import { ABTestService } from '@/services';
 
 // Helper to create mock variant
 function createMockVariant(
@@ -37,7 +66,109 @@ function createMockVariant(
   };
 }
 
+// Sample data for tests
+const sampleVariantConfig: ABVariantConfig = {
+  id: 'config-1',
+  abVariantId: 'variant-1',
+  variantType: 'withThinking',
+  temperature: 0.7,
+  maxTokens: 4000,
+  thinkingType: 'enabled',
+  budgetTokens: 10000,
+};
+
+const sampleABVariant: ABVariant & { configs: ABVariantConfig[] } = {
+  id: 'variant-1',
+  abTestId: 'ab-test-1',
+  name: 'Variant A',
+  content: 'Test variant content',
+  model: 'claude-sonnet-4-20250514',
+  weight: 0.5,
+  impressions: 100,
+  conversions: 10,
+  createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
+  configs: [sampleVariantConfig],
+};
+
+const sampleABTest: ABTest & { variants: (ABVariant & { configs: ABVariantConfig[] })[] } = {
+  id: 'ab-test-1',
+  promptId: 'prompt-1',
+  name: 'Test A/B',
+  description: 'A/B test description',
+  isActive: true,
+  startDate: new Date('2024-01-01'),
+  endDate: new Date('2024-12-31'),
+  createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
+  variants: [sampleABVariant],
+};
+
 describe('ABTestService', () => {
+  let abTestService: ABTestService;
+  const mockPrisma = mockPrismaObj;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    abTestService = new ABTestService();
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  describe('getAll', () => {
+    it('should return all A/B tests with variants', async () => {
+      mockPrisma.aBTest.findMany.mockResolvedValue([sampleABTest]);
+
+      const result = await abTestService.getAll();
+
+      expect(result).toEqual([sampleABTest]);
+      expect(mockPrisma.aBTest.findMany).toHaveBeenCalledWith({
+        include: {
+          variants: {
+            include: { configs: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    });
+
+    it('should return empty array when no A/B tests exist', async () => {
+      mockPrisma.aBTest.findMany.mockResolvedValue([]);
+
+      const result = await abTestService.getAll();
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getById', () => {
+    it('should return A/B test by ID with variants', async () => {
+      mockPrisma.aBTest.findUnique.mockResolvedValue(sampleABTest);
+
+      const result = await abTestService.getById('ab-test-1');
+
+      expect(result).toEqual(sampleABTest);
+      expect(mockPrisma.aBTest.findUnique).toHaveBeenCalledWith({
+        where: { id: 'ab-test-1' },
+        include: {
+          variants: {
+            include: { configs: true },
+          },
+        },
+      });
+    });
+
+    it('should return null for non-existent A/B test', async () => {
+      mockPrisma.aBTest.findUnique.mockResolvedValue(null);
+
+      const result = await abTestService.getById('non-existent');
+
+      expect(result).toBeNull();
+    });
+  });
+
   describe('selectVariant', () => {
     it('should throw error when variants array is empty', () => {
       expect(() => abTestService.selectVariant([])).toThrow(
