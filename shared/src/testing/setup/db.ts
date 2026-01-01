@@ -18,7 +18,7 @@
 
 /**
  * Minimal interface for Prisma-like client operations.
- * This allows the shared testing module to work without importing @prisma/client.
+ * This allows the shared testing module to work without importing the generated client directly.
  */
 export interface PrismaLikeClient {
   $connect(): Promise<void>;
@@ -39,7 +39,7 @@ let testClient: PrismaLikeClient | null = null;
  * @example
  * ```typescript
  * // prompt-service/vitest.setup.ts
- * import { PrismaClient } from '@prisma/client';
+ * import { PrismaClient } from 'shared';
  * import { setTestPrisma } from 'shared/testing';
  *
  * const prisma = new PrismaClient();

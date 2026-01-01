@@ -14,13 +14,11 @@
  * ESLint disabled rules are due to PrismaLibSql adapter not preserving full PrismaClient types.
  * See: https://github.com/prisma/prisma/issues/21365
  */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import { Scheduler } from './scheduler';
 import { tokenCleanupJob } from './jobs';
 import { logger } from './utils';
-import { prisma } from './prisma';
+import { prisma } from './prisma/client';
 
 const log = logger.child({ component: 'main' });
 

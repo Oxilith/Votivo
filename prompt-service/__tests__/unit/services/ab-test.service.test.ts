@@ -11,7 +11,7 @@
  */
 
 import { ABTestService } from '@/services';
-import type { ABVariant, ABVariantConfig } from '@prisma/client';
+import type { ABVariant, ABVariantConfig } from 'shared/prisma';
 
 // Create a test instance without database dependency
 const abTestService = new ABTestService();

@@ -71,6 +71,7 @@ PARENT_IMPORTS=$(grep -rn "from ['\"]\.\./" --include="*.ts" --include="*.tsx" \
     | grep -v "\.spec\." \
     | grep -v "__tests__" \
     | grep -v "// @allow-relative" \
+    | grep -v "shared/src/generated/prisma/" \
     || true)
 
 if [ -n "$PARENT_IMPORTS" ]; then
@@ -225,6 +226,9 @@ echo -e "${BLUE}[8/13] Checking for barrel exports (index.ts) in directories wit
 # Note: shared/src IS a library with barrel exports, not an entry point
 ENTRY_POINT_DIRS=("app/src")
 
+# Generated directories to skip (auto-generated code has its own structure)
+GENERATED_DIRS_PATTERN="shared/src/generated/prisma"
+
 # Collect directories missing barrels
 MISSING_BARRELS=""
 
@@ -245,6 +249,11 @@ for src_dir in "${SRC_DIRS[@]}"; do
                 fi
             done
             if [ "$SKIP" = true ]; then
+                continue
+            fi
+
+            # Skip generated directories (Prisma, etc.)
+            if [[ "$dir" == $GENERATED_DIRS_PATTERN* ]]; then
                 continue
             fi
 
@@ -282,6 +291,7 @@ fi
 #   - Code-splitting sensitive paths: @/stores/*, @/services/api/* (Vite chunking)
 #   - Admin pages importing from submodules (circular dependency prevention)
 #   - Bootstrap logger imports (circular dependency with config)
+#   - Test setup files importing specific routes (integration-setup needs health.routes directly)
 # ============================================================================
 echo ""
 echo -e "${BLUE}[9/13] Checking for deep imports bypassing barrels...${NC}"
@@ -300,6 +310,7 @@ DEEP_IMPORTS=$(grep -rn "from ['\"]@/[^'\"]*/[^'\"]*['\"]" --include="*.ts" --in
     | grep -v "@/services/api/" \
     | grep -v "admin/pages/.*@/admin/" \
     | grep -v "@/utils/bootstrap-logger" \
+    | grep -v "testing/integration-setup.ts" \
     || true)
 
 if [ -n "$DEEP_IMPORTS" ]; then

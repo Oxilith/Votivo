@@ -18,22 +18,19 @@
  * See: https://github.com/prisma/prisma/issues/21365
  */
  
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import express, { type Express, type ErrorRequestHandler } from 'express';
 import cookieParser from 'cookie-parser';
 import type { Test } from 'supertest';
 import request from 'supertest';
 import { apiRouter } from '@/routes';
 import { tracingMiddleware } from '@/middleware';
-import { prisma } from '@/prisma';
 import {
   cleanupTestDb,
   setTestPrisma,
   checkDatabaseAvailable,
   type PrismaLikeClient,
 } from 'shared/testing';
+import { prisma } from '@/prisma';
 
 /** Response type for register endpoint */
 interface RegisterResponse {

@@ -15,7 +15,7 @@
 
 import { promptService, abTestService, type ABTestWithVariants } from '@/services';
 import { ClaudeModel, type PromptConfig, type ClaudeModel as ClaudeModelType } from 'shared';
-import type { ABVariantConfig } from '@prisma/client';
+import type { ABVariantConfig } from 'shared/prisma';
 import { NotFoundError, ValidationError } from '@/errors';
 
 /**

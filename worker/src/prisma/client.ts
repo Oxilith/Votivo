@@ -7,7 +7,7 @@
  * - Shares database with prompt-service
  * - Provides factory function for fresh connections (avoids stale connection issues)
  * @dependencies
- * - @prisma/client for database access
+ * - shared/prisma for PrismaClient (generated types)
  * - @prisma/adapter-libsql for libsql support
  * - @/config for database configuration
  *
@@ -15,10 +15,8 @@
  * This is a known limitation when using Prisma's driver adapter pattern.
  * See: https://github.com/prisma/prisma/issues/21365
  */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'shared/prisma';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
 import { config } from '@/config';
 

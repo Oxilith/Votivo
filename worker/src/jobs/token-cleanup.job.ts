@@ -15,10 +15,6 @@
  * ESLint disabled rules are due to PrismaLibSql adapter not preserving full PrismaClient types.
  * See: https://github.com/prisma/prisma/issues/21365
  */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 
 import { createFreshPrismaClient } from '@/prisma';
 import { config } from '@/config';

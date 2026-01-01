@@ -16,16 +16,11 @@
  * ESLint disabled rules are due to PrismaLibSql adapter not preserving full PrismaClient types.
  * See: https://github.com/prisma/prisma/issues/21365
  */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/require-await */
 
 import { prisma } from '@/prisma';
-import type { Prisma, Prompt, PromptVariant, PromptVersion } from '@prisma/client';
 import { NotFoundError } from '@/errors';
 import { validatePromptContent, validatePromptKey } from '@/utils';
+import type { Prisma, Prompt, PromptVariant, PromptVersion } from 'shared/prisma';
 
 export interface PromptWithVariants extends Prompt {
   variants: PromptVariant[];

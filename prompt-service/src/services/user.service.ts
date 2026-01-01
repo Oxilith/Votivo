@@ -25,14 +25,9 @@
  * ESLint disabled rules are due to PrismaLibSql adapter not preserving full PrismaClient types.
  * See: https://github.com/prisma/prisma/issues/21365
  */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import { prisma } from '@/prisma';
-import { Prisma, type User } from '@prisma/client';
+import { TransactionIsolationLevel, type Prisma, type User } from 'shared/prisma';
 import { config } from '@/config';
 import {
   NotFoundError,
@@ -667,7 +662,7 @@ export class UserService {
       async (tx: Prisma.TransactionClient) => {
         await this.rotateTokenInTransaction(tx, userId, tokenId, newTokenId, newExpiresAt, ctx, false);
       },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+      { isolationLevel: TransactionIsolationLevel.Serializable }
     );
 
     // Generate new access token
@@ -719,7 +714,7 @@ export class UserService {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- fetchUser=true ensures non-null return
         return userData!;
       },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+      { isolationLevel: TransactionIsolationLevel.Serializable }
     );
 
     // Generate new access token

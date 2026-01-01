@@ -15,7 +15,7 @@
  * - Email service mock for email sending
  */
 
-import type { User, RefreshToken, PasswordResetToken, EmailVerifyToken, Assessment, Analysis } from '@prisma/client';
+import type { User, RefreshToken, PasswordResetToken, EmailVerifyToken, Assessment, Analysis } from 'shared/prisma';
 
 // Define the return type for verifyRefreshToken mock
 interface VerifyResult {

@@ -8,7 +8,7 @@
  * - Prevents multiple client instances in development with hot reload
  * @note Graceful shutdown is handled in index.ts via SIGTERM/SIGINT handlers
  * @dependencies
- * - @prisma/client for database access
+ * - shared/prisma for PrismaClient (generated types)
  * - @prisma/adapter-libsql for driver adapter
  * - @libsql/client for SQLCipher encrypted connections
  *
@@ -16,12 +16,8 @@
  * This is a known limitation when using Prisma's driver adapter pattern.
  * See: https://github.com/prisma/prisma/issues/21365
  */
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'shared/prisma';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
 
 /**

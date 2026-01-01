@@ -2,7 +2,7 @@
  * @file shared/src/testing/mocks/prisma.mock.ts
  * @purpose Type-safe Prisma client mock factory
  * @functionality
- * - Creates deep mock of Prisma client without importing @prisma/client
+ * - Creates deep mock of Prisma client without importing the generated client
  * - Provides type-safe model mocks for all database models
  * - Supports transaction mocking with callback execution
  * @dependencies

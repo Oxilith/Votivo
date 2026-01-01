@@ -15,7 +15,7 @@ import express, { Router, type Express } from 'express';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { analyze } from '@/controllers';
-import healthRoutes from '@/routes';
+import healthRoutes from '@/routes/health.routes';
 import { tracingMiddleware, notFoundHandler, errorHandler } from '@/middleware';
 
 /**
