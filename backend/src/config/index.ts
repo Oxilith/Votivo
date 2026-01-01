@@ -53,6 +53,12 @@ const configSchema = z.object({
     .default('true')
     .transform((val) => val === 'true'),
 
+  // E2E Testing - Mock Claude API (returns fixture data instead of real API calls)
+  mockClaudeApi: z
+    .string()
+    .default('false')
+    .transform((val) => val === 'true'),
+
   // Prompt Service
   promptServiceUrl: z.url().default('http://localhost:3002'),
 
@@ -84,6 +90,7 @@ function loadConfig(): Config {
     claudeRateLimitMaxRequests: process.env.CLAUDE_RATE_LIMIT_MAX_REQUESTS,
     logLevel: process.env.LOG_LEVEL,
     thinkingEnabled: process.env.THINKING_ENABLED,
+    mockClaudeApi: process.env.MOCK_CLAUDE_API,
     promptServiceUrl: process.env.PROMPT_SERVICE_URL,
     circuitBreakerTimeout: process.env.CIRCUIT_BREAKER_TIMEOUT,
     circuitBreakerResetTimeout: process.env.CIRCUIT_BREAKER_RESET_TIMEOUT,
