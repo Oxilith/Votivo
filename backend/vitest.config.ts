@@ -70,7 +70,12 @@ export default defineConfig({
           ],
           exclude: ['node_modules', 'dist'],
           testTimeout: 30000,
-          hookTimeout: 30000,
+          hookTimeout: 30000, 
+          
+          // Run integration tests sequentially to avoid SQLite database locking
+          // Use single-threaded mode for database access
+          maxConcurrency: 1,
+          fileParallelism: false,
         },
       },
     ],

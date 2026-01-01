@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install --include=optional --no-audit
@@ -55,6 +56,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install --include=optional --no-audit
@@ -75,7 +77,8 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./app/coverage/lcov.info,./backend/coverage/lcov.info,./prompt-service/coverage/lcov.info,./shared/coverage/lcov.info,./worker/coverage/lcov.info
+          directory: ./
+          files: '**/coverage/lcov.info'
           fail_ci_if_error: false
           verbose: true
 
@@ -91,6 +94,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install --include=optional --no-audit

@@ -226,11 +226,11 @@ describe('JWT Protection Integration Tests', () => {
         .get(`/api/user-auth/assessment/${assessmentId}`)
         .set('Authorization', `Bearer ${token2}`);
 
-      // Cross-user access prevention:
-      // - 404: Assessment not found for this user (ownership check filters it out)
-      // - 403: Explicit forbidden if authorization check runs before ownership filter
-      // Both are valid security responses that prevent data leakage
-      expect([403, 404]).toContain(response.status);
+      // Ownership filter in database query returns null for wrong user's data.
+      // Controller maps null to 404 "not found" - this is intentional as it
+      // doesn't leak information about resource existence (preferred over 403).
+      expect(response.status).toBe(404);
+      expect(response.body.error).toMatch(/not found/i);
     });
   });
 });

@@ -25,7 +25,7 @@ describe('Rate Limiting Integration Tests', () => {
 
   beforeAll(async () => {
     // Set real rate limits with a short window for fast testing
-    process.env['RATE_LIMIT_WINDOW_MS'] = '5000'; // 5 second window
+    process.env['RATE_LIMIT_WINDOW_MS'] = '1000'; // 1 second window
     process.env['RATE_LIMIT_LOGIN'] = '2';
     process.env['RATE_LIMIT_REGISTER'] = '2';
     process.env['RATE_LIMIT_PASSWORD_RESET'] = '2';

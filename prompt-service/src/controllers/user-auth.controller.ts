@@ -364,8 +364,8 @@ export class UserAuthController {
       const sent = await userService.resendEmailVerification(userId, ctx);
 
       if (!sent) {
-        res.json({
-          message: 'Email is already verified.',
+        res.status(StatusCodes.BAD_REQUEST).json({
+          error: 'Email is already verified.',
         });
         return;
       }

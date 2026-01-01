@@ -19,6 +19,7 @@ import {
   extractCsrfToken,
   integrationTestHooks,
   MOCK_PASSWORD,
+  prisma,
   registerTestUser,
 } from '@/testing';
 
@@ -402,11 +403,35 @@ describe('Auth Flow Integration Tests', () => {
       expect(response.status).toBe(403);
     });
 
-    it('should accept request with valid JWT and CSRF token', async () => {
+    it('should send verification email for unverified user', async () => {
       const { accessToken, csrfToken } = await registerTestUser(app, {
         email: 'resendverify@example.com',
         password: MOCK_PASSWORD,
         name: 'Resend Verify Test',
+      });
+      // Fresh user is unverified by default
+
+      const response = await request(app)
+        .post('/api/user-auth/resend-verification')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('x-csrf-token', csrfToken || '')
+        .set('Cookie', `csrf-token=${csrfToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.message).toMatch(/verification email/i);
+    });
+
+    it('should return 400 for already verified user', async () => {
+      const { accessToken, csrfToken, user } = await registerTestUser(app, {
+        email: 'alreadyverified@example.com',
+        password: MOCK_PASSWORD,
+        name: 'Already Verified User',
+      });
+
+      // Manually verify the user in database
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: true },
       });
 
       const response = await request(app)
@@ -415,12 +440,12 @@ describe('Auth Flow Integration Tests', () => {
         .set('x-csrf-token', csrfToken || '')
         .set('Cookie', `csrf-token=${csrfToken}`);
 
-      // Valid responses based on user state:
-      // 200 = success (email sent)
-      // 400 = already verified (no email needed)
-      // 429 = rate limited (too many requests)
-      // Note: 500 is NOT acceptable - indicates misconfiguration or bug
-      expect([200, 400, 429]).toContain(response.status);
+      expect(response.status).toBe(400);
+      expect(response.body.error).toMatch(/already verified/i);
     });
+
+    // Note: Rate limiting (429) is tested in rate-limiting.flow.test.ts
+    // which has proper setup for real rate limits (vitest.setup.ts disables
+    // rate limiting with 10000 req/min for regular tests)
   });
 });
