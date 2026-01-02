@@ -30,13 +30,30 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-// Mock DateBadge
+// Mock components
 vi.mock('@/components', () => ({
   DateBadge: ({ date }: { date: string }) => (
     <span data-testid="date-badge">{date}</span>
   ),
   DownloadIcon: ({ size }: { size: string }) => (
     <span data-testid={`download-icon-${size}`}>↓</span>
+  ),
+  ExportDropdown: ({ onExportAssessment, onExportAnalysis }: {
+    onExportAssessment?: () => void;
+    onExportAnalysis?: () => void;
+  }) => (
+    <div data-testid="export-dropdown">
+      {onExportAnalysis && (
+        <button data-testid="export-analysis-btn" onClick={onExportAnalysis}>
+          Export Insights
+        </button>
+      )}
+      {onExportAssessment && (
+        <button data-testid="export-assessment-btn" onClick={onExportAssessment}>
+          Export Assessment
+        </button>
+      )}
+    </div>
   ),
 }));
 
@@ -50,22 +67,29 @@ describe('InsightsPageHeader', () => {
   });
 
   describe('rendering', () => {
-    it('should render view only badge', () => {
-      render(<InsightsPageHeader createdAt="2024-01-15T10:30:00Z" />);
+    it('should render view only badge when isReadOnly', () => {
+      render(<InsightsPageHeader isReadOnly createdAt="2024-01-15T10:30:00Z" />);
 
       expect(screen.getByText('View Only')).toBeInTheDocument();
     });
 
-    it('should render saved analysis title', () => {
-      render(<InsightsPageHeader createdAt="2024-01-15T10:30:00Z" />);
+    it('should render saved analysis title when isReadOnly', () => {
+      render(<InsightsPageHeader isReadOnly createdAt="2024-01-15T10:30:00Z" />);
 
       expect(screen.getByText('Saved Analysis')).toBeInTheDocument();
     });
 
-    it('should render date badge with createdAt', () => {
-      render(<InsightsPageHeader createdAt="2024-01-15T10:30:00Z" />);
+    it('should render date badge with createdAt when isReadOnly', () => {
+      render(<InsightsPageHeader isReadOnly createdAt="2024-01-15T10:30:00Z" />);
 
       expect(screen.getByTestId('date-badge')).toHaveTextContent('2024-01-15T10:30:00Z');
+    });
+
+    it('should not render badges when not in readonly mode', () => {
+      render(<InsightsPageHeader createdAt="2024-01-15T10:30:00Z" />);
+
+      expect(screen.queryByText('View Only')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('date-badge')).not.toBeInTheDocument();
     });
   });
 

@@ -102,8 +102,17 @@ test.describe('Assessment Editing', () => {
     const countAfterFirst = await profilePage.getAssessmentCount();
     expect(countAfterFirst).toBe(initialCount + 1);
 
-    // Complete another assessment
+    // Use Retake button to start a new assessment (clears store and starts fresh)
     await assessmentPage.navigate();
+    // After completing, we should be redirected to insights, go back to assessment
+    // The assessment page should show the completed assessment with Retake button
+    await authenticatedPage.waitForSelector('[data-testid="assessment-btn-retake"]', {
+      state: 'visible',
+      timeout: 10000,
+    });
+    await assessmentPage.clickRetake();
+
+    // Complete another assessment
     await assessmentPage.completeFullAssessment();
     await authenticatedPage.waitForURL('**/insights', { timeout: 10000 });
 
@@ -141,7 +150,7 @@ test.describe('Assessment Editing', () => {
 });
 
 test.describe('Assessment Editing - Authenticated User', () => {
-  test('should track dirty state when editing after save', async ({
+  test('should allow starting new assessment via Retake after completion', async ({
     authenticatedPage,
   }) => {
     const assessmentPage = new AssessmentPage(authenticatedPage);
@@ -157,19 +166,16 @@ test.describe('Assessment Editing - Authenticated User', () => {
     const count = await profilePage.getAssessmentCount();
     expect(count).toBeGreaterThan(0);
 
-    // Start a new assessment (this should create dirty state)
+    // Navigate back to assessment - should be in readonly mode with Retake button
     await assessmentPage.navigate();
-    await assessmentPage.startAssessment();
-    await assessmentPage.selectMultipleOptions([0]);
 
-    // Navigate to insights - should see dirty warning (if applicable)
-    await authenticatedPage.goto('/insights');
-    await authenticatedPage.waitForLoadState('domcontentloaded');
+    // Wait for retake button (indicates readonly completed assessment)
+    const retakeVisible = await authenticatedPage
+      .locator('[data-testid="assessment-btn-retake"]')
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
 
-    // The insights page should show something (either ready state or dirty warning)
-    const pageVisible = await authenticatedPage
-      .locator('[data-testid="insights-page"]')
-      .isVisible({ timeout: 5000 });
-    expect(pageVisible).toBe(true);
+    // Retake button should be visible since assessment is completed
+    expect(retakeVisible).toBe(true);
   });
 });

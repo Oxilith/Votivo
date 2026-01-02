@@ -23,7 +23,10 @@ const FooterSection: FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="py-10 px-6 lg:px-10 border-t border-[var(--border)]">
+    <footer
+      data-testid="footer-section"
+      className="py-10 px-6 lg:px-10 border-t border-[var(--border)]"
+    >
       <div className="flex items-center justify-between max-w-[1200px] mx-auto">
         {/* Logo and Brand - Left */}
         <div className="flex items-center gap-2">

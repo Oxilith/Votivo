@@ -66,9 +66,12 @@ vi.mock('@/stores/useAuthStore', () => ({
   useCurrentUser: () => mockUser,
 }));
 
+const mockResetUIState = vi.fn();
+
 vi.mock('@/stores/useUIStore', () => ({
   useUIStore: () => ({
     setView: mockSetView,
+    resetUIState: mockResetUIState,
   }),
 }));
 

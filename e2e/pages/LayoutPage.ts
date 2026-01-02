@@ -34,6 +34,9 @@ export class LayoutPage extends BasePage {
   readonly navBtnSignIn = '[data-testid="nav-btn-signin"]';
   readonly userAvatarDropdown = '[data-testid="user-avatar-dropdown"]';
 
+  // Landing page navigation (anchor links to sections)
+  readonly landingNavLinks = '.nav-link';
+
   // Theme and Language selectors
   readonly themeToggle = '[data-testid="theme-toggle"]';
   readonly languageToggle = '[data-testid="language-toggle"]';
@@ -42,6 +45,9 @@ export class LayoutPage extends BasePage {
 
   // Footer selector (text-based fallback if no data-testid)
   readonly footer = 'footer, [data-testid="footer-section"]';
+
+  // Decorative element selector
+  readonly inkBrushDecoration = '[data-testid="ink-brush-decoration"]';
 
   // Mobile menu selectors
   readonly mobileMenuButton = '[data-testid="mobile-menu-btn"], button[aria-label*="menu" i]';
@@ -86,9 +92,18 @@ export class LayoutPage extends BasePage {
 
   /**
    * Check if navigation links are visible
+   * For landing page: checks for anchor links (Philosophy, Journey, Insights) - actual visibility, not just in DOM
+   * For other pages: checks for route links (Assessment, Insights)
    */
   async areNavLinksVisible(): Promise<boolean> {
     try {
+      // On landing page, check for anchor links (class="nav-link")
+      // Must check actual visibility since they're hidden on mobile via CSS
+      if (this.isOnLandingPage()) {
+        const navLink = this.page.locator(this.landingNavLinks).first();
+        return await navLink.isVisible({ timeout: 3000 });
+      }
+      // On other pages, check for route links
       const assessment = await this.page.locator(this.navLinkAssessment).isVisible({ timeout: 3000 });
       const insights = await this.page.locator(this.navLinkInsights).isVisible({ timeout: 3000 });
       return assessment && insights;
@@ -117,6 +132,49 @@ export class LayoutPage extends BasePage {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Check if InkBrushDecoration is visible (only on desktop/large screens)
+   */
+  async isInkBrushDecorationVisible(): Promise<boolean> {
+    try {
+      return await this.page.locator(this.inkBrushDecoration).isVisible({ timeout: 3000 });
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Validate common layout elements on a page
+   * @param options.hasFooter - Whether footer should be present (false for auth pages)
+   * @param options.hasDecoration - Whether InkBrushDecoration should be visible (desktop only)
+   */
+  async validateCommonLayout(options: { hasFooter?: boolean; hasDecoration?: boolean } = {}): Promise<{
+    header: boolean;
+    footer: boolean;
+    themeToggle: boolean;
+    languageToggle: boolean;
+    inkBrushDecoration: boolean;
+  }> {
+    const { hasFooter = true, hasDecoration = true } = options;
+
+    const header = await this.isHeaderVisible();
+    const themeToggle = await this.isThemeToggleVisible();
+    const languageToggle = await this.isLanguageToggleVisible();
+
+    let footer = false;
+    if (hasFooter) {
+      await this.scrollToBottom();
+      footer = await this.isFooterVisible();
+    }
+
+    let inkBrushDecoration = false;
+    if (hasDecoration) {
+      inkBrushDecoration = await this.isInkBrushDecorationVisible();
+    }
+
+    return { header, footer, themeToggle, languageToggle, inkBrushDecoration };
   }
 
   /**

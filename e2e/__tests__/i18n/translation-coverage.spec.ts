@@ -38,6 +38,7 @@ const FALSE_POSITIVES = [
   '.css',
   'i18n.',
   'node.',
+  '.local', // For test email domains like test.votive.local
 ];
 
 /**

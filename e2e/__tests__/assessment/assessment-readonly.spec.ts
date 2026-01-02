@@ -33,6 +33,12 @@ test.describe('Assessment Readonly Mode', () => {
     await profilePage.navigate();
     await profilePage.viewAssessment(0);
 
+    // Wait for synthesis step to be visible (readonly mode loads synthesis directly)
+    await authenticatedPage.waitForSelector('[data-testid="synthesis-step"]', {
+      state: 'visible',
+      timeout: 10000,
+    });
+
     // Should be in readonly mode (synthesis visible, progress hidden)
     const isReadonly = await assessmentPage.isReadOnlyMode();
     expect(isReadonly).toBe(true);
@@ -65,6 +71,12 @@ test.describe('Assessment Readonly Mode', () => {
     // Navigate to profile and view the saved assessment
     await profilePage.navigate();
     await profilePage.viewAssessment(0);
+
+    // Wait for synthesis step to be visible
+    await authenticatedPage.waitForSelector('[data-testid="synthesis-step"]', {
+      state: 'visible',
+      timeout: 10000,
+    });
 
     // Progress header should be hidden
     const hasProgressHeader = await assessmentPage.hasProgressHeader();
@@ -114,6 +126,12 @@ test.describe('Assessment Readonly Mode', () => {
     // Navigate to profile and view the saved assessment
     await profilePage.navigate();
     await profilePage.viewAssessment(0);
+
+    // Wait for synthesis step to be visible
+    await authenticatedPage.waitForSelector('[data-testid="synthesis-step"]', {
+      state: 'visible',
+      timeout: 10000,
+    });
 
     // Page header should be visible
     const hasPageHeader = await assessmentPage.hasPageHeader();

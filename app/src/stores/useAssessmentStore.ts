@@ -8,7 +8,7 @@
  * - Computes completion status and percentage
  * - Persists to localStorage for session recovery
  * - Clears analysis results when responses change (invalidates stale analysis)
- * - Tracks dirty state (unsaved changes) via lastSavedAt comparison
+ * - Tracks completion state via savedAt (null = uncompleted/editable, non-null = completed and readonly)
  * @dependencies
  * - zustand (create, persist, createJSONStorage)
  * - @/types/assessment.types (AssessmentResponses)
@@ -25,8 +25,10 @@ import { useAnalysisStore } from '@/stores';
 interface AssessmentState {
   // State
   responses: Partial<AssessmentResponses>;
-  lastUpdated: string | null;
-  lastSavedAt: string | null;
+  /** When assessment was saved (completed). Null = uncompleted, non-null = completed/readonly */
+  savedAt: string | null;
+  lastReachedPhase: number;
+  lastReachedStep: number;
 
   // Actions
   updateResponse: <K extends keyof AssessmentResponses>(
@@ -35,13 +37,20 @@ interface AssessmentState {
   ) => void;
   setResponses: (responses: Partial<AssessmentResponses>) => void;
   clearResponses: () => void;
-  setLastSavedAt: (timestamp: string) => void;
+  /** Mark assessment as saved/completed with timestamp */
+  setSavedAt: (timestamp: string) => void;
+  updateLastReached: (phase: number, step: number) => void;
+  /**
+   * Hydrate responses from database.
+   * Sets responses and savedAt for completed assessments loaded from DB.
+   */
+  hydrateFromDB: (responses: Partial<AssessmentResponses>, savedAt: string) => void;
 
   // Computed
   isComplete: () => boolean;
   getCompletionPercentage: () => number;
   getResponses: () => Partial<AssessmentResponses>;
-  isDirty: () => boolean;
+  hasResponsesInStore: () => boolean;
 }
 
 export const useAssessmentStore = create<AssessmentState>()(
@@ -49,8 +58,9 @@ export const useAssessmentStore = create<AssessmentState>()(
     (set, get) => ({
       // Initial state
       responses: {},
-      lastUpdated: null,
-      lastSavedAt: null,
+      savedAt: null,
+      lastReachedPhase: 0,
+      lastReachedStep: 0,
 
       // Actions
       updateResponse: (key, value) => {
@@ -61,29 +71,45 @@ export const useAssessmentStore = create<AssessmentState>()(
             ...state.responses,
             [key]: value,
           },
-          lastUpdated: new Date().toISOString(),
         }));
       },
 
       setResponses: (responses) => {
         // Clear analysis when responses change (stale data)
         useAnalysisStore.getState().clearAnalysis();
-        set({
-          responses,
-          lastUpdated: new Date().toISOString(),
-        });
+        set({ responses });
       },
 
       clearResponses: () => {
         set({
           responses: {},
-          lastUpdated: null,
-          lastSavedAt: null,
+          savedAt: null,
+          lastReachedPhase: 0,
+          lastReachedStep: 0,
         });
       },
 
-      setLastSavedAt: (timestamp: string) => {
-        set({ lastSavedAt: timestamp });
+      setSavedAt: (timestamp: string) => {
+        set({ savedAt: timestamp });
+      },
+
+      hydrateFromDB: (responses: Partial<AssessmentResponses>, savedAt: string) => {
+        // Load saved assessment from database
+        set({
+          responses,
+          savedAt,
+        });
+      },
+
+      updateLastReached: (phase: number, step: number) => {
+        const { lastReachedPhase, lastReachedStep } = get();
+        // Only update if the new position is further than current
+        const isNewPositionFurther =
+          phase > lastReachedPhase ||
+          (phase === lastReachedPhase && step > lastReachedStep);
+        if (isNewPositionFurther) {
+          set({ lastReachedPhase: phase, lastReachedStep: step });
+        }
       },
 
       // Computed
@@ -112,14 +138,9 @@ export const useAssessmentStore = create<AssessmentState>()(
 
       getResponses: () => get().responses,
 
-      isDirty: () => {
-        const { lastUpdated, lastSavedAt } = get();
-        // No changes if nothing has been updated
-        if (!lastUpdated) return false;
-        // If never saved, any update means dirty
-        if (!lastSavedAt) return true;
-        // Compare timestamps - dirty if updated after last save
-        return new Date(lastUpdated) > new Date(lastSavedAt);
+      hasResponsesInStore: () => {
+        const { responses } = get();
+        return Object.keys(responses).length > 0;
       },
     }),
     {
@@ -127,8 +148,9 @@ export const useAssessmentStore = create<AssessmentState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         responses: state.responses,
-        lastUpdated: state.lastUpdated,
-        lastSavedAt: state.lastSavedAt,
+        savedAt: state.savedAt,
+        lastReachedPhase: state.lastReachedPhase,
+        lastReachedStep: state.lastReachedStep,
       }),
     }
   )

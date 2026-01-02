@@ -1,10 +1,11 @@
 /**
  * @file e2e/__tests__/insights/insights-navigation.spec.ts
- * @purpose E2E tests for insights page navigation
+ * @purpose E2E tests for insights page navigation (requires authentication)
  * @functionality
- * - Tests direct URL access to /insights
- * - Tests accessing specific analysis by ID
+ * - Tests redirect to auth when accessing insights unauthenticated
+ * - Tests authenticated access to /insights
  * - Tests no assessment message display
+ * - Tests accessing specific analysis by ID
  * @dependencies
  * - Custom test fixtures from fixtures/test
  * - InsightsPage, AssessmentPage, and ProfilePage page objects
@@ -13,25 +14,55 @@
 import { test, expect } from '../../fixtures';
 import { AssessmentPage, InsightsPage, ProfilePage } from '../../pages';
 
-test.describe('Insights Navigation', () => {
-  test('should access insights page via direct URL', async ({ insightsPage }) => {
+test.describe('Insights Navigation - Unauthenticated', () => {
+  test('should redirect to auth when accessing insights without login', async ({
+    page,
+    insightsPage,
+  }) => {
+    // Clear localStorage to ensure clean state
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.clear();
+    });
+
+    // Try to navigate to insights
     await insightsPage.navigate();
 
-    // Page should load
-    const pageVisible = await insightsPage.page
+    // Should redirect to sign-in page
+    await page.waitForURL('**/sign-in', { timeout: 10000 });
+    expect(page.url()).toContain('/sign-in');
+  });
+});
+
+test.describe('Insights Navigation - Authenticated', () => {
+  test('should access insights page via direct URL', async ({ authenticatedPage }) => {
+    const insightsPage = new InsightsPage(authenticatedPage);
+    await insightsPage.navigate();
+
+    // Page should load (either insights page or no-assessment state)
+    const pageVisible = await authenticatedPage
       .locator(insightsPage.insightsPage)
       .isVisible({ timeout: 5000 });
     expect(pageVisible).toBe(true);
   });
 
   test('should show no assessment message when no assessment data', async ({
-    page,
-    insightsPage,
+    authenticatedPage,
   }) => {
-    // Clear localStorage to ensure no assessment data
-    await page.goto('/');
-    await page.evaluate(() => {
-      localStorage.clear();
+    const insightsPage = new InsightsPage(authenticatedPage);
+
+    // Fresh authenticated user has no assessments in DB
+    // Clear only assessment storage, preserve auth tokens
+    await authenticatedPage.goto('/');
+
+    // Wait for auth hydration to complete (user avatar appears when logged in)
+    await authenticatedPage.waitForSelector('[data-testid="user-avatar-dropdown"]', {
+      state: 'visible',
+      timeout: 10000,
+    });
+
+    await authenticatedPage.evaluate(() => {
+      localStorage.removeItem('assessment-storage');
     });
 
     // Navigate to insights
@@ -43,29 +74,39 @@ test.describe('Insights Navigation', () => {
   });
 
   test('should show ready state when assessment data exists but no analysis', async ({
-    assessmentPage,
-    insightsPage,
+    authenticatedPage,
   }) => {
+    const assessmentPage = new AssessmentPage(authenticatedPage);
+    const insightsPage = new InsightsPage(authenticatedPage);
+
     // Complete assessment to populate data
     await assessmentPage.navigate();
     await assessmentPage.completeFullAssessment();
 
     // Should be on insights in ready state
-    expect(insightsPage.page.url()).toContain('/insights');
+    await authenticatedPage.waitForURL('**/insights', { timeout: 10000 });
+
+    // Wait for page content to load before checking state
+    await insightsPage.waitForPageReady();
 
     const isReady = await insightsPage.isReadyState();
     expect(isReady).toBe(true);
   });
 
   test('should navigate to insights from assessment completion', async ({
-    assessmentPage,
-    insightsPage,
+    authenticatedPage,
   }) => {
+    const assessmentPage = new AssessmentPage(authenticatedPage);
+    const insightsPage = new InsightsPage(authenticatedPage);
+
     await assessmentPage.navigate();
     await assessmentPage.completeFullAssessment();
 
     // Should redirect to insights
-    expect(insightsPage.page.url()).toContain('/insights');
+    await authenticatedPage.waitForURL('**/insights', { timeout: 10000 });
+
+    // Wait for page content to load before checking state
+    await insightsPage.waitForPageReady();
 
     // Ready state should be visible
     const isReady = await insightsPage.isReadyState();
@@ -112,6 +153,9 @@ test.describe('Insights Navigation - Authenticated User', () => {
     await assessmentPage.completeFullAssessment();
     await authenticatedPage.waitForURL('**/insights', { timeout: 10000 });
 
+    // Wait for page content to load
+    await insightsPage.waitForPageReady();
+
     // Insights page should be visible
     const pageVisible = await authenticatedPage
       .locator(insightsPage.insightsPage)
@@ -140,9 +184,9 @@ test.describe('Insights Navigation - Authenticated User', () => {
         .isVisible({ timeout: 3000 })
         .catch(() => false);
 
-      // Either button is visible or we're in dirty state
-      const hasDirtyWarning = await insightsPage.hasDirtyWarning();
-      expect(analyzeVisible || hasDirtyWarning).toBe(true);
+      // Either analyze button is visible or we see an incomplete assessment warning
+      const hasIncompleteWarning = await insightsPage.hasIncompleteWarning();
+      expect(analyzeVisible || hasIncompleteWarning).toBe(true);
     }
   });
 });

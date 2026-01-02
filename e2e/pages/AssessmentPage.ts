@@ -35,7 +35,7 @@ export class AssessmentPage extends BasePage {
   readonly nextButton = 'button:has-text("Next"), button:has-text("Continue")';
   readonly backButton = 'button:has-text("Back"), button:has-text("Previous")';
   readonly beginButton = 'button:has-text("Begin"), button:has-text("Start")';
-  readonly completeButton = 'button:has-text("Complete"), button:has-text("Finish")';
+  readonly completeButton = '[data-testid="assessment-complete-button"]';
 
   // Progress indicators
   readonly progressBar = '[role="progressbar"]';
@@ -63,6 +63,19 @@ export class AssessmentPage extends BasePage {
   readonly viewOnlyBadge = '[data-testid="view-only-badge"]';
   readonly progressHeader = '[data-testid="assessment-progress"]';
   readonly pageHeader = '[data-testid="page-header"]';
+
+  // Unified header selectors
+  readonly assessmentHeader = '[data-testid="assessment-header"]';
+  readonly skipToLastButton = '[data-testid="assessment-btn-skip-to-last"]';
+  readonly retakeButton = '[data-testid="assessment-btn-retake"]';
+  readonly importButton = '[data-testid="import-btn-assessment"]';
+  readonly exportButton = '[data-testid="export-btn-assessment"]';
+
+  // SavePromptModal selectors (shown at synthesis for unauthenticated users)
+  readonly savePromptModal = '[data-testid="save-prompt-modal"]';
+  readonly savePromptDismiss = '[data-testid="save-prompt-dismiss"]';
+  readonly savePromptSignIn = '[data-testid="save-prompt-sign-in"]';
+  readonly savePromptCreateAccount = '[data-testid="save-prompt-create-account"]';
 
   /**
    * Navigate to the assessment page
@@ -158,6 +171,8 @@ export class AssessmentPage extends BasePage {
    * Complete the assessment at the synthesis step
    */
   async clickComplete(): Promise<void> {
+    // Wait for complete button to be visible before clicking
+    await this.page.waitForSelector(this.completeButton, { state: 'visible', timeout: 10000 });
     await this.page.click(this.completeButton);
     await this.waitForNavigation();
   }
@@ -367,13 +382,13 @@ export class AssessmentPage extends BasePage {
   }
 
   /**
-   * Check if page header is visible (shown in readonly mode)
+   * Check if page header is visible (now using unified assessment header)
    *
-   * @returns True if page header is visible
+   * @returns True if assessment header is visible
    */
   async hasPageHeader(): Promise<boolean> {
     return await this.page
-      .locator(this.pageHeader)
+      .locator(this.assessmentHeader)
       .isVisible({ timeout: 3000 })
       .catch(() => false);
   }
@@ -397,5 +412,105 @@ export class AssessmentPage extends BasePage {
    */
   async viewAssessment(assessmentId: string): Promise<void> {
     await this.goto(`/assessment/${assessmentId}`);
+  }
+
+  /**
+   * Click the Skip to Last button in the header
+   */
+  async clickSkipToLast(): Promise<void> {
+    await this.page.click(this.skipToLastButton);
+    await this.page.waitForTimeout(300);
+  }
+
+  /**
+   * Click the Retake button in the header (only visible for readonly assessments)
+   */
+  async clickRetake(): Promise<void> {
+    await this.page.click(this.retakeButton);
+    await this.page.waitForTimeout(300);
+  }
+
+  /**
+   * Check if the Skip to Last button is enabled
+   *
+   * @returns True if button is enabled
+   */
+  async isSkipToLastEnabled(): Promise<boolean> {
+    return !(await this.page.locator(this.skipToLastButton).isDisabled());
+  }
+
+  /**
+   * Check if the unified assessment header is visible
+   *
+   * @returns True if header is visible
+   */
+  async hasAssessmentHeader(): Promise<boolean> {
+    return await this.page
+      .locator(this.assessmentHeader)
+      .isVisible({ timeout: 3000 })
+      .catch(() => false);
+  }
+
+  /**
+   * Check if the Retake button is visible
+   *
+   * @returns True if button is visible
+   */
+  async isRetakeButtonVisible(): Promise<boolean> {
+    return await this.page
+      .locator(this.retakeButton)
+      .isVisible({ timeout: 3000 })
+      .catch(() => false);
+  }
+
+  /**
+   * Check if the Import button is visible
+   *
+   * @returns True if button is visible
+   */
+  async isImportButtonVisible(): Promise<boolean> {
+    return await this.page
+      .locator(this.importButton)
+      .isVisible({ timeout: 3000 })
+      .catch(() => false);
+  }
+
+  /**
+   * Check if the SavePromptModal is visible
+   *
+   * @returns True if modal is visible
+   */
+  async isSavePromptModalVisible(): Promise<boolean> {
+    return await this.page
+      .locator(this.savePromptModal)
+      .isVisible({ timeout: 2000 })
+      .catch(() => false);
+  }
+
+  /**
+   * Dismiss the SavePromptModal if visible
+   */
+  async dismissSavePromptModal(): Promise<void> {
+    const modal = this.page.locator(this.savePromptModal);
+    if (await modal.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await this.page.click(this.savePromptDismiss);
+      await this.page.waitForTimeout(300);
+    }
+  }
+
+  /**
+   * Click "Sign In" button on SavePromptModal
+   */
+  async clickSavePromptSignIn(): Promise<void> {
+    await this.page.click(this.savePromptSignIn);
+    await this.waitForNavigation();
+  }
+
+  /**
+   * Click "Create Account" button on SavePromptModal
+   */
+  async clickSavePromptCreateAccount(): Promise<void> {
+    await this.page.click(this.savePromptCreateAccount);
+    await this.waitForNavigation();
   }
 }

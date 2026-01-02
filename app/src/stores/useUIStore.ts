@@ -25,6 +25,7 @@ interface UIState {
   assessmentKey: number;
   hasReachedSynthesis: boolean;
   pendingAuthReturn: AppView | null; // Where to redirect after successful auth
+  pendingAssessmentSave: boolean; // Whether to save assessment after auth (for complete flow)
 
   // Read-only view state (for viewing saved assessments/analyses by ID)
   isReadOnly: boolean;
@@ -46,10 +47,14 @@ interface UIState {
   setStartAtSynthesis: (value: boolean) => void;
   setHasReachedSynthesis: (value: boolean) => void;
   setPendingAuthReturn: (view: AppView | null) => void;
+  setPendingAssessmentSave: (value: boolean) => void;
 
   // Read-only mode actions
   setReadOnlyMode: (resourceId: string, assessmentId?: string) => void;
   clearReadOnlyMode: () => void;
+
+  // Reset action for logout
+  resetUIState: () => void;
 
   // Loading/Error actions
   setLoading: (loading: boolean) => void;
@@ -70,6 +75,7 @@ export const useUIStore = create<UIState>()((set) => ({
   assessmentKey: 0,
   hasReachedSynthesis: false,
   pendingAuthReturn: null,
+  pendingAssessmentSave: false,
   isReadOnly: false,
   viewingResourceId: null,
   viewingAssessmentId: null,
@@ -111,6 +117,8 @@ export const useUIStore = create<UIState>()((set) => ({
 
   setPendingAuthReturn: (view) => { set({ pendingAuthReturn: view }); },
 
+  setPendingAssessmentSave: (value) => { set({ pendingAssessmentSave: value }); },
+
   // Read-only mode actions
   setReadOnlyMode: (resourceId, assessmentId) =>
     { set({
@@ -124,6 +132,24 @@ export const useUIStore = create<UIState>()((set) => ({
       isReadOnly: false,
       viewingResourceId: null,
       viewingAssessmentId: null,
+    }); },
+
+  // Reset all UI state for logout
+  resetUIState: () =>
+    { set({
+      currentView: 'landing',
+      currentPhase: 0,
+      currentStep: 0,
+      startAtSynthesis: false,
+      assessmentKey: 0,
+      hasReachedSynthesis: false,
+      pendingAuthReturn: null,
+      pendingAssessmentSave: false,
+      isReadOnly: false,
+      viewingResourceId: null,
+      viewingAssessmentId: null,
+      isLoading: false,
+      error: null,
     }); },
 
   // Loading/Error actions

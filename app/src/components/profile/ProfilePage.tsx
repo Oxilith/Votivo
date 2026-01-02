@@ -70,7 +70,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   const { t, i18n } = useTranslation(['profile', 'auth']);
   const user = useCurrentUser();
   const { clearAuth, setUser } = useAuthStore();
-  const { setView } = useUIStore();
+  const { setView, resetUIState } = useUIStore();
   const { clearResponses } = useAssessmentStore();
   const { clearAnalysis } = useAnalysisStore();
 
@@ -198,9 +198,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       clearResponses();
       clearAnalysis();
       clearAuth();
+      resetUIState();
       setView('landing');
     }
-  }, [clearResponses, clearAnalysis, clearAuth, setView]);
+  }, [clearResponses, clearAnalysis, clearAuth, resetUIState, setView]);
 
   const handleLogout = useCallback(() => {
     void handleLogoutAsync();

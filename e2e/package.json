@@ -8,6 +8,8 @@
     "e2e:headed": "playwright test --headed",
     "e2e:debug": "playwright test --debug",
     "e2e:ui": "playwright test --ui",
+    "e2e:failed": "playwright test --last-failed",
+    "e2e:grep": "playwright test --grep",
     "report": "playwright show-report",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

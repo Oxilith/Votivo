@@ -5,6 +5,7 @@
  * - Initializes i18next with language resources split by feature area
  * - Configures language detection and fallback behavior
  * - Sets up localStorage persistence for language preference
+ * - Updates HTML lang attribute on language change for accessibility
  * - Exports initialized i18n instance
  * @dependencies
  * - i18next
@@ -80,5 +81,15 @@ void i18n
       caches: ['localStorage'],
     },
   });
+
+// Update HTML lang attribute when language changes (for accessibility and E2E tests)
+i18n.on('languageChanged', (lng: string) => {
+  document.documentElement.lang = lng;
+});
+
+// Set initial lang attribute
+if (i18n.language) {
+  document.documentElement.lang = i18n.language;
+}
 
 export default i18n;

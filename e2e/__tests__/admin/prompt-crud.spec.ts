@@ -59,6 +59,9 @@ test.describe('Prompt CRUD Operations', () => {
     test('should display create prompt form with all fields', async ({ adminPage }) => {
       await adminPage.navigateToCreatePrompt();
 
+      // Wait for form to fully render before checking fields
+      await adminPage.page.waitForSelector(adminPage.promptKeyInput, { state: 'visible', timeout: 5000 });
+
       // Check all form fields are visible
       expect(await adminPage.page.locator(adminPage.promptKeyInput).isVisible()).toBe(true);
       expect(await adminPage.page.locator(adminPage.promptNameInput).isVisible()).toBe(true);

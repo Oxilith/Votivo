@@ -227,7 +227,10 @@
     "back": "← Back",
     "continue": "Continue →",
     "complete": "Complete Assessment & View AI Insights",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "skipToLast": "Skip to Last",
+    "retakeAssessment": "Retake",
+    "import": "Import"
   },
   "validation": {
     "required": "Please complete this step before continuing",

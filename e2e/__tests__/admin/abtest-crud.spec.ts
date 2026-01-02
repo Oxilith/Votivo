@@ -59,6 +59,11 @@ test.describe('A/B Test CRUD Operations', () => {
     test('should display create A/B test form with all fields', async ({ adminPage }) => {
       await adminPage.navigateToCreateAbTest();
 
+      // Wait for form fields to render (prompt select loads async)
+      await adminPage.page.waitForSelector(adminPage.abTestNameInput, { state: 'visible', timeout: 5000 });
+      // Wait for prompts to load - the select element appears after loading
+      await adminPage.page.waitForSelector(adminPage.abTestSelectPrompt, { state: 'visible', timeout: 10000 });
+
       // Check all form fields are visible
       expect(await adminPage.page.locator(adminPage.abTestSelectPrompt).isVisible()).toBe(true);
       expect(await adminPage.page.locator(adminPage.abTestNameInput).isVisible()).toBe(true);
@@ -102,6 +107,9 @@ test.describe('A/B Test CRUD Operations', () => {
 
     test('should display prompt dropdown with options', async ({ adminPage }) => {
       await adminPage.navigateToCreateAbTest();
+
+      // Wait for form to fully render before checking select
+      await adminPage.page.waitForSelector(adminPage.abTestSelectPrompt, { state: 'visible', timeout: 5000 });
 
       // Check that the prompt select has options (at least the placeholder)
       const promptSelect = adminPage.page.locator(adminPage.abTestSelectPrompt);

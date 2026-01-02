@@ -6,7 +6,7 @@
  * - Handles loading and error states
  * - Provides tab navigation for different insight categories
  * - Shows identity synthesis section
- * - Detects dirty state warning alert
+ * - Detects incomplete assessment warning alert
  * - Handles pending changes alert visibility
  * @dependencies
  * - BasePage for common functionality
@@ -52,10 +52,10 @@ export class InsightsPage extends BasePage {
   readonly synthesisSection = '[data-testid="synthesis"], [class*="synthesis"]';
   readonly noAssessmentMessage = '[class*="no-assessment"], p:has-text("no assessment")';
 
-  // Dirty state selectors
-  readonly dirtyWarning = '[data-testid="insights-dirty-warning"]';
+  // Incomplete assessment state selectors
+  readonly incompleteWarning = '[data-testid="insights-incomplete-warning"]';
   readonly pendingChangesAlert = '[data-testid="pending-changes-alert"]';
-  readonly reanalyzeDirtyWarning = '[data-testid="insights-reanalyze-dirty-warning"]';
+  readonly reanalyzeIncompleteWarning = '[data-testid="insights-reanalyze-incomplete-warning"]';
   readonly readyState = '[data-testid="insights-ready"]';
   readonly noAssessmentState = '[data-testid="insights-no-assessment"]';
   readonly insightsPage = '[data-testid="insights-page"]';
@@ -68,6 +68,20 @@ export class InsightsPage extends BasePage {
    */
   async navigate(): Promise<void> {
     await this.goto('/insights');
+  }
+
+  /**
+   * Wait for page to be ready (any content state visible)
+   * Use this before checking specific states like isReadyState(), isNoAssessmentState()
+   *
+   * @param timeout - Maximum wait time (default 10 seconds)
+   */
+  async waitForPageReady(timeout = 10000): Promise<void> {
+    // Wait for any of the possible content states to be visible
+    await this.page.waitForSelector(
+      `${this.readyState}, ${this.noAssessmentState}, ${this.insightsTabs}, ${this.pendingChangesAlert}`,
+      { state: 'visible', timeout }
+    );
   }
 
   /**
@@ -201,13 +215,13 @@ export class InsightsPage extends BasePage {
   }
 
   /**
-   * Check if the dirty state warning is visible
+   * Check if the incomplete assessment warning is visible
    *
-   * @returns True if dirty warning is visible
+   * @returns True if incomplete warning is visible
    */
-  async hasDirtyWarning(): Promise<boolean> {
+  async hasIncompleteWarning(): Promise<boolean> {
     return await this.page
-      .locator(this.dirtyWarning)
+      .locator(this.incompleteWarning)
       .isVisible({ timeout: 3000 })
       .catch(() => false);
   }
@@ -225,13 +239,13 @@ export class InsightsPage extends BasePage {
   }
 
   /**
-   * Check if the reanalyze dirty warning is visible
+   * Check if the reanalyze incomplete warning is visible
    *
-   * @returns True if reanalyze dirty warning is visible
+   * @returns True if reanalyze incomplete warning is visible
    */
-  async hasReanalyzeDirtyWarning(): Promise<boolean> {
+  async hasReanalyzeIncompleteWarning(): Promise<boolean> {
     return await this.page
-      .locator(this.reanalyzeDirtyWarning)
+      .locator(this.reanalyzeIncompleteWarning)
       .isVisible({ timeout: 3000 })
       .catch(() => false);
   }

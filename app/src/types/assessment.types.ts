@@ -54,6 +54,9 @@ export interface AssessmentProps {
   onExport?: () => void;
   onNavigateToLanding?: () => void;
   onNavigateToInsights?: () => void;
+  onNavigateToAssessment?: () => void;
+  /** Navigate to /assessment/new for fresh start (clears stores, doesn't load from DB) */
+  onRetakeAssessment?: () => void;
   onNavigateToAuth?: () => void;
   onNavigateToProfile?: () => void;
   onSignOut?: () => void;
@@ -72,7 +75,6 @@ export interface InsightsProps {
   onNavigateToAssessment?: () => void;
   onNavigateToAuth?: () => void;
   onNavigateToProfile?: () => void;
-  onNavigateToAuthWithReturn?: (returnTo: 'insights' | 'assessment') => void;
   onSignOut?: () => void;
   isReadOnly?: boolean;
   viewingAssessmentId?: string | null;

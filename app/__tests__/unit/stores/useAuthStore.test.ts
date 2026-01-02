@@ -13,7 +13,15 @@
  * - shared/testing for mock fixtures
  */
 
-import { useAuthStore } from '@/stores/useAuthStore';
+import { renderHook } from '@testing-library/react';
+import {
+  useAuthStore,
+  useIsAuthenticated,
+  useCurrentUser,
+  useAuthInitialized,
+  useAuthError,
+  useAuthHydrated,
+} from '@/stores/useAuthStore';
 import { createMockSafeUser, createMockSavedAssessment, createMockSavedAnalysis } from '@votive/shared/testing';
 
 describe('useAuthStore', () => {
@@ -311,6 +319,70 @@ describe('useAuthStore', () => {
       expect(isAnalysesListStale()).toBe(true);
 
       vi.useRealTimers();
+    });
+  });
+
+  describe('selector hooks', () => {
+    it('useIsAuthenticated should return false when user is null', () => {
+      const { result } = renderHook(() => useIsAuthenticated());
+      expect(result.current).toBe(false);
+    });
+
+    it('useIsAuthenticated should return true when user is set', () => {
+      const mockUser = createMockSafeUser();
+      useAuthStore.getState().setAuth(mockUser, 'token', 'csrf');
+
+      const { result } = renderHook(() => useIsAuthenticated());
+      expect(result.current).toBe(true);
+    });
+
+    it('useCurrentUser should return null initially', () => {
+      const { result } = renderHook(() => useCurrentUser());
+      expect(result.current).toBeNull();
+    });
+
+    it('useCurrentUser should return user when set', () => {
+      const mockUser = createMockSafeUser({ email: 'hook@test.com' });
+      useAuthStore.getState().setAuth(mockUser, 'token', 'csrf');
+
+      const { result } = renderHook(() => useCurrentUser());
+      expect(result.current).toEqual(mockUser);
+    });
+
+    it('useAuthInitialized should return false initially', () => {
+      const { result } = renderHook(() => useAuthInitialized());
+      expect(result.current).toBe(false);
+    });
+
+    it('useAuthInitialized should return true after setInitialized', () => {
+      useAuthStore.getState().setInitialized();
+
+      const { result } = renderHook(() => useAuthInitialized());
+      expect(result.current).toBe(true);
+    });
+
+    it('useAuthError should return null initially', () => {
+      const { result } = renderHook(() => useAuthError());
+      expect(result.current).toBeNull();
+    });
+
+    it('useAuthError should return error when set', () => {
+      useAuthStore.getState().setError('Auth failed');
+
+      const { result } = renderHook(() => useAuthError());
+      expect(result.current).toBe('Auth failed');
+    });
+
+    it('useAuthHydrated should return false initially', () => {
+      const { result } = renderHook(() => useAuthHydrated());
+      expect(result.current).toBe(false);
+    });
+
+    it('useAuthHydrated should return true after setHydrated', () => {
+      useAuthStore.getState().setHydrated();
+
+      const { result } = renderHook(() => useAuthHydrated());
+      expect(result.current).toBe(true);
     });
   });
 });

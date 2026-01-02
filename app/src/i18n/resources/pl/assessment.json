@@ -227,7 +227,10 @@
     "back": "← Wstecz",
     "continue": "Kontynuuj →",
     "complete": "Zakończ ocenę i zobacz analizę AI",
-    "saving": "Zapisywanie..."
+    "saving": "Zapisywanie...",
+    "skipToLast": "Przejdź dalej",
+    "retakeAssessment": "Od nowa",
+    "import": "Importuj"
   },
   "validation": {
     "required": "Proszę wypełnić ten krok przed kontynuowaniem",

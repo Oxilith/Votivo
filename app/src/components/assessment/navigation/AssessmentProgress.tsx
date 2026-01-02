@@ -32,7 +32,10 @@ export const AssessmentProgress: React.FC<AssessmentProgressProps> = ({
   const progressPercent = (currentStep / totalSteps) * 100;
 
   return (
-    <div className="border-b border-[var(--border)] sticky top-20 lg:top-24 bg-[var(--bg-primary)]/95 backdrop-blur-sm z-10">
+    <div
+      data-testid="assessment-progress"
+      className="border-b border-[var(--border)] sticky top-20 lg:top-24 bg-[var(--bg-primary)]/95 backdrop-blur-sm z-10"
+    >
       <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">

@@ -196,13 +196,15 @@ export class ProfilePage extends BasePage {
    */
   async viewAssessment(index: number): Promise<void> {
     await this.clickTab('assessments');
+    // Wait for list to load
+    await this.waitForListLoaded(this.assessmentItem, this.emptyAssessmentsMessage);
     const items = await this.page.locator(this.assessmentItem).all();
     if (items[index]) {
-      const viewBtn = items[index].locator(this.viewButton);
-      if (await viewBtn.isVisible()) {
-        await viewBtn.click();
-        await this.waitForNavigation();
-      }
+      // Click the entire item (it's a clickable li element, no separate View button)
+      await items[index].click();
+      // Wait for URL to change to /assessment/:id
+      await this.page.waitForURL(/\/assessment\/[^/]+$/, { timeout: 10000 });
+      await this.waitForNavigation();
     }
   }
 
@@ -213,13 +215,15 @@ export class ProfilePage extends BasePage {
    */
   async viewAnalysis(index: number): Promise<void> {
     await this.clickTab('analyses');
+    // Wait for list to load
+    await this.waitForListLoaded(this.analysisItem, this.emptyAnalysesMessage);
     const items = await this.page.locator(this.analysisItem).all();
     if (items[index]) {
-      const viewBtn = items[index].locator(this.viewButton);
-      if (await viewBtn.isVisible()) {
-        await viewBtn.click();
-        await this.waitForNavigation();
-      }
+      // Click the entire item (it's a clickable li element, no separate View button)
+      await items[index].click();
+      // Wait for URL to change to /insights/:id
+      await this.page.waitForURL(/\/insights\/[^/]+$/, { timeout: 10000 });
+      await this.waitForNavigation();
     }
   }
 

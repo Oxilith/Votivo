@@ -58,6 +58,19 @@ vi.mock('@/stores/useAuthStore', () => ({
   useCurrentUser: () => mockCurrentUser,
 }));
 
+// Mock assessment store - savedAt determines if assessment is completed (readonly)
+const mockSavedAt: string | null = '2024-01-01T00:00:00Z'; // Default to completed
+
+vi.mock('@/stores/useAssessmentStore', () => ({
+  useAssessmentStore: (selector?: (state: { savedAt: string | null }) => unknown) => {
+    const state = { savedAt: mockSavedAt };
+    if (typeof selector === 'function') {
+      return selector(state);
+    }
+    return state;
+  },
+}));
+
 // Mock authService
 vi.mock('@/services/api/AuthService', () => ({
   authService: {
@@ -71,6 +84,7 @@ vi.mock('@/components', () => ({
   PageNavigation: () => <div data-testid="page-navigation" />,
   InkBrushDecoration: () => <div data-testid="ink-brush" />,
   InkLoader: () => <div data-testid="ink-loader" />,
+  PendingChangesAlert: () => <div data-testid="pending-changes-alert" />,
   ErrorCircleIcon: () => <span data-testid="error-icon" />,
   SearchIcon: () => <span data-testid="search-icon" />,
   SwitchHorizontalIcon: () => <span data-testid="switch-icon" />,
