@@ -80,11 +80,17 @@ const UserAvatarDropdown: FC<UserAvatarDropdownProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 bg-[var(--bg-primary)] border border-[var(--border)] shadow-md z-50">
+        <div
+          className="absolute right-0 mt-2 w-40 bg-[var(--bg-primary)] border border-[var(--border)] shadow-md z-50"
+          role="menu"
+          aria-orientation="vertical"
+          data-testid="user-menu"
+        >
           <div className="py-1">
             {onNavigateToProfile && (
               <button
                 onClick={handleProfileClick}
+                role="menuitem"
                 className="w-full text-left px-4 py-2 font-body text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
                 data-testid="profile-button"
               >
@@ -93,6 +99,7 @@ const UserAvatarDropdown: FC<UserAvatarDropdownProps> = ({
             )}
             <button
               onClick={handleSignOutClick}
+              role="menuitem"
               className="w-full text-left px-4 py-2 font-body text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
               data-testid="sign-out-button"
             >

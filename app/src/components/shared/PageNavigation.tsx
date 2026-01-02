@@ -74,7 +74,11 @@ const PageNavigation: FC<PageNavigationProps> = ({
   const hasImportExport = onImport ?? onExportAssessment ?? onExportAnalysis;
 
   return (
-    <nav className="fixed top-4 left-4 right-4 lg:top-6 lg:left-10 lg:right-10 z-[100] flex justify-between items-center px-4 py-3 lg:px-6 bg-[var(--bg-primary)]/85 backdrop-blur-[12px] border border-[var(--border)] transition-colors">
+    <nav
+      className="fixed top-4 left-4 right-4 lg:top-6 lg:left-10 lg:right-10 z-[100] flex justify-between items-center px-4 py-3 lg:px-6 bg-[var(--bg-primary)]/85 backdrop-blur-[12px] border border-[var(--border)] transition-colors"
+      data-testid="nav-header"
+      aria-label="Main navigation"
+    >
       {/* Left Section: Logo and Nav Links */}
       <div className="flex items-center gap-6 lg:gap-10">
         {/* Logo and Brand - Click to go back to landing */}
@@ -93,6 +97,8 @@ const PageNavigation: FC<PageNavigationProps> = ({
           <button
             type="button"
             onClick={() => onNavigateToAssessment?.()}
+            data-testid="nav-link-assessment"
+            aria-current={currentPage === 'assessment' ? 'page' : undefined}
             className={`nav-link font-body text-sm transition-colors cursor-pointer ${
               currentPage === 'assessment'
                 ? 'text-[var(--text-primary)] font-medium'
@@ -104,6 +110,8 @@ const PageNavigation: FC<PageNavigationProps> = ({
           <button
             type="button"
             onClick={() => onNavigateToInsights?.()}
+            data-testid="nav-link-insights"
+            aria-current={currentPage === 'insights' ? 'page' : undefined}
             className={`nav-link font-body text-sm transition-colors cursor-pointer ${
               currentPage === 'insights'
                 ? 'text-[var(--text-primary)] font-medium'
@@ -126,6 +134,7 @@ const PageNavigation: FC<PageNavigationProps> = ({
                 <button
                   type="button"
                   onClick={onImport}
+                  data-testid="nav-btn-import"
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors"
                 >
                   <UploadIcon size="sm" />
@@ -159,6 +168,7 @@ const PageNavigation: FC<PageNavigationProps> = ({
           ) : (
             <button
               onClick={() => onNavigateToAuth?.()}
+              data-testid="nav-btn-signin"
               className="px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               {t('nav.signIn')}

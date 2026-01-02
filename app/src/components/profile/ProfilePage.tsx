@@ -326,7 +326,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col" data-testid="profile-page">
       {/* Fixed Ink Brush Decoration - Right side */}
       <InkBrushDecoration />
 
@@ -355,12 +355,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar tabs */}
-          <nav className="md:w-48 flex-shrink-0">
-            <ul className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+          <nav className="md:w-48 flex-shrink-0" aria-label="Profile sections">
+            <ul className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0" role="tablist" aria-orientation="vertical">
               {tabs.map((tab) => (
-                <li key={tab.id}>
+                <li key={tab.id} role="presentation">
                   <button
                     onClick={() => { setActiveTab(tab.id); }}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    aria-controls={`profile-tabpanel-${tab.id}`}
                     data-testid={`profile-tab-${tab.id}`}
                     className={`
                       w-full text-left px-4 py-2 font-body text-sm rounded-sm transition-colors whitespace-nowrap
@@ -380,7 +383,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
           {/* Tab content */}
           <div className="flex-1">
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm p-6">
+            <div
+              className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm p-6"
+              role="tabpanel"
+              id={`profile-tabpanel-${activeTab}`}
+              aria-labelledby={`profile-tab-${activeTab}`}
+              data-testid={`profile-tabpanel-${activeTab}`}
+            >
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <form onSubmit={handleProfileSubmit} className="space-y-6">

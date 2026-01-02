@@ -26,6 +26,8 @@ const ThemeToggle: FC = () => {
       onClick={toggleTheme}
       className="w-8 h-8 flex items-center justify-center border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
       aria-label={isDark ? t('theme.toggleLight') : t('theme.toggleDark')}
+      aria-pressed={isDark}
+      data-testid="theme-toggle"
     >
       {isDark ? <SunIcon size="sm" /> : <MoonIcon size="sm" />}
     </button>

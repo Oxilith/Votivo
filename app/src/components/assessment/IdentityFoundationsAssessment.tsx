@@ -486,7 +486,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative" data-testid="assessment-page">
       {/* Hidden file input for import - placed at root level for browser compatibility */}
       <input
         ref={fileInputRef}

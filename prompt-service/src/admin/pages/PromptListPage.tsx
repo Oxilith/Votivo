@@ -23,18 +23,18 @@ export function PromptListPage() {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loading}>Loading prompts...</div>
+      <div style={styles.container} data-testid="prompt-list-page">
+        <div style={styles.loading} data-testid="prompt-list-loading">Loading prompts...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <div style={styles.error}>
+      <div style={styles.container} data-testid="prompt-list-page">
+        <div style={styles.error} data-testid="prompt-list-error" role="alert">
           <p>Error: {error}</p>
-          <button onClick={() => void refetch()} style={styles.retryButton}>
+          <button onClick={() => void refetch()} style={styles.retryButton} data-testid="prompt-btn-retry">
             Retry
           </button>
         </div>
@@ -43,21 +43,21 @@ export function PromptListPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} data-testid="prompt-list-page">
       <div style={styles.header}>
         <h1 style={styles.title}>Prompts</h1>
-        <Link to="/prompts/new" style={styles.createButton}>
+        <Link to="/prompts/new" style={styles.createButton} data-testid="prompt-btn-create">
           + Create Prompt
         </Link>
       </div>
 
       {prompts.length === 0 ? (
-        <div style={styles.empty}>
+        <div style={styles.empty} data-testid="prompt-list-empty">
           <p>No prompts found. Create your first prompt to get started.</p>
         </div>
       ) : (
         <div style={styles.tableContainer}>
-          <table style={styles.table}>
+          <table style={styles.table} data-testid="prompt-list-table">
             <thead>
               <tr>
                 <th style={styles.th}>Key</th>
@@ -70,7 +70,7 @@ export function PromptListPage() {
             </thead>
             <tbody>
               {prompts.map((prompt: PromptDTO) => (
-                <tr key={prompt.id} style={styles.tr}>
+                <tr key={prompt.id} style={styles.tr} data-testid={`prompt-row-${prompt.id}`}>
                   <td style={styles.td}>
                     <code style={styles.code}>{prompt.key}</code>
                   </td>
@@ -85,6 +85,7 @@ export function PromptListPage() {
                         backgroundColor: prompt.isActive ? colors.successBg : colors.dangerBg,
                         color: prompt.isActive ? colors.successText : colors.dangerText,
                       }}
+                      data-testid={`prompt-status-${prompt.id}`}
                     >
                       {prompt.isActive ? 'Active' : 'Inactive'}
                     </span>
@@ -93,7 +94,7 @@ export function PromptListPage() {
                     {new Date(prompt.updatedAt).toLocaleDateString()}
                   </td>
                   <td style={styles.td}>
-                    <Link to={`/prompts/${prompt.id}`} style={styles.editLink}>
+                    <Link to={`/prompts/${prompt.id}`} style={styles.editLink} data-testid={`prompt-btn-edit-${prompt.id}`}>
                       Edit
                     </Link>
                   </td>

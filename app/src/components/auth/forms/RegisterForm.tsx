@@ -166,7 +166,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto" data-testid="register-form">
       <div className="text-center mb-8">
         <h2 className="font-display text-3xl text-[var(--text-primary)] mb-2">
           {t('register.title')}
@@ -176,7 +176,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" aria-label={t('register.title')}>
         <FormInput
           label={t('register.name')}
           type="text"
@@ -265,6 +265,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <div
             className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-600 dark:border-red-400"
             role="alert"
+            aria-live="polite"
+            data-testid="register-error"
           >
             <p className="font-body text-sm text-red-600 dark:text-red-400">
               {apiError}
@@ -281,6 +283,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           type="button"
           onClick={onSwitchToLogin}
           className="font-medium text-[var(--accent)] hover:text-[var(--accent-soft)] transition-colors"
+          data-testid="register-btn-login"
         >
           {t('register.signIn')}
         </button>

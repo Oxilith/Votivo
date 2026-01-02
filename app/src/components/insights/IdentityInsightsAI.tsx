@@ -243,7 +243,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
     : [];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative" data-testid="insights-page">
       {/* Save Prompt Modal */}
       <SavePromptModal
         isOpen={showSavePrompt}
@@ -305,7 +305,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
         <div className="max-w-6xl mx-auto px-6 py-8">
         {/* No assessment data - prompt user to complete assessment first */}
         {!hasResponses && !loading && !error && (
-          <div className="text-center py-16 reveal">
+          <div className="text-center py-16 reveal" data-testid="insights-no-assessment">
             {/* Ink brush circle - empty assessment indicator */}
             <div className="w-20 h-20 mx-auto mb-6 relative">
               <svg viewBox="0 0 80 80" className="w-full h-full" aria-hidden="true">
@@ -351,7 +351,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
         {/* Ready for analysis - has assessment data but no analysis yet */}
         {hasResponses && !analysis && !loading && !error && (
-          <div className="text-center py-16 reveal">
+          <div className="text-center py-16 reveal" data-testid="insights-ready">
             {/* Ink brush circle - minimalist ready state */}
             <div className="w-20 h-20 mx-auto mb-6 relative">
               <svg viewBox="0 0 80 80" className="w-full h-full" aria-hidden="true">
@@ -388,6 +388,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
             <button
               onClick={analyzeWithClaude}
               className="cta-button px-6 py-3 bg-[var(--accent)] text-white font-body font-medium rounded-sm inline-flex items-center gap-2"
+              data-testid="insights-btn-analyze"
             >
               <span>{t('ready.button')}</span>
               <span>→</span>
@@ -404,7 +405,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
         )}
 
         {error && (
-          <div className="text-center py-16">
+          <div className="text-center py-16" data-testid="insights-error">
             {/* Minimalist error indicator */}
             <div className="w-20 h-20 mx-auto mb-6 relative">
               <svg viewBox="0 0 80 80" className="w-full h-full" aria-hidden="true">
@@ -460,12 +461,16 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
         {analysis && (
           <>
             {/* Tabs */}
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm mb-6 overflow-hidden">
-              <div className="flex overflow-x-auto">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm mb-6 overflow-hidden" data-testid="insights-tabs">
+              <div className="flex overflow-x-auto" role="tablist" aria-label="Analysis categories">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => { setActiveTab(tab.id); }}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    aria-controls={`insights-tabpanel-${tab.id}`}
+                    data-testid={`insights-tab-${tab.id}`}
                     className={`px-4 py-3 font-body text-sm font-medium whitespace-nowrap border-b-2 transition-colors flex-1 flex items-center justify-center gap-2 ${
                       activeTab === tab.id
                         ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent)]/5'
@@ -489,7 +494,13 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
             </div>
 
             {/* Content */}
-            <div className="space-y-4">
+            <div
+              className="space-y-4"
+              role="tabpanel"
+              id={`insights-tabpanel-${activeTab}`}
+              aria-labelledby={`insights-tab-${activeTab}`}
+              data-testid={`insights-tabpanel-${activeTab}`}
+            >
               {activeTab === 'patterns' && analysis.patterns.map((item: AnalysisPattern, i: number) => <InsightCard key={i} item={item} />)}
 
               {activeTab === 'contradictions' && analysis.contradictions.map((item: AnalysisContradiction, i: number) => <InsightCard key={i} item={item} />)}
@@ -557,6 +568,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
                 <button
                   onClick={analyzeWithClaude}
                   className="px-5 py-2.5 bg-[var(--bg-secondary)] text-[var(--text-secondary)] rounded-sm font-body font-medium hover:bg-[var(--bg-tertiary)] border border-[var(--border)] transition-colors inline-flex items-center gap-2"
+                  data-testid="insights-btn-reanalyze"
                 >
                   <RefreshIcon size="sm" />
                   <span>{t('reanalyze.button')}</span>

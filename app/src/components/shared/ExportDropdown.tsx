@@ -72,6 +72,7 @@ const ExportDropdown: FC<ExportDropdownProps> = ({
         className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors"
         aria-expanded={isOpen}
         aria-haspopup="true"
+        data-testid="export-dropdown-trigger"
       >
         <DownloadIcon size="sm" />
         <span>{t('buttons.export')}</span>
@@ -82,10 +83,17 @@ const ExportDropdown: FC<ExportDropdownProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 min-w-[180px] bg-[var(--bg-primary)] border border-[var(--border)] shadow-lg z-50">
+        <div
+          className="absolute right-0 top-full mt-1 min-w-[180px] bg-[var(--bg-primary)] border border-[var(--border)] shadow-lg z-50"
+          role="menu"
+          aria-orientation="vertical"
+          data-testid="export-dropdown-menu"
+        >
           {onExportAssessment && (
             <button
               onClick={handleExportAssessment}
+              role="menuitem"
+              data-testid="export-btn-assessment"
               className="w-full text-left px-4 py-2.5 text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
             >
               {t('buttons.exportAssessment')}
@@ -94,6 +102,8 @@ const ExportDropdown: FC<ExportDropdownProps> = ({
           {onExportAnalysis && (
             <button
               onClick={handleExportAnalysis}
+              role="menuitem"
+              data-testid="export-btn-analysis"
               className="w-full text-left px-4 py-2.5 text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
             >
               {t('buttons.exportInsights')}

@@ -68,6 +68,7 @@ const FormButton: React.FC<FormButtonProps> = ({
       type={type}
       disabled={isDisabled}
       className={`${baseClasses} ${variantClasses[variant]}`}
+      data-testid="form-btn-submit"
       {...props}
     >
       {isLoading && (

@@ -54,18 +54,18 @@ export function ABTestListPage() {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loading}>Loading A/B tests...</div>
+      <div style={styles.container} data-testid="abtest-list-page">
+        <div style={styles.loading} data-testid="abtest-list-loading">Loading A/B tests...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <div style={styles.error}>
+      <div style={styles.container} data-testid="abtest-list-page">
+        <div style={styles.error} role="alert" data-testid="abtest-list-error">
           <p>Error: {error}</p>
-          <button onClick={() => void refetch()} style={styles.retryButton}>
+          <button onClick={() => void refetch()} style={styles.retryButton} data-testid="abtest-btn-retry">
             Retry
           </button>
         </div>
@@ -74,21 +74,21 @@ export function ABTestListPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} data-testid="abtest-list-page">
       <div style={styles.header}>
         <h1 style={styles.title}>A/B Tests</h1>
-        <Link to="/ab-tests/new" style={styles.createButton}>
+        <Link to="/ab-tests/new" style={styles.createButton} data-testid="abtest-btn-create">
           + Create A/B Test
         </Link>
       </div>
 
       {abTests.length === 0 ? (
-        <div style={styles.empty}>
+        <div style={styles.empty} data-testid="abtest-list-empty">
           <p>No A/B tests found. Create your first test to start experimenting.</p>
         </div>
       ) : (
         <div style={styles.tableContainer}>
-          <table style={styles.table}>
+          <table style={styles.table} data-testid="abtest-list-table">
             <thead>
               <tr>
                 <th style={styles.th}>Name</th>
@@ -105,7 +105,7 @@ export function ABTestListPage() {
               {abTests.map((test: ABTestDTO) => {
                 const { impressions, conversions } = getTotalStats(test);
                 return (
-                  <tr key={test.id} style={styles.tr}>
+                  <tr key={test.id} style={styles.tr} data-testid={`abtest-row-${test.id}`}>
                     <td style={styles.td}>
                       <Link to={`/ab-tests/${test.id}`} style={styles.testLink}>
                         {test.name}
@@ -123,6 +123,7 @@ export function ABTestListPage() {
                           backgroundColor: test.isActive ? colors.successBg : colors.bgTertiary,
                           color: test.isActive ? colors.successText : colors.textMuted,
                         }}
+                        data-testid={`abtest-btn-toggle-${test.id}`}
                       >
                         {toggling === test.id ? '...' : test.isActive ? 'Active' : 'Inactive'}
                       </button>
@@ -147,7 +148,7 @@ export function ABTestListPage() {
                       </span>
                     </td>
                     <td style={styles.td}>
-                      <Link to={`/ab-tests/${test.id}`} style={styles.editLink}>
+                      <Link to={`/ab-tests/${test.id}`} style={styles.editLink} data-testid={`abtest-btn-edit-${test.id}`}>
                         Edit
                       </Link>
                     </td>
