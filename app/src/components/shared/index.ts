@@ -10,6 +10,7 @@
  * - Exports LanguageToggle component
  * - Exports LoadingFallback component for Suspense boundaries
  * - Exports PageNavigation component
+ * - Exports PendingChangesAlert component for dirty state warning
  * - Exports ThemeToggle component
  * - Exports UserAvatarDropdown component
  * - Re-exports all icons from icons sub-barrel
@@ -22,6 +23,7 @@
  * - ./LanguageToggle
  * - ./LoadingFallback
  * - ./PageNavigation
+ * - ./PendingChangesAlert
  * - ./ThemeToggle
  * - ./UserAvatarDropdown
  * - ./icons
@@ -35,6 +37,7 @@ export { default as InkLoader } from './InkLoader';
 export { default as LanguageToggle } from './LanguageToggle';
 export { default as LoadingFallback } from './LoadingFallback';
 export { default as PageNavigation } from './PageNavigation';
+export { default as PendingChangesAlert } from './PendingChangesAlert';
 export { default as ThemeToggle } from './ThemeToggle';
 export { default as UserAvatarDropdown } from './UserAvatarDropdown';
 

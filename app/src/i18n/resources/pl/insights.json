@@ -4,6 +4,10 @@
     "description": "Najpierw ukończ ocenę, aby odblokować analizę wzorców tożsamości wspieraną przez AI.",
     "button": "Przejdź do oceny"
   },
+  "dirty": {
+    "message": "Masz niezapisane zmiany w ocenie. Ukończ ocenę, aby zapisać i umożliwić nową analizę.",
+    "action": "Ukończ ocenę"
+  },
   "ready": {
     "title": "Gotowe do analizy",
     "description": "Kliknij poniżej aby wysłać dane oceny do Claude w celu głębokiej analizy wzorców. Zajmuje to zazwyczaj około 15 minut.",
