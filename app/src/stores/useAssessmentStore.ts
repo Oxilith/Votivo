@@ -8,6 +8,7 @@
  * - Computes completion status and percentage
  * - Persists to localStorage for session recovery
  * - Clears analysis results when responses change (invalidates stale analysis)
+ * - Tracks dirty state (unsaved changes) via lastSavedAt comparison
  * @dependencies
  * - zustand (create, persist, createJSONStorage)
  * - @/types/assessment.types (AssessmentResponses)
@@ -25,6 +26,7 @@ interface AssessmentState {
   // State
   responses: Partial<AssessmentResponses>;
   lastUpdated: string | null;
+  lastSavedAt: string | null;
 
   // Actions
   updateResponse: <K extends keyof AssessmentResponses>(
@@ -33,11 +35,13 @@ interface AssessmentState {
   ) => void;
   setResponses: (responses: Partial<AssessmentResponses>) => void;
   clearResponses: () => void;
+  setLastSavedAt: (timestamp: string) => void;
 
   // Computed
   isComplete: () => boolean;
   getCompletionPercentage: () => number;
   getResponses: () => Partial<AssessmentResponses>;
+  isDirty: () => boolean;
 }
 
 export const useAssessmentStore = create<AssessmentState>()(
@@ -46,6 +50,7 @@ export const useAssessmentStore = create<AssessmentState>()(
       // Initial state
       responses: {},
       lastUpdated: null,
+      lastSavedAt: null,
 
       // Actions
       updateResponse: (key, value) => {
@@ -73,7 +78,12 @@ export const useAssessmentStore = create<AssessmentState>()(
         set({
           responses: {},
           lastUpdated: null,
+          lastSavedAt: null,
         });
+      },
+
+      setLastSavedAt: (timestamp: string) => {
+        set({ lastSavedAt: timestamp });
       },
 
       // Computed
@@ -101,6 +111,16 @@ export const useAssessmentStore = create<AssessmentState>()(
       },
 
       getResponses: () => get().responses,
+
+      isDirty: () => {
+        const { lastUpdated, lastSavedAt } = get();
+        // No changes if nothing has been updated
+        if (!lastUpdated) return false;
+        // If never saved, any update means dirty
+        if (!lastSavedAt) return true;
+        // Compare timestamps - dirty if updated after last save
+        return new Date(lastUpdated) > new Date(lastSavedAt);
+      },
     }),
     {
       name: 'assessment-storage',
@@ -108,6 +128,7 @@ export const useAssessmentStore = create<AssessmentState>()(
       partialize: (state) => ({
         responses: state.responses,
         lastUpdated: state.lastUpdated,
+        lastSavedAt: state.lastSavedAt,
       }),
     }
   )
