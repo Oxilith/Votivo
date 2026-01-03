@@ -27,7 +27,8 @@ test.describe('Admin Login', () => {
 
     const error = await adminPage.getLoginError();
     expect(error).toBeTruthy();
-    expect(error?.toLowerCase()).toMatch(/invalid|incorrect|unauthorized/);
+    // API returns "Invalid API key" for failed admin login
+    expect(error).toBe('Invalid API key');
   });
 
   test('should login with valid API key', async ({ adminPage }) => {

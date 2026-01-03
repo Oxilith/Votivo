@@ -69,7 +69,8 @@ test.describe('User Registration', () => {
 
     const error = await registerPage.getErrorMessage();
     expect(error).toBeTruthy();
-    expect(error?.toLowerCase()).toMatch(/already|exists|registered|duplicate|email/);
+    // API returns "Email already exists" for duplicate registration
+    expect(error).toBe('Email already exists');
   });
 
   test('should show error for weak password', async ({ registerPage, testUser }) => {
@@ -77,15 +78,15 @@ test.describe('User Registration', () => {
     await registerPage.register({
       name: testUser.name,
       email: testUser.email,
-      password: 'weak', // Too short, no uppercase/number
-      confirmPassword: 'weak',
+      password: 'weakpassword', // 12 chars but no uppercase/number (fails complexity)
+      confirmPassword: 'weakpassword',
       birthYear: testUser.birthYear,
     });
 
     const error = await registerPage.getErrorMessage();
     expect(error).toBeTruthy();
-    // Should indicate password requirements
-    expect(error?.toLowerCase()).toMatch(/password|character|uppercase|number|strong/);
+    // Frontend validation message for weak password (missing uppercase and number)
+    expect(error).toBe('Password must contain at least one uppercase letter, one lowercase letter, and one number');
   });
 
   test('should show error for password mismatch', async ({ registerPage, testUser }) => {
@@ -100,7 +101,8 @@ test.describe('User Registration', () => {
 
     const error = await registerPage.getErrorMessage();
     expect(error).toBeTruthy();
-    expect(error?.toLowerCase()).toMatch(/match|same|confirm/);
+    // Frontend validation message for password mismatch
+    expect(error).toBe('Passwords do not match');
   });
 
   test('should navigate to login form', async ({ registerPage }) => {

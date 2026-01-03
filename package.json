@@ -26,6 +26,7 @@
     "db:migrate": "npm run db:migrate -w prompt-service",
     "db:generate": "npm run db:generate --workspaces --if-present",
     "db:seed": "npm run db:seed -w prompt-service",
+    "db:seed:test": "npm run db:seed:test -w prompt-service",
     "db:studio": "npm run db:studio -w prompt-service",
     "test:e2e": "npx dotenvx run -f .env.test -- npm run e2e -w e2e",
     "test:e2e:headed": "npx dotenvx run -f .env.test -- npm run e2e:headed -w e2e",

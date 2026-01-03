@@ -86,6 +86,11 @@ export class AssessmentPage extends BasePage {
    */
   async navigate(): Promise<void> {
     await this.goto('/assessment');
+    // Wait for assessment content to render
+    await this.page
+      .locator(`${this.introStep}, ${this.multiSelectStep}, ${this.synthesisStep}`)
+      .first()
+      .waitFor({ state: 'visible', timeout: E2E_TIMEOUTS.navigation });
   }
 
   /**
@@ -159,8 +164,14 @@ export class AssessmentPage extends BasePage {
    */
   async clickNext(): Promise<void> {
     await this.page.click(this.nextButton);
-    // Wait for step transition to complete
-    await this.page.waitForLoadState('networkidle');
+    // Wait for step transition (any step type becomes visible)
+    await this.page
+      .locator(
+        `${this.introStep}, ${this.multiSelectStep}, ${this.singleSelectStep}, ` +
+          `${this.scaleStep}, ${this.textareaStep}, ${this.synthesisStep}`
+      )
+      .first()
+      .waitFor({ state: 'visible', timeout: E2E_TIMEOUTS.navigation });
   }
 
   /**
@@ -168,8 +179,14 @@ export class AssessmentPage extends BasePage {
    */
   async clickBack(): Promise<void> {
     await this.page.click(this.backButton);
-    // Wait for step transition to complete
-    await this.page.waitForLoadState('networkidle');
+    // Wait for step transition (any step type becomes visible)
+    await this.page
+      .locator(
+        `${this.introStep}, ${this.multiSelectStep}, ${this.singleSelectStep}, ` +
+          `${this.scaleStep}, ${this.textareaStep}, ${this.synthesisStep}`
+      )
+      .first()
+      .waitFor({ state: 'visible', timeout: E2E_TIMEOUTS.navigation });
   }
 
   /**

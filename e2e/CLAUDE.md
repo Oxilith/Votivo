@@ -68,6 +68,7 @@ e2e/
 │   ├── insights/        # AI analysis display
 │   ├── admin/           # Admin CRUD operations
 │   ├── layout/          # Responsive, theme, language
+│   ├── error-handling/  # Network failure tests
 │   └── i18n/            # Translation coverage
 ├── pages/               # Page Object Models
 │   ├── BasePage.ts      # Common methods, CSRF handling
@@ -97,7 +98,7 @@ export class MyPage extends BasePage {
 ```
 
 **Key BasePage methods:**
-- `goto(path)` - Navigate with networkidle wait
+- `goto(path)` - Navigate with domcontentloaded wait
 - `getCsrfToken()` - Extract CSRF token from cookies
 - `isLoggedIn()` - Check for auth state via UI
 - `waitForElement(selector, timeout)` - Wait for element visibility
@@ -210,3 +211,29 @@ expect(csrfToken).toBeTruthy();
 ```
 
 For authenticated requests, the browser automatically sends the httpOnly cookie.
+
+## Test Data Cleanup Strategy
+
+The E2E test suite uses **stateless per-test isolation**:
+
+### User Isolation
+- Each test generates a unique user with UUID-based email: `e2e-{uuid}@test.votive.local`
+- No shared users between parallel tests
+- Users are created fresh per test, never reused
+
+### Automatic Cleanup
+| What | How | When |
+|------|-----|------|
+| Cookies | `page.context().clearCookies()` | After `authenticatedPage` fixture |
+| Browser context | Playwright isolation | Each test file |
+| localStorage | `localStorage.clear()` | Explicitly in tests when needed |
+
+### Database Considerations
+- Test users accumulate in database (no auto-cleanup)
+- Uses `.votive.local` domain to distinguish from real users
+- Reset via `npm run db:seed:test` if needed (drops and recreates data with dummy prompt)
+
+### Why No afterEach Hooks?
+- Playwright's browser context isolation provides cleanup automatically
+- Each test gets a fresh browser context via fixtures
+- No shared state between test files or parallel workers

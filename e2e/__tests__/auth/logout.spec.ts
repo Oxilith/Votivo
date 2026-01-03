@@ -71,7 +71,7 @@ test.describe('User Logout', () => {
 
     // Wait for redirect and page to fully load
     await authenticatedPage.waitForURL('**/');
-    await authenticatedPage.waitForLoadState('networkidle');
+    await authenticatedPage.waitForLoadState('domcontentloaded');
 
     // Wait for CSRF cookie to be cleared using Playwright context
     // (cookie is httpOnly so document.cookie can't see it)

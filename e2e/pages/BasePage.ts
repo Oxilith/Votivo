@@ -41,20 +41,36 @@ export class BasePage {
   }
 
   /**
+   * Wait for the React app to render by checking for common page indicators.
+   * Uses a disjunction of selectors that cover all page types.
+   */
+  async waitForAppReady(): Promise<void> {
+    // Wait for any of these page-level containers (React has rendered)
+    await this.page
+      .locator(
+        '[data-testid="landing-page"], ' +
+          '[data-testid="auth-page"], ' +
+          '[data-testid="nav-header"]'
+      )
+      .first()
+      .waitFor({ state: 'visible', timeout: E2E_TIMEOUTS.navigation });
+  }
+
+  /**
    * Navigate to a path relative to base URL
    *
    * @param path - Path to navigate to (e.g., '/auth', '/assessment')
    */
   async goto(path: string): Promise<void> {
-    await this.page.goto(path);
-    await this.page.waitForLoadState('networkidle');
+    await this.page.goto(path, { waitUntil: 'domcontentloaded' });
+    await this.waitForAppReady();
   }
 
   /**
-   * Wait for navigation and network to complete
+   * Wait for navigation and DOM to be ready
    */
   async waitForNavigation(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**
@@ -81,12 +97,8 @@ export class BasePage {
     // Look for user avatar dropdown - only check the specific data-testid
     try {
       const avatar = this.page.locator('[data-testid="user-avatar-dropdown"]');
-      return await avatar.isVisible({ timeout: E2E_TIMEOUTS.elementQuick });
-    } catch (error) {
-      // Timeout is expected when element not visible
-      if (error instanceof Error && !error.message.includes('Timeout')) {
-        console.debug('Login state check failed:', error.message);
-      }
+      return await avatar.isVisible({ timeout: E2E_TIMEOUTS.elementVisible });
+    } catch {
       return false;
     }
   }
@@ -115,7 +127,7 @@ export class BasePage {
       await Promise.all([this.page.waitForResponse(options.url), this.page.click(selector)]);
     } else {
       await this.page.click(selector);
-      await this.page.waitForLoadState('networkidle');
+      await this.page.waitForLoadState('domcontentloaded');
     }
   }
 
@@ -160,7 +172,6 @@ export class BasePage {
    * Reload the current page
    */
   async reload(): Promise<void> {
-    await this.page.reload();
-    await this.page.waitForLoadState('networkidle');
+    await this.page.reload({ waitUntil: 'domcontentloaded' });
   }
 }

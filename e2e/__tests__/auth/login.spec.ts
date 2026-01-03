@@ -41,7 +41,7 @@ test.describe('User Login', () => {
     const error = await loginPage.getErrorMessage();
     expect(error).toBeTruthy();
     // API returns "Invalid email or password" for failed login
-    expect(error?.toLowerCase()).toContain('invalid');
+    expect(error).toBe('Invalid email or password');
   });
 
   test('should login successfully with valid credentials', async ({ page }) => {

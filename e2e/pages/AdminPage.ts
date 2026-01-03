@@ -91,7 +91,28 @@ export class AdminPage extends BasePage {
    */
   async navigate(): Promise<void> {
     await this.page.goto(`${ADMIN_BASE_URL}/admin`);
-    await this.page.waitForLoadState('networkidle');
+    await this.waitForAdminReady();
+  }
+
+  /**
+   * Wait for admin panel to be ready (either login form or logged-in UI)
+   * Overrides base waitForAppReady since admin panel has different structure
+   */
+  async waitForAdminReady(): Promise<void> {
+    // Wait for either login form OR logout button (logged-in state)
+    await this.page
+      .locator(`${this.apiKeyInput}, ${this.logoutButton}`)
+      .first()
+      .waitFor({ state: 'visible', timeout: E2E_TIMEOUTS.navigation });
+  }
+
+  /**
+   * Reload the admin page
+   * Overrides base reload since admin panel has different structure
+   */
+  async reload(): Promise<void> {
+    await this.page.reload({ waitUntil: 'domcontentloaded' });
+    await this.waitForAdminReady();
   }
 
   /**
