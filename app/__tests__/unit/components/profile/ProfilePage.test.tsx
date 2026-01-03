@@ -2,7 +2,7 @@
  * @file app/__tests__/unit/components/profile/ProfilePage.test.tsx
  * @purpose Unit tests for ProfilePage component
  * @functionality
- * - Tests tab navigation between profile sections
+ * - Tests tab navigation between profile sections (using data-testid)
  * - Tests profile form submission and validation
  * - Tests password change form with validation
  * - Tests assessments and analyses list loading
@@ -66,9 +66,12 @@ vi.mock('@/stores/useAuthStore', () => ({
   useCurrentUser: () => mockUser,
 }));
 
+const mockResetUIState = vi.fn();
+
 vi.mock('@/stores/useUIStore', () => ({
   useUIStore: () => ({
     setView: mockSetView,
+    resetUIState: mockResetUIState,
   }),
 }));
 
@@ -139,7 +142,7 @@ vi.mock('@/components', () => ({
   ),
   FooterSection: () => <footer data-testid="footer" />,
   CheckIcon: () => <span data-testid="check-icon" />,
-  LoadingSpinnerIcon: () => <span data-testid="loading-spinner" />,
+  InkLoader: () => <span data-testid="ink-loader" />,
   ErrorCircleIcon: () => <span data-testid="error-icon" />,
   RefreshIcon: () => <span data-testid="refresh-icon" />,
   InkBrushDecoration: () => <div data-testid="ink-decoration" />,
@@ -169,11 +172,11 @@ describe('ProfilePage', () => {
 
     it('should render tab navigation', () => {
       render(<ProfilePage />);
-      expect(screen.getByText('profile.tabs.profile')).toBeInTheDocument();
-      expect(screen.getByText('profile.tabs.password')).toBeInTheDocument();
-      expect(screen.getByText('profile.tabs.assessments')).toBeInTheDocument();
-      expect(screen.getByText('profile.tabs.analyses')).toBeInTheDocument();
-      expect(screen.getByText('profile.tabs.danger')).toBeInTheDocument();
+      expect(screen.getByTestId('profile-tab-profile')).toBeInTheDocument();
+      expect(screen.getByTestId('profile-tab-password')).toBeInTheDocument();
+      expect(screen.getByTestId('profile-tab-assessments')).toBeInTheDocument();
+      expect(screen.getByTestId('profile-tab-analyses')).toBeInTheDocument();
+      expect(screen.getByTestId('profile-tab-danger')).toBeInTheDocument();
     });
 
     it('should show profile tab content by default', () => {
@@ -187,7 +190,7 @@ describe('ProfilePage', () => {
       const user = userEvent.setup();
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.password'));
+      await user.click(screen.getByTestId('profile-tab-password'));
 
       expect(screen.getByText('passwordTab.title')).toBeInTheDocument();
     });
@@ -198,7 +201,7 @@ describe('ProfilePage', () => {
       mockGetAssessments.mockResolvedValue([]);
 
       render(<ProfilePage />);
-      await user.click(screen.getByText('profile.tabs.assessments'));
+      await user.click(screen.getByTestId('profile-tab-assessments'));
 
       expect(screen.getByText('assessmentsTab.title')).toBeInTheDocument();
     });
@@ -207,7 +210,7 @@ describe('ProfilePage', () => {
       const user = userEvent.setup();
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.danger'));
+      await user.click(screen.getByTestId('profile-tab-danger'));
 
       expect(screen.getByText('dangerTab.title')).toBeInTheDocument();
     });
@@ -284,7 +287,7 @@ describe('ProfilePage', () => {
       const user = userEvent.setup();
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.password'));
+      await user.click(screen.getByTestId('profile-tab-password'));
 
       const currentPwd = screen.getByTestId('input-passwordTab.currentPassword');
       const newPwd = screen.getByTestId('input-passwordTab.newPassword');
@@ -303,7 +306,7 @@ describe('ProfilePage', () => {
       const user = userEvent.setup();
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.password'));
+      await user.click(screen.getByTestId('profile-tab-password'));
 
       const currentPwd = screen.getByTestId('input-passwordTab.currentPassword');
       const newPwd = screen.getByTestId('input-passwordTab.newPassword');
@@ -322,7 +325,7 @@ describe('ProfilePage', () => {
       const user = userEvent.setup();
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.password'));
+      await user.click(screen.getByTestId('profile-tab-password'));
 
       const currentPwd = screen.getByTestId('input-passwordTab.currentPassword');
       const newPwd = screen.getByTestId('input-passwordTab.newPassword');
@@ -343,7 +346,7 @@ describe('ProfilePage', () => {
 
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.password'));
+      await user.click(screen.getByTestId('profile-tab-password'));
 
       const currentPwd = screen.getByTestId('input-passwordTab.currentPassword');
       const newPwd = screen.getByTestId('input-passwordTab.newPassword');
@@ -369,7 +372,7 @@ describe('ProfilePage', () => {
 
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.password'));
+      await user.click(screen.getByTestId('profile-tab-password'));
 
       const currentPwd = screen.getByTestId('input-passwordTab.currentPassword');
       const newPwd = screen.getByTestId('input-passwordTab.newPassword');
@@ -396,7 +399,7 @@ describe('ProfilePage', () => {
       ]);
 
       render(<ProfilePage />);
-      await user.click(screen.getByText('profile.tabs.assessments'));
+      await user.click(screen.getByTestId('profile-tab-assessments'));
 
       await waitFor(() => {
         expect(mockGetAssessments).toHaveBeenCalled();
@@ -409,7 +412,7 @@ describe('ProfilePage', () => {
       mockGetAssessments.mockResolvedValue([]);
 
       render(<ProfilePage />);
-      await user.click(screen.getByText('profile.tabs.assessments'));
+      await user.click(screen.getByTestId('profile-tab-assessments'));
 
       await waitFor(() => {
         expect(screen.getByText('assessmentsTab.empty')).toBeInTheDocument();
@@ -422,7 +425,7 @@ describe('ProfilePage', () => {
       mockGetAssessments.mockRejectedValue(new Error('Load failed'));
 
       render(<ProfilePage />);
-      await user.click(screen.getByText('profile.tabs.assessments'));
+      await user.click(screen.getByTestId('profile-tab-assessments'));
 
       await waitFor(() => {
         expect(screen.getByText('assessmentsTab.loadError')).toBeInTheDocument();
@@ -436,21 +439,21 @@ describe('ProfilePage', () => {
       const user = userEvent.setup();
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.danger'));
-      await user.click(screen.getByText('dangerTab.deleteButton'));
+      await user.click(screen.getByTestId('profile-tab-danger'));
+      await user.click(screen.getByTestId('profile-btn-delete-account'));
 
       expect(screen.getByText('dangerTab.confirmPrompt')).toBeInTheDocument();
-      expect(screen.getByText('dangerTab.confirmDelete')).toBeInTheDocument();
-      expect(screen.getByText('dangerTab.cancel')).toBeInTheDocument();
+      expect(screen.getByTestId('profile-btn-confirm-delete')).toBeInTheDocument();
+      expect(screen.getByTestId('profile-btn-cancel-delete')).toBeInTheDocument();
     });
 
     it('should cancel deletion when cancel is clicked', async () => {
       const user = userEvent.setup();
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.danger'));
-      await user.click(screen.getByText('dangerTab.deleteButton'));
-      await user.click(screen.getByText('dangerTab.cancel'));
+      await user.click(screen.getByTestId('profile-tab-danger'));
+      await user.click(screen.getByTestId('profile-btn-delete-account'));
+      await user.click(screen.getByTestId('profile-btn-cancel-delete'));
 
       expect(screen.queryByText('dangerTab.confirmPrompt')).not.toBeInTheDocument();
     });
@@ -461,9 +464,9 @@ describe('ProfilePage', () => {
 
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.danger'));
-      await user.click(screen.getByText('dangerTab.deleteButton'));
-      await user.click(screen.getByText('dangerTab.confirmDelete'));
+      await user.click(screen.getByTestId('profile-tab-danger'));
+      await user.click(screen.getByTestId('profile-btn-delete-account'));
+      await user.click(screen.getByTestId('profile-btn-confirm-delete'));
 
       await waitFor(() => {
         expect(mockDeleteAccount).toHaveBeenCalled();
@@ -478,9 +481,9 @@ describe('ProfilePage', () => {
 
       render(<ProfilePage />);
 
-      await user.click(screen.getByText('profile.tabs.danger'));
-      await user.click(screen.getByText('dangerTab.deleteButton'));
-      await user.click(screen.getByText('dangerTab.confirmDelete'));
+      await user.click(screen.getByTestId('profile-tab-danger'));
+      await user.click(screen.getByTestId('profile-btn-delete-account'));
+      await user.click(screen.getByTestId('profile-btn-confirm-delete'));
 
       await waitFor(() => {
         expect(screen.getByText('dangerTab.deleteFailed')).toBeInTheDocument();
@@ -516,7 +519,7 @@ describe('ProfilePage', () => {
       mockIsAssessmentsListStale.mockReturnValue(false);
 
       render(<ProfilePage onNavigateToAssessmentById={onNavigateToAssessmentById} />);
-      await user.click(screen.getByText('profile.tabs.assessments'));
+      await user.click(screen.getByTestId('profile-tab-assessments'));
 
       // Wait for the list to render, then click
       const assessmentItem = await screen.findByText(/assessmentsTab.fromDate/);
@@ -542,7 +545,7 @@ describe('ProfilePage', () => {
       mockIsAnalysesListStale.mockReturnValue(false);
 
       render(<ProfilePage onNavigateToInsightsById={onNavigateToInsightsById} />);
-      await user.click(screen.getByText('profile.tabs.analyses'));
+      await user.click(screen.getByTestId('profile-tab-analyses'));
 
       // Wait for the list to render, then click
       const analysisItem = await screen.findByText(/analysesTab.fromDate/);

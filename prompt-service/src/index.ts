@@ -139,10 +139,10 @@ app.use('/api', apiRouter);
 // Serve admin UI static files
 const adminPath = path.join(__dirname, 'admin');
 
-// Rate limiter for admin static files
+// Rate limiter for admin static files (uses same config as admin API)
 const adminStaticRateLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 100, // 100 requests per 10 minutes
+  windowMs: config.rateLimit.adminWindowMs,
+  max: config.rateLimit.adminApi,
   message: { error: 'Too many requests to admin UI, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,

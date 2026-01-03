@@ -57,7 +57,7 @@ const LandingPage: FC<LandingPageProps> = ({ onStartDiscovery, onNavigateToAuth,
   useScrollReveal();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" data-testid="landing-page">
       <NavSection
         onStartDiscovery={onStartDiscovery}
         onNavigateToAuth={onNavigateToAuth}

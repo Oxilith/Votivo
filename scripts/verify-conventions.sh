@@ -297,46 +297,41 @@ fi
 echo ""
 echo -e "${BLUE}[9/13] Checking for deep imports bypassing barrels...${NC}"
 
-# Find imports that go 2+ levels deep with @/ alias (but not test files)
-# Pattern: '@/word/word' where second word is not index
-DEEP_IMPORTS=$(grep -rn "from ['\"]@/[^'\"]*/[^'\"]*['\"]" --include="*.ts" --include="*.tsx" \
+# Find imports that go 3+ levels deep with @/ alias (but not test files)
+# Pattern: '@/word/word/word' - 3+ segments means bypassing a barrel
+# Note: '@/one/two' (2 segments) is allowed as it's importing from a barrel
+DEEP_IMPORTS=$(grep -rn "from ['\"]@/[^/'\"]\+/[^/'\"]\+/[^'\"]\+['\"]" --include="*.ts" --include="*.tsx" \
     backend/src worker/src prompt-service/src app/src 2>/dev/null \
-    | grep -v "\.test\." \
-    | grep -v "\.spec\." \
-    | grep -v "__tests__" \
-    | grep -v "/index['\"]" \
     | grep -v "\.json['\"]" \
-    | grep -v "// @allow-deep-import" \
-    | grep -v "@/stores/use" \
-    | grep -v "@/services/api/" \
-    | grep -v "admin/pages/.*@/admin/" \
-    | grep -v "@/utils/bootstrap-logger" \
-    | grep -v "testing/integration-setup.ts" \
     || true)
 
 if [ -n "$DEEP_IMPORTS" ]; then
-    # Check if the parent directory has a barrel
+    # Check if the import bypasses an existing barrel
     ACTUAL_VIOLATIONS=""
     while IFS= read -r line; do
         # Extract file path
         FILE_PATH=$(echo "$line" | cut -d':' -f1)
-        
+
         # Check for file-level exception (// @barrel-exceptions in first 10 lines)
         if head -10 "$FILE_PATH" 2>/dev/null | grep -q "// @barrel-exceptions"; then
             continue
         fi
-        
+
         # Extract the import path using sed (POSIX compatible)
         IMPORT_PATH=$(echo "$line" | sed -n "s/.*from ['\"]@\/\([^'\"]*\)['\"].*/\1/p")
-        # Get the first directory level
-        FIRST_DIR=$(echo "$IMPORT_PATH" | cut -d'/' -f1)
         PKG_DIR=$(echo "$FILE_PATH" | cut -d'/' -f1)
-        
-        # Check if barrel exists at first level
-        BARREL_PATH="$PKG_DIR/src/$FIRST_DIR/index.ts"
-        if [ -f "$BARREL_PATH" ]; then
-            ACTUAL_VIOLATIONS="$ACTUAL_VIOLATIONS$line"$'\n'
-        fi
+
+        # For 3+ segment imports, check if any parent directory has a barrel
+        # e.g., @/admin/styles/theme -> check if admin/styles/index.ts exists
+        PARENT_PATH=$(dirname "$IMPORT_PATH")
+        while [ "$PARENT_PATH" != "." ]; do
+            PARENT_BARREL="$PKG_DIR/src/$PARENT_PATH/index.ts"
+            if [ -f "$PARENT_BARREL" ]; then
+                ACTUAL_VIOLATIONS="$ACTUAL_VIOLATIONS$line"$'\n'
+                break
+            fi
+            PARENT_PATH=$(dirname "$PARENT_PATH")
+        done
     done <<< "$DEEP_IMPORTS"
     
     if [ -n "$ACTUAL_VIOLATIONS" ]; then

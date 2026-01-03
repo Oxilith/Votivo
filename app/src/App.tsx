@@ -27,13 +27,13 @@
  * - @/types/assessment.types
  * - @/utils/fileUtils
  * - @/components/providers/ThemeProvider
- * - @/services/api/AuthService
+ * - @/services
  */
 
 import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { AuthGuard, ChunkErrorBoundary, ThemeProvider, LoadingFallback } from '@/components';
 import type { AssessmentResponses } from '@/types';
-import { exportToJson } from '@/utils';
+import { exportToJson, logger } from '@/utils';
 import { useAssessmentStore, useUIStore, useAnalysisStore, useAuthStore, useAuthInitialized, useAuthHydrated } from '@/stores';
 import { authService } from '@/services';
 import { useRouting, useResourceLoader } from '@/hooks';
@@ -50,7 +50,7 @@ const NotFoundPage = lazy(() => import('@/components/not-found/NotFoundPage'));
 
 function App() {
   // Zustand stores
-  const { responses, setResponses, clearResponses } = useAssessmentStore();
+  const { responses, setResponses, clearResponses, updateLastReached, setSavedAt } = useAssessmentStore();
   const {
     currentView,
     assessmentKey,
@@ -59,8 +59,12 @@ function App() {
     setStartAtSynthesis,
     pendingAuthReturn,
     setPendingAuthReturn,
+    pendingAssessmentSave,
+    setPendingAssessmentSave,
     isReadOnly,
     viewingAssessmentId,
+    resetUIState,
+    setError,
   } = useUIStore();
   const { analysis, exportAnalysisToJson, clearAnalysis } = useAnalysisStore();
 
@@ -74,7 +78,7 @@ function App() {
   const isAuthInitialized = useAuthInitialized();
   const isAuthHydrated = useAuthHydrated();
   const isAuthenticated = useAuthStore((state) => state.user !== null);
-  const { setAuth, setInitialized, setLoading, clearAuth } = useAuthStore();
+  const { setAuth, setInitialized, setLoading, clearAuth, invalidateAssessmentsList } = useAuthStore();
 
   // Initialize auth state on mount
   // Wait for Zustand persist to hydrate before attempting auth refresh
@@ -90,8 +94,9 @@ function App() {
         // Use combined endpoint for efficient auth restoration
         const result = await authService.refreshTokenWithUser();
         setAuth(result.user, result.accessToken, result.csrfToken);
-      } catch {
+      } catch (error) {
         // No valid session - clear any stale auth state
+        logger.debug('Session refresh failed, clearing auth', { error });
         clearAuth();
       } finally {
         setLoading(false);
@@ -113,10 +118,12 @@ function App() {
   const handleImportResponses = useCallback(
     (imported: AssessmentResponses) => {
       setResponses(imported);
+      // Update lastReached to synthesis position (phase 3, step 0) since import = complete assessment
+      updateLastReached(3, 0);
       setStartAtSynthesis(true);
       incrementAssessmentKey();
     },
-    [setResponses, setStartAtSynthesis, incrementAssessmentKey]
+    [setResponses, updateLastReached, setStartAtSynthesis, incrementAssessmentKey]
   );
 
   const handleExportResponses = useCallback(() => {
@@ -137,6 +144,13 @@ function App() {
     navigate('assessment');
   }, [navigate]);
 
+  // Navigate to /assessment/new for fresh start (retake clears stores, doesn't load from DB)
+  const handleRetakeAssessment = useCallback(() => {
+    clearResponses();
+    clearAnalysis();
+    navigate('assessment', { freshStart: true });
+  }, [clearResponses, clearAnalysis, navigate]);
+
   const handleNavigateToAuth = useCallback(() => {
     navigate('auth', { authMode: 'login' });
   }, [navigate]);
@@ -145,7 +159,24 @@ function App() {
     navigate('auth', { authMode: 'register' });
   }, [navigate]);
 
-  const handleAuthSuccess = useCallback(() => {
+  const handleAuthSuccessAsync = useCallback(async () => {
+    // If we have a pending assessment save, save it now
+    if (pendingAssessmentSave) {
+      setPendingAssessmentSave(false);
+      try {
+        const savedAssessment = await authService.saveAssessment(responses as AssessmentResponses);
+        // Use server timestamp for accurate sync
+        setSavedAt(savedAssessment.createdAt);
+        invalidateAssessmentsList();
+      } catch (error) {
+        // Save failed - log error, show alert to user, stay on assessment
+        logger.error('Failed to save assessment after auth', error);
+        setError('Failed to save assessment. Please try again.');
+        navigate('assessment');
+        return;
+      }
+    }
+
     // Check if we should return to a specific view after auth
     if (pendingAuthReturn) {
       const returnTo = pendingAuthReturn;
@@ -154,7 +185,11 @@ function App() {
     } else {
       navigate('landing');
     }
-  }, [navigate, pendingAuthReturn, setPendingAuthReturn]);
+  }, [navigate, pendingAuthReturn, setPendingAuthReturn, pendingAssessmentSave, setPendingAssessmentSave, responses, setSavedAt, invalidateAssessmentsList, setError]);
+
+  const handleAuthSuccess = useCallback(() => {
+    void handleAuthSuccessAsync();
+  }, [handleAuthSuccessAsync]);
 
   const handleNavigateToProfile = useCallback(() => {
     navigate('profile');
@@ -180,25 +215,21 @@ function App() {
     [navigate]
   );
 
-  // Navigate to auth with return destination (for save prompts)
-  const handleNavigateToAuthWithReturn = useCallback((returnTo: 'insights' | 'assessment') => {
-    setPendingAuthReturn(returnTo);
-    navigate('auth', { authMode: 'login' });
-  }, [navigate, setPendingAuthReturn]);
-
   // Sign out - clear auth and all user data
   const handleSignOutAsync = useCallback(async () => {
     try {
       await authService.logout();
-    } catch {
+    } catch (error) {
       // Logout errors are expected (e.g., expired token) - proceed with local cleanup
+      logger.debug('Logout request failed, proceeding with local cleanup', { error });
     } finally {
       clearResponses();
       clearAnalysis();
       clearAuth();
+      resetUIState();
       navigate('landing');
     }
-  }, [clearResponses, clearAnalysis, clearAuth, navigate]);
+  }, [clearResponses, clearAnalysis, clearAuth, resetUIState, navigate]);
 
   // Sync wrapper for event handlers
   const handleSignOut = useCallback(() => {
@@ -315,21 +346,15 @@ function App() {
           </ThemeProvider>
         );
       }
-      // Now auth is ready - require authentication
+      // Redirect unauthenticated users to sign-in page
       if (!isAuthenticated) {
+        if (!pendingAuthReturn) {
+          setPendingAuthReturn('assessment');
+        }
+        navigate('auth', { authMode: 'login' });
         return (
           <ThemeProvider>
-            <ChunkErrorBoundary>
-              <Suspense fallback={<LoadingFallback />}>
-                <AuthPage
-                  initialMode="login"
-                  onAuthSuccess={() => {
-                    // Stay on current URL - component re-renders when auth state changes
-                    // and useResourceLoader will load the assessment
-                  }}
-                />
-              </Suspense>
-            </ChunkErrorBoundary>
+            <LoadingFallback />
           </ThemeProvider>
         );
       }
@@ -346,6 +371,8 @@ function App() {
               onImport={handleImportResponses}
               onExport={handleExportResponses}
               onNavigateToLanding={handleNavigateToLanding}
+              onNavigateToAssessment={handleNavigateToAssessment}
+              onRetakeAssessment={handleRetakeAssessment}
               onNavigateToInsights={handleNavigateToInsights}
               onNavigateToAuth={handleNavigateToAuth}
               onNavigateToProfile={handleNavigateToProfile}
@@ -359,35 +386,27 @@ function App() {
     );
   }
 
-  // Insights view has its own navigation
-  // For ID-based navigation, wait for auth to be fully ready before rendering
-  if (routeParams.resourceId) {
-    // Show loading while auth is initializing
-    if (!isAuthHydrated || !isAuthInitialized) {
-      return (
-        <ThemeProvider>
-          <LoadingFallback />
-        </ThemeProvider>
-      );
+  // Insights view requires authentication
+  // Wait for auth to be fully ready before rendering
+  if (!isAuthHydrated || !isAuthInitialized) {
+    return (
+      <ThemeProvider>
+        <LoadingFallback />
+      </ThemeProvider>
+    );
+  }
+  // Redirect unauthenticated users to sign-in page
+  if (!isAuthenticated) {
+    // Set pending return so after auth we come back to insights
+    if (!pendingAuthReturn) {
+      setPendingAuthReturn('insights');
     }
-    // Now auth is ready - require authentication
-    if (!isAuthenticated) {
-      return (
-        <ThemeProvider>
-          <ChunkErrorBoundary>
-            <Suspense fallback={<LoadingFallback />}>
-              <AuthPage
-                initialMode="login"
-                onAuthSuccess={() => {
-                  // Stay on current URL - component re-renders when auth state changes
-                  // and useResourceLoader will load the analysis
-                }}
-              />
-            </Suspense>
-          </ChunkErrorBoundary>
-        </ThemeProvider>
-      );
-    }
+    navigate('auth', { authMode: 'login' });
+    return (
+      <ThemeProvider>
+        <LoadingFallback />
+      </ThemeProvider>
+    );
   }
   return (
     <ThemeProvider>
@@ -403,7 +422,6 @@ function App() {
             onNavigateToAssessment={handleNavigateToAssessment}
             onNavigateToAuth={handleNavigateToAuth}
             onNavigateToProfile={handleNavigateToProfile}
-            onNavigateToAuthWithReturn={handleNavigateToAuthWithReturn}
             onSignOut={handleSignOut}
             isReadOnly={isReadOnly}
             viewingAssessmentId={viewingAssessmentId}

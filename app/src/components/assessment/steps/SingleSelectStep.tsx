@@ -28,21 +28,31 @@ export const SingleSelectStep: React.FC<SingleSelectStepProps> = ({ step, value,
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="single-select-step">
       <div>
-        <h3 className="font-display text-xl font-medium text-[var(--text-primary)] mb-2">
+        <h3
+          id={`question-${step.id}`}
+          className="font-display text-xl font-medium text-[var(--text-primary)] mb-2"
+        >
           {step.question}
         </h3>
         {step.context && (
           <p className="font-body text-[var(--text-secondary)] text-sm">{step.context}</p>
         )}
       </div>
-      <div className="grid gap-2">
+      <div
+        className="grid gap-2"
+        role="radiogroup"
+        aria-labelledby={`question-${step.id}`}
+      >
         {step.options.map((option: SelectOption) => (
           <button
             key={option.id}
+            role="radio"
+            aria-checked={value === option.id}
             onClick={() => { handleClick(option.id); }}
             disabled={isReadOnly}
+            data-testid={`single-select-option-${option.id}`}
             className={`text-left p-4 border-2 rounded-sm transition-all ${
               value === option.id
                 ? 'border-[var(--accent)] bg-[var(--accent)]/5'

@@ -1,6 +1,6 @@
 /**
- * @file src/components/insights/IdentityInsightsAI.tsx
- * @purpose AI-powered analysis display with Ink & Stone styling
+ * @file app/src/components/insights/IdentityInsightsAI.tsx
+ * @purpose AI-powered analysis display with Ink & Stone styling (requires authentication)
  * @functionality
  * - Receives assessment responses as props
  * - Uses Zustand analysis store for state management
@@ -14,25 +14,26 @@
  * - Supports view-only mode for viewing saved analyses with PageHeader
  * - Supports dark mode theme switching
  * - Supports internationalization (English/Polish)
- * - Prompts unauthenticated users to save their analysis
- * - Auto-saves analysis for authenticated users
+ * - Auto-saves analysis via store action with error tracking
+ * - Shows save error alert with retry option when save fails
+ * - Blocks analysis when assessment has unsaved changes (dirty state)
  * @dependencies
  * - React (useState, useCallback, useRef, useEffect)
  * - react-i18next (useTranslation)
  * - @/types/assessment.types (InsightsProps)
- * - @/stores (useAnalysisStore)
- * - @/stores/useAuthStore (useIsAuthenticated, useCurrentUser)
+ * - @/stores (useAnalysisStore, useAssessmentStore)
+ * - @/stores/useAuthStore (useCurrentUser)
  * - @/services/api/AuthService
  * - @/styles/theme (cardStyles, textStyles)
  * - shared (UserProfileForAnalysis)
  * - @/components/landing/sections/FooterSection
  * - @/components/shared/PageNavigation
+ * - @/components/shared/Alert
  * - @/components/insights/InsightsPageHeader
  * - @/components/shared/InkBrushDecoration
  * - @/components/shared/icons (ErrorCircleIcon, SearchIcon, etc.)
  * - @/utils/fileUtils
  * - ./InsightCard (InsightCard component)
- * - ./SavePromptModal
  */
 
 import React, { useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
@@ -46,16 +47,18 @@ import type {
   AnalysisRisk,
 } from '@/types';
 import { useAnalysisStore } from '@/stores/useAnalysisStore';
-import { useIsAuthenticated, useCurrentUser } from '@/stores/useAuthStore';
+import { useAssessmentStore } from '@/stores/useAssessmentStore';
+import { useCurrentUser } from '@/stores/useAuthStore';
 import type { UserProfileForAnalysis } from '@votive/shared';
-import { authService } from '@/services/api/AuthService';
+import { authService } from '@/services/api';
 import { cardStyles, textStyles } from '@/styles';
 import InsightCard from './InsightCard';
-import SavePromptModal from './SavePromptModal';
 import {
   FooterSection,
   PageNavigation,
   InkBrushDecoration,
+  InkLoader,
+  Alert,
   ErrorCircleIcon,
   SearchIcon,
   SwitchHorizontalIcon,
@@ -87,7 +90,6 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
   onNavigateToAssessment,
   onNavigateToAuth,
   onNavigateToProfile,
-  onNavigateToAuthWithReturn,
   onSignOut,
   isReadOnly = false,
   viewingAssessmentId,
@@ -106,56 +108,58 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
     analysisError: error,
     analyze,
     downloadRawResponse,
+    // Save status
+    saveError,
+    isSaving,
+    saveAnalysis,
+    clearSaveError,
   } = useAnalysisStore();
 
   // In view-only mode, use the viewOnlyAnalysis.result instead of store analysis
   const analysis = viewOnlyAnalysis?.result ?? storeAnalysis;
 
-  // Auth state
-  const isAuthenticated = useIsAuthenticated();
+  // Auth state - insights page requires authentication (enforced by App.tsx)
   const currentUser = useCurrentUser();
-  const [showSavePrompt, setShowSavePrompt] = useState(false);
-  const [hasSaved, setHasSaved] = useState(false);
+
+  // Check if assessment is not yet completed (blocks analysis)
+  const savedAt = useAssessmentStore((state) => state.savedAt);
+  const isAssessmentIncomplete = savedAt === null;
   const prevAnalysisRef = useRef(storeAnalysis);
 
-  // Auto-save for authenticated users when analysis completes
+  // Auto-save analysis when it completes
   // Skip if read-only (viewing a saved analysis) to prevent duplication
   useEffect(() => {
     // Only run when store analysis changes from null/undefined to a value
     if (storeAnalysis && storeAnalysis !== prevAnalysisRef.current && !loading && !isReadOnly) {
       prevAnalysisRef.current = storeAnalysis;
 
-      if (isAuthenticated) {
-        // Auto-save for authenticated users
-        // Pass viewingAssessmentId to link this analysis to its assessment
-        const saveAnalysisAsync = async () => {
+      // Link analysis to assessment: use viewingAssessmentId if set, otherwise get most recent
+      const saveAnalysisAsync = async () => {
+        let assessmentIdToLink = viewingAssessmentId ?? undefined;
+
+        // If no viewingAssessmentId, get the most recent assessment to link to
+        if (!assessmentIdToLink) {
           try {
-            await authService.saveAnalysis(storeAnalysis, viewingAssessmentId ?? undefined);
-            setHasSaved(true);
+            const assessments = await authService.getAssessments();
+            if (Array.isArray(assessments) && assessments.length > 0) {
+              const sorted = [...assessments].sort(
+                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              );
+              assessmentIdToLink = sorted[0].id;
+            }
           } catch (error) {
-            // Silently fail - user can still see their analysis
-            logger.error('Failed to save analysis', error);
+            // If fetching assessments fails, proceed without linking
+            // Log for debugging purposes
+            logger.debug('Failed to fetch assessments for analysis linking', { error });
           }
-        };
-        void saveAnalysisAsync();
-      }
-    }
-  }, [storeAnalysis, isAuthenticated, loading, isReadOnly, viewingAssessmentId]);
+        }
 
-  // Show save prompt for unauthenticated users after analysis completes
-  // Using a separate effect to track when we should show the prompt
-  // Skip in view-only mode (we're viewing an existing analysis, not creating new)
-  const shouldShowPrompt = !!(analysis && !isAuthenticated && !hasSaved && !loading && !showSavePrompt && !isReadOnly);
-
-  useEffect(() => {
-    if (shouldShowPrompt) {
-      // Use a small delay to avoid cascading render issues
-      const timer = setTimeout(() => {
-        setShowSavePrompt(true);
-      }, 500);
-      return () => { clearTimeout(timer); };
+        // Use store action to save with error tracking
+        void saveAnalysis(storeAnalysis, assessmentIdToLink);
+      };
+      void saveAnalysisAsync();
     }
-  }, [shouldShowPrompt]);
+  }, [storeAnalysis, loading, isReadOnly, viewingAssessmentId, saveAnalysis]);
 
   const handleFileSelectAsync = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -186,9 +190,8 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
   const analyzeWithClaudeAsync = useCallback(async () => {
     const language = i18n.language === 'pl' ? 'polish' : 'english';
-    setHasSaved(false); // Reset saved state for new analysis
 
-    // Build user profile for demographic context if authenticated
+    // Build user profile for demographic context
     let userProfile: UserProfileForAnalysis | undefined;
     if (currentUser) {
       const currentYear = new Date().getFullYear();
@@ -206,29 +209,11 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
     void analyzeWithClaudeAsync();
   }, [analyzeWithClaudeAsync]);
 
-  // Save prompt handlers - use returnTo so user comes back to insights after auth
-  const handleSavePromptSignIn = useCallback(() => {
-    setShowSavePrompt(false);
-    if (onNavigateToAuthWithReturn) {
-      onNavigateToAuthWithReturn('insights');
-    } else {
-      onNavigateToAuth?.();
-    }
-  }, [onNavigateToAuth, onNavigateToAuthWithReturn]);
-
-  const handleSavePromptCreateAccount = useCallback(() => {
-    setShowSavePrompt(false);
-    if (onNavigateToAuthWithReturn) {
-      onNavigateToAuthWithReturn('insights');
-    } else {
-      onNavigateToAuth?.();
-    }
-  }, [onNavigateToAuth, onNavigateToAuthWithReturn]);
-
-  const handleSavePromptContinue = useCallback(() => {
-    setShowSavePrompt(false);
-    setHasSaved(true); // Prevent modal from reappearing
-  }, []);
+  // Handler for retrying save when it fails
+  const handleRetrySave = useCallback(() => {
+    if (!storeAnalysis) return;
+    void saveAnalysis(storeAnalysis, viewingAssessmentId ?? undefined);
+  }, [storeAnalysis, saveAnalysis, viewingAssessmentId]);
 
   const tabs: Tab[] = analysis
     ? [
@@ -242,15 +227,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
     : [];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative">
-      {/* Save Prompt Modal */}
-      <SavePromptModal
-        isOpen={showSavePrompt}
-        onSignIn={handleSavePromptSignIn}
-        onCreateAccount={handleSavePromptCreateAccount}
-        onContinue={handleSavePromptContinue}
-      />
-
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative" data-testid="insights-page">
       {/* Hidden file input for import - placed at root level for browser compatibility */}
       <input
         ref={fileInputRef}
@@ -263,31 +240,28 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
       {/* Fixed Ink Brush Decoration - Right side */}
       <InkBrushDecoration />
 
-      {/* Page Navigation */}
+      {/* Page Navigation - export is handled by InsightsPageHeader */}
       <PageNavigation
         currentPage="insights"
         onNavigateToLanding={onNavigateToLanding}
         onNavigateToAssessment={onNavigateToAssessment}
         onNavigateToInsights={undefined} // Already on insights
         onNavigateToAuth={onNavigateToAuth}
-        onExportAssessment={isReadOnly ? undefined : (hasResponses ? handleExportClick : undefined)}
-        onExportAnalysis={isReadOnly ? undefined : (hasAnalysis && onExportAnalysis ? handleExportAnalysisClick : undefined)}
         onNavigateToProfile={onNavigateToProfile}
         onSignOut={onSignOut}
       />
 
-      {/* View-only Page Header */}
-      {isReadOnly && viewOnlyAnalysis && (
-        <InsightsPageHeader
-          createdAt={viewOnlyAnalysis.createdAt}
-          onExportAnalysis={handleExportAnalysisClick}
-          onExportAssessment={viewOnlyAnalysis.assessmentId ? handleExportClick : undefined}
-        />
-      )}
+      {/* Page Header - always visible */}
+      <InsightsPageHeader
+        isReadOnly={isReadOnly}
+        createdAt={viewOnlyAnalysis?.createdAt}
+        onExportAnalysis={hasAnalysis ? handleExportAnalysisClick : undefined}
+        onExportAssessment={hasResponses ? handleExportClick : undefined}
+      />
 
       {/* Import error message */}
       {importError && (
-        <div className={`fixed ${isReadOnly && viewOnlyAnalysis ? 'top-32 lg:top-36' : 'top-20 lg:top-24'} left-4 right-4 lg:left-10 lg:right-10 z-30 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center gap-2`}>
+        <div className="fixed top-32 lg:top-36 left-4 right-4 lg:left-10 lg:right-10 z-30 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
           <ErrorCircleIcon size="sm" className="flex-shrink-0" />
           <span>{importError}</span>
           <button
@@ -299,12 +273,12 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
         </div>
       )}
 
-      {/* Content with top padding for floating nav (extra padding when view-only header is shown) */}
-      <div className={`flex-1 ${isReadOnly && viewOnlyAnalysis ? 'pt-32 lg:pt-36' : 'pt-20 lg:pt-24'}`}>
+      {/* Content with top padding to clear nav + header */}
+      <div className="flex-1 pt-32 lg:pt-36">
         <div className="max-w-6xl mx-auto px-6 py-8">
         {/* No assessment data - prompt user to complete assessment first */}
         {!hasResponses && !loading && !error && (
-          <div className="text-center py-16 reveal">
+          <div className="text-center py-16" data-testid="insights-no-assessment">
             {/* Ink brush circle - empty assessment indicator */}
             <div className="w-20 h-20 mx-auto mb-6 relative">
               <svg viewBox="0 0 80 80" className="w-full h-full" aria-hidden="true">
@@ -340,6 +314,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
             <p className="font-body text-[var(--text-secondary)] mb-6 max-w-md mx-auto">{t('noAssessment.description')}</p>
             <button
               onClick={onNavigateToAssessment}
+              data-testid="insights-btn-start-assessment"
               className="cta-button px-6 py-3 bg-[var(--accent)] text-white font-body font-medium rounded-sm inline-flex items-center gap-2"
             >
               <span>{t('noAssessment.button')}</span>
@@ -350,7 +325,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
         {/* Ready for analysis - has assessment data but no analysis yet */}
         {hasResponses && !analysis && !loading && !error && (
-          <div className="text-center py-16 reveal">
+          <div className="text-center py-16" data-testid="insights-ready">
             {/* Ink brush circle - minimalist ready state */}
             <div className="w-20 h-20 mx-auto mb-6 relative">
               <svg viewBox="0 0 80 80" className="w-full h-full" aria-hidden="true">
@@ -384,52 +359,45 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
             </div>
             <h2 className="font-display text-xl font-semibold text-[var(--text-primary)] mb-2">{t('ready.title')}</h2>
             <p className="font-body text-[var(--text-secondary)] mb-6 max-w-md mx-auto">{t('ready.description')}</p>
-            <button
-              onClick={analyzeWithClaude}
-              className="cta-button px-6 py-3 bg-[var(--accent)] text-white font-body font-medium rounded-sm inline-flex items-center gap-2"
-            >
-              <span>{t('ready.button')}</span>
-              <span>→</span>
-            </button>
+
+            {/* Show warning alert when assessment is not completed */}
+            {isAssessmentIncomplete && onNavigateToAssessment ? (
+              <div className="max-w-lg mx-auto" data-testid="insights-incomplete-warning">
+                <Alert.Warning
+                  title={t('dirty.title', 'Assessment Incomplete')}
+                  description={t('dirty.message')}
+                  data-testid="insights-pending-changes-alert"
+                >
+                  <Alert.Actions>
+                    <Alert.Action onClick={onNavigateToAssessment} data-testid="insights-pending-changes-alert-action">
+                      {t('dirty.action')}
+                    </Alert.Action>
+                  </Alert.Actions>
+                </Alert.Warning>
+              </div>
+            ) : isAssessmentIncomplete ? null : (
+              <button
+                onClick={analyzeWithClaude}
+                className="cta-button px-6 py-3 bg-[var(--accent)] text-white font-body font-medium rounded-sm inline-flex items-center gap-2"
+                data-testid="insights-btn-analyze"
+              >
+                <span>{t('ready.button')}</span>
+                <span>→</span>
+              </button>
+            )}
           </div>
         )}
 
         {loading && (
-          <div className="text-center py-16">
-            {/* Ink brush loading animation */}
-            <div className="w-20 h-20 mx-auto mb-6 relative">
-              <svg viewBox="0 0 80 80" className="w-full h-full animate-spin" style={{ animationDuration: '3s' }} aria-hidden="true">
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="32"
-                  fill="none"
-                  stroke="var(--accent)"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeDasharray="60 140"
-                  className="opacity-60"
-                />
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="24"
-                  fill="none"
-                  stroke="var(--accent)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray="40 120"
-                  className="opacity-30"
-                />
-              </svg>
-            </div>
-            <h2 className="font-display text-xl font-semibold text-[var(--text-primary)] mb-2">{t('loading.title')}</h2>
-            <p className="font-body text-[var(--text-secondary)]">{t('loading.description')}</p>
-          </div>
+          <InkLoader
+            variant="contained"
+            message={t('loading.title')}
+            description={t('loading.description')}
+          />
         )}
 
         {error && (
-          <div className="text-center py-16">
+          <div className="text-center py-16" data-testid="insights-error">
             {/* Minimalist error indicator */}
             <div className="w-20 h-20 mx-auto mb-6 relative">
               <svg viewBox="0 0 80 80" className="w-full h-full" aria-hidden="true">
@@ -467,6 +435,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
               {rawResponse && (
                 <button
                   onClick={downloadRawResponse}
+                  data-testid="insights-btn-download-raw"
                   className="px-4 py-2.5 text-amber-600 hover:bg-amber-500/10 border border-amber-500/30 font-body font-medium rounded-sm transition-colors"
                 >
                   {t('error.downloadRaw')}
@@ -474,6 +443,7 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
               )}
               <button
                 onClick={analyzeWithClaude}
+                data-testid="insights-btn-try-again"
                 className="cta-button px-6 py-3 bg-[var(--accent)] text-white font-body font-medium rounded-sm"
               >
                 {t('error.tryAgain')}
@@ -485,12 +455,16 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
         {analysis && (
           <>
             {/* Tabs */}
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm mb-6 overflow-hidden">
-              <div className="flex overflow-x-auto">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm mb-6 overflow-hidden" data-testid="insights-tabs">
+              <div className="flex overflow-x-auto" role="tablist" aria-label="Analysis categories">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => { setActiveTab(tab.id); }}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    aria-controls={`insights-tabpanel-${tab.id}`}
+                    data-testid={`insights-tab-${tab.id}`}
                     className={`px-4 py-3 font-body text-sm font-medium whitespace-nowrap border-b-2 transition-colors flex-1 flex items-center justify-center gap-2 ${
                       activeTab === tab.id
                         ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent)]/5'
@@ -513,8 +487,37 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
               </div>
             </div>
 
+            {/* Save error alert - shown when analysis save fails */}
+            {!isReadOnly && saveError && (
+              <div className="mb-6">
+                <Alert.Warning
+                  title={t('saveError.title')}
+                  description={t('saveError.message')}
+                  note={saveError}
+                  onDismiss={clearSaveError}
+                  data-testid="analysis-save-error-alert"
+                >
+                  <Alert.Actions>
+                    <Alert.Action
+                      onClick={handleRetrySave}
+                      loading={isSaving}
+                      data-testid="analysis-save-error-alert-retry"
+                    >
+                      {t('saveError.retry')}
+                    </Alert.Action>
+                  </Alert.Actions>
+                </Alert.Warning>
+              </div>
+            )}
+
             {/* Content */}
-            <div className="space-y-4">
+            <div
+              className="space-y-4"
+              role="tabpanel"
+              id={`insights-tabpanel-${activeTab}`}
+              aria-labelledby={`insights-tab-${activeTab}`}
+              data-testid={`insights-tabpanel-${activeTab}`}
+            >
               {activeTab === 'patterns' && analysis.patterns.map((item: AnalysisPattern, i: number) => <InsightCard key={i} item={item} />)}
 
               {activeTab === 'contradictions' && analysis.contradictions.map((item: AnalysisContradiction, i: number) => <InsightCard key={i} item={item} />)}
@@ -576,17 +579,36 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
               )}
             </div>
 
-            {/* Re-analyze button - hide in view-only mode */}
+            {/* Re-analyze button - hide in view-only mode, show warning when incomplete */}
             {!isReadOnly && (
               <div className="mt-8 text-center">
-                <button
-                  onClick={analyzeWithClaude}
-                  className="px-5 py-2.5 bg-[var(--bg-secondary)] text-[var(--text-secondary)] rounded-sm font-body font-medium hover:bg-[var(--bg-tertiary)] border border-[var(--border)] transition-colors inline-flex items-center gap-2"
-                >
-                  <RefreshIcon size="sm" />
-                  <span>{t('reanalyze.button')}</span>
-                </button>
-                <p className="font-body text-[var(--text-muted)] text-sm mt-2">{t('reanalyze.description')}</p>
+                {isAssessmentIncomplete && onNavigateToAssessment ? (
+                  <div className="max-w-lg mx-auto" data-testid="insights-reanalyze-incomplete-warning">
+                    <Alert.Warning
+                      title={t('dirty.title', 'Assessment Incomplete')}
+                      description={t('dirty.message')}
+                      data-testid="insights-reanalyze-pending-changes-alert"
+                    >
+                      <Alert.Actions>
+                        <Alert.Action onClick={onNavigateToAssessment} data-testid="insights-reanalyze-pending-changes-alert-action">
+                          {t('dirty.action')}
+                        </Alert.Action>
+                      </Alert.Actions>
+                    </Alert.Warning>
+                  </div>
+                ) : isAssessmentIncomplete ? null : (
+                  <>
+                    <button
+                      onClick={analyzeWithClaude}
+                      className="px-5 py-2.5 bg-[var(--bg-secondary)] text-[var(--text-secondary)] rounded-sm font-body font-medium hover:bg-[var(--bg-tertiary)] border border-[var(--border)] transition-colors inline-flex items-center gap-2"
+                      data-testid="insights-btn-reanalyze"
+                    >
+                      <RefreshIcon size="sm" />
+                      <span>{t('reanalyze.button')}</span>
+                    </button>
+                    <p className="font-body text-[var(--text-muted)] text-sm mt-2">{t('reanalyze.description')}</p>
+                  </>
+                )}
               </div>
             )}
           </>

@@ -69,7 +69,7 @@ describe('MultiSelectStep', () => {
     const onChange = vi.fn();
 
     render(<MultiSelectStep step={mockStep} value={[]} onChange={onChange} />);
-    await user.click(screen.getByText('Option 1'));
+    await user.click(screen.getByTestId('multi-select-option-opt1'));
 
     expect(onChange).toHaveBeenCalledWith(['opt1']);
   });
@@ -79,7 +79,7 @@ describe('MultiSelectStep', () => {
     const onChange = vi.fn();
 
     render(<MultiSelectStep step={mockStep} value={['opt1']} onChange={onChange} />);
-    await user.click(screen.getByText('Option 1'));
+    await user.click(screen.getByTestId('multi-select-option-opt1'));
 
     expect(onChange).toHaveBeenCalledWith([]);
   });
@@ -89,7 +89,7 @@ describe('MultiSelectStep', () => {
     const onChange = vi.fn();
 
     render(<MultiSelectStep step={mockStep} value={['opt1']} onChange={onChange} />);
-    await user.click(screen.getByText('Option 2'));
+    await user.click(screen.getByTestId('multi-select-option-opt2'));
 
     expect(onChange).toHaveBeenCalledWith(['opt1', 'opt2']);
   });
@@ -99,7 +99,7 @@ describe('MultiSelectStep', () => {
     const onChange = vi.fn();
 
     render(<MultiSelectStep step={mockStep} value={[]} onChange={onChange} isReadOnly />);
-    await user.click(screen.getByText('Option 1'));
+    await user.click(screen.getByTestId('multi-select-option-opt1'));
 
     expect(onChange).not.toHaveBeenCalled();
   });

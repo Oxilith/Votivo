@@ -36,6 +36,7 @@ const InkBrushDecoration: FC = () => {
 
   return (
     <svg
+      data-testid="ink-brush-decoration"
       className="fixed right-0 top-[10%] h-[80vh] w-auto max-w-[500px] opacity-[0.06] dark:opacity-[0.08] pointer-events-none z-[1] hidden lg:block"
       viewBox="0 0 400 800"
       fill="none"

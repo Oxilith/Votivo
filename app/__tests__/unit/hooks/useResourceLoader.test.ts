@@ -25,13 +25,14 @@ const mockSetLoading = vi.fn();
 const mockSetStartAtSynthesis = vi.fn();
 const mockSetHasReachedSynthesis = vi.fn();
 const mockIncrementAssessmentKey = vi.fn();
-const mockSetResponses = vi.fn();
+const mockHydrateFromDB = vi.fn();
 const mockSetAnalysis = vi.fn();
 
 let mockUser: { id: string } | null = { id: 'user-1' };
 let mockIsAuthInitialized = true;
 let mockIsAuthHydrated = true;
 let mockResponses: Record<string, unknown> = {};
+let mockSavedAt: string | null = null;
 let mockAnalysis: unknown = null;
 let mockCurrentView = 'assessment';
 let mockResourceId: string | undefined = undefined;
@@ -41,8 +42,16 @@ vi.mock('@/stores', () => ({
     selector({ user: mockUser }),
   useAuthInitialized: () => mockIsAuthInitialized,
   useAuthHydrated: () => mockIsAuthHydrated,
-  useAssessmentStore: (selector?: (state: { responses: Record<string, unknown>; setResponses: typeof mockSetResponses }) => unknown) => {
-    const state = { responses: mockResponses, setResponses: mockSetResponses };
+  useAssessmentStore: (selector?: (state: {
+    responses: Record<string, unknown>;
+    hydrateFromDB: typeof mockHydrateFromDB;
+    savedAt: string | null;
+  }) => unknown) => {
+    const state = {
+      responses: mockResponses,
+      hydrateFromDB: mockHydrateFromDB,
+      savedAt: mockSavedAt,
+    };
     // Handle both selector and direct usage patterns
     if (typeof selector === 'function') {
       return selector(state);
@@ -104,10 +113,11 @@ describe('useResourceLoader', () => {
     mockIsAuthInitialized = true;
     mockIsAuthHydrated = true;
     mockResponses = {};
+    mockSavedAt = null; // Default to unsaved (uncompleted)
     mockAnalysis = null;
     mockCurrentView = 'assessment';
     mockResourceId = undefined;
-    // Set default return values for mocked services to avoid undefined access
+    // Set default return values for mocked functions
     mockGetAssessments.mockResolvedValue([]);
     mockGetAnalyses.mockResolvedValue([]);
   });
@@ -241,11 +251,11 @@ describe('useResourceLoader', () => {
       renderHook(() => useResourceLoader());
 
       await waitFor(() => {
-        expect(mockSetResponses).toHaveBeenCalled();
+        expect(mockHydrateFromDB).toHaveBeenCalled();
       });
 
       // Should load the newest one (sorted by createdAt desc)
-      expect(mockSetResponses).toHaveBeenCalledWith({ peakEnergyTime: 'morning' });
+      expect(mockHydrateFromDB).toHaveBeenCalledWith({ peakEnergyTime: 'morning' }, '2024-01-02T00:00:00Z');
       expect(mockClearReadOnlyMode).toHaveBeenCalled();
     });
 
@@ -260,6 +270,90 @@ describe('useResourceLoader', () => {
       });
 
       expect(mockGetAssessments).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('saved assessment readonly detection', () => {
+    it('should set readonly mode when savedAt is set (completed assessment)', async () => {
+      mockResourceId = undefined;
+      mockResponses = { peakEnergyTime: 'morning' }; // Has data
+      mockSavedAt = '2024-01-01T00:00:00Z'; // Completed (savedAt set)
+
+      renderHook(() => useResourceLoader());
+
+      await waitFor(() => {
+        expect(mockSetReadOnlyMode).toHaveBeenCalledWith('local-saved');
+      });
+
+      expect(mockSetStartAtSynthesis).toHaveBeenCalledWith(true);
+      expect(mockSetHasReachedSynthesis).toHaveBeenCalledWith(true);
+      expect(mockIncrementAssessmentKey).toHaveBeenCalled();
+    });
+
+    it('should clear readonly mode when savedAt is null (uncompleted assessment)', async () => {
+      mockResourceId = undefined;
+      mockResponses = { peakEnergyTime: 'morning' }; // Has data
+      mockSavedAt = null; // Uncompleted (never saved)
+
+      renderHook(() => useResourceLoader());
+
+      await waitFor(() => {
+        expect(mockClearReadOnlyMode).toHaveBeenCalled();
+      });
+
+      expect(mockSetReadOnlyMode).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('insights view with analysis in store', () => {
+    it('should load assessment first, then matching analysis when stores are empty', async () => {
+      mockCurrentView = 'insights';
+      mockResourceId = undefined;
+      mockResponses = {}; // Empty assessment store
+      mockAnalysis = null; // Empty analysis store
+
+      // Mock getAssessments returns newest assessment with id
+      mockGetAssessments.mockResolvedValueOnce([
+        { id: 'assessment-1', responses: { peakEnergyTime: 'morning' }, createdAt: '2024-01-02T00:00:00Z' },
+      ]);
+
+      // Mock getAnalyses returns analysis linked to that assessment
+      mockGetAnalyses.mockResolvedValueOnce([
+        { id: 'analysis-1', result: { patterns: ['test'] }, createdAt: '2024-01-02T00:00:00Z', assessmentId: 'assessment-1' },
+      ]);
+
+      renderHook(() => useResourceLoader());
+
+      await waitFor(() => {
+        expect(mockHydrateFromDB).toHaveBeenCalled();
+      });
+
+      // Should load assessment first
+      expect(mockHydrateFromDB).toHaveBeenCalledWith({ peakEnergyTime: 'morning' }, '2024-01-02T00:00:00Z');
+
+      await waitFor(() => {
+        expect(mockSetAnalysis).toHaveBeenCalled();
+      });
+
+      // Should load matching analysis
+      expect(mockSetAnalysis).toHaveBeenCalledWith({ patterns: ['test'] }, '');
+      expect(mockClearReadOnlyMode).toHaveBeenCalled();
+    });
+
+    it('should not load when analysis store already has data', async () => {
+      mockCurrentView = 'insights';
+      mockResourceId = undefined;
+      mockResponses = { peakEnergyTime: 'morning' }; // Has data
+      mockAnalysis = { patterns: ['existing'] }; // Has data
+
+      renderHook(() => useResourceLoader());
+
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      expect(mockGetAnalyses).not.toHaveBeenCalled();
+      expect(mockClearReadOnlyMode).toHaveBeenCalled();
     });
   });
 

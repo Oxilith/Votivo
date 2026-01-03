@@ -99,15 +99,15 @@ describe('AuthLayout', () => {
     it('should render language toggle buttons', () => {
       render(<AuthLayout><div>Content</div></AuthLayout>);
 
-      expect(screen.getByText('EN')).toBeInTheDocument();
-      expect(screen.getByText('PL')).toBeInTheDocument();
+      expect(screen.getByTestId('language-btn-en')).toBeInTheDocument();
+      expect(screen.getByTestId('language-btn-pl')).toBeInTheDocument();
     });
 
     it('should change language to English when EN is clicked', async () => {
       const user = userEvent.setup();
       render(<AuthLayout><div>Content</div></AuthLayout>);
 
-      await user.click(screen.getByText('EN'));
+      await user.click(screen.getByTestId('language-btn-en'));
 
       expect(mockChangeLanguage).toHaveBeenCalledWith('en');
     });
@@ -116,7 +116,7 @@ describe('AuthLayout', () => {
       const user = userEvent.setup();
       render(<AuthLayout><div>Content</div></AuthLayout>);
 
-      await user.click(screen.getByText('PL'));
+      await user.click(screen.getByTestId('language-btn-pl'));
 
       expect(mockChangeLanguage).toHaveBeenCalledWith('pl');
     });

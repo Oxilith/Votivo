@@ -1,10 +1,10 @@
 /**
- * @file src/components/insights/SavePromptModal.tsx
- * @purpose Modal to prompt users to sign in to save their analysis results
+ * @file app/src/components/assessment/SavePromptModal.tsx
+ * @purpose Modal to prompt users to sign in to save assessment and access AI analysis
  * @functionality
- * - Shows after analysis is complete for unauthenticated users
- * - Offers options to sign in, create account, or continue without saving
- * - Displays brief explanation of benefits of saving
+ * - Shows at synthesis step for unauthenticated users
+ * - Offers options to sign in, create account, or dismiss
+ * - Displays brief explanation of benefits (save assessment + get AI analysis)
  * - Supports Ink & Stone design system styling
  * @dependencies
  * - React
@@ -24,37 +24,41 @@ interface SavePromptModalProps {
   onSignIn: () => void;
   /** Handler for create account action */
   onCreateAccount: () => void;
-  /** Handler for continue without saving */
-  onContinue: () => void;
+  /** Handler for dismiss (continue viewing synthesis) */
+  onDismiss: () => void;
 }
 
 /**
  * Benefits list for saving
  */
 const SAVE_BENEFITS = [
-  'Access your analysis anytime',
+  'Unlock AI-powered behavioral analysis',
+  'Discover your hidden patterns and blind spots',
+  'Save your assessment permanently',
   'Track your progress over time',
-  'Compare multiple analyses',
-  'Never lose your insights',
 ];
 
 /**
- * SavePromptModal - Prompts users to save their analysis
+ * SavePromptModal - Prompts users to sign in to complete assessment
  */
 const SavePromptModal: FC<SavePromptModalProps> = ({
   isOpen,
   onSignIn,
   onCreateAccount,
-  onContinue,
+  onDismiss,
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <div
+      data-testid="save-prompt-modal"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
       <div
+        data-testid="save-prompt-backdrop"
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onContinue}
+        onClick={onDismiss}
         aria-hidden="true"
       />
 
@@ -84,12 +88,12 @@ const SavePromptModal: FC<SavePromptModalProps> = ({
 
           {/* Title */}
           <h2 className="font-display text-2xl text-[var(--text-primary)] text-center mb-2">
-            Save Your Analysis?
+            Ready to Unlock Your Insights?
           </h2>
 
           {/* Description */}
           <p className="font-body text-[var(--text-secondary)] text-center mb-6">
-            Create a free account to keep your insights safe and track your journey over time.
+            Sign in to save your assessment and get AI-powered analysis of your behavioral patterns.
           </p>
 
           {/* Benefits */}
@@ -108,6 +112,7 @@ const SavePromptModal: FC<SavePromptModalProps> = ({
           {/* Actions */}
           <div className="space-y-3">
             <button
+              data-testid="save-prompt-create-account"
               onClick={onCreateAccount}
               className="cta-button w-full py-3 px-6 font-body font-medium text-white bg-[var(--accent)]"
             >
@@ -115,6 +120,7 @@ const SavePromptModal: FC<SavePromptModalProps> = ({
             </button>
 
             <button
+              data-testid="save-prompt-sign-in"
               onClick={onSignIn}
               className="w-full py-3 px-6 font-body font-medium text-[var(--text-primary)] bg-[var(--bg-secondary)] border border-[var(--border)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
             >
@@ -122,10 +128,11 @@ const SavePromptModal: FC<SavePromptModalProps> = ({
             </button>
 
             <button
-              onClick={onContinue}
+              data-testid="save-prompt-dismiss"
+              onClick={onDismiss}
               className="w-full py-2 font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             >
-              Continue without saving
+              View synthesis without saving
             </button>
           </div>
         </div>

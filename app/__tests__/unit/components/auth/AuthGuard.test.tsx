@@ -33,9 +33,9 @@ vi.mock('@/stores', () => ({
   useAuthInitialized: () => mockIsInitialized,
 }));
 
-// Mock LoadingSpinnerIcon
+// Mock InkLoader
 vi.mock('@/components', () => ({
-  LoadingSpinnerIcon: () => <span data-testid="loading-spinner" />,
+  InkLoader: () => <span data-testid="ink-loader" />,
 }));
 
 describe('AuthGuard', () => {
@@ -67,7 +67,7 @@ describe('AuthGuard', () => {
         </AuthGuard>
       );
 
-      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+      expect(screen.getByTestId('ink-loader')).toBeInTheDocument();
       expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
     });
 
@@ -81,7 +81,7 @@ describe('AuthGuard', () => {
       );
 
       expect(screen.getByTestId('custom-fallback')).toBeInTheDocument();
-      expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('ink-loader')).not.toBeInTheDocument();
     });
   });
 
@@ -109,7 +109,7 @@ describe('AuthGuard', () => {
         </AuthGuard>
       );
 
-      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+      expect(screen.getByTestId('ink-loader')).toBeInTheDocument();
       expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
     });
 

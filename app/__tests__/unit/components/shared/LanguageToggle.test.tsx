@@ -40,19 +40,19 @@ describe('LanguageToggle', () => {
     it('should render EN button', () => {
       render(<LanguageToggle />);
 
-      expect(screen.getByText('EN')).toBeInTheDocument();
+      expect(screen.getByTestId('language-btn-en')).toBeInTheDocument();
     });
 
     it('should render PL button', () => {
       render(<LanguageToggle />);
 
-      expect(screen.getByText('PL')).toBeInTheDocument();
+      expect(screen.getByTestId('language-btn-pl')).toBeInTheDocument();
     });
 
-    it('should render divider between buttons', () => {
+    it('should render language toggle container', () => {
       render(<LanguageToggle />);
 
-      expect(screen.getByText('|')).toBeInTheDocument();
+      expect(screen.getByTestId('language-toggle')).toBeInTheDocument();
     });
   });
 
@@ -61,7 +61,7 @@ describe('LanguageToggle', () => {
       const user = userEvent.setup();
       render(<LanguageToggle />);
 
-      await user.click(screen.getByText('EN'));
+      await user.click(screen.getByTestId('language-btn-en'));
 
       expect(mockChangeLanguage).toHaveBeenCalledWith('en');
     });
@@ -70,7 +70,7 @@ describe('LanguageToggle', () => {
       const user = userEvent.setup();
       render(<LanguageToggle />);
 
-      await user.click(screen.getByText('PL'));
+      await user.click(screen.getByTestId('language-btn-pl'));
 
       expect(mockChangeLanguage).toHaveBeenCalledWith('pl');
     });
@@ -81,7 +81,7 @@ describe('LanguageToggle', () => {
       mockLanguage = 'en';
       render(<LanguageToggle />);
 
-      const enButton = screen.getByText('EN');
+      const enButton = screen.getByTestId('language-btn-en');
       expect(enButton).toHaveClass('text-[var(--text-primary)]');
     });
 
@@ -89,7 +89,7 @@ describe('LanguageToggle', () => {
       mockLanguage = 'pl';
       render(<LanguageToggle />);
 
-      const plButton = screen.getByText('PL');
+      const plButton = screen.getByTestId('language-btn-pl');
       expect(plButton).toHaveClass('text-[var(--text-primary)]');
     });
 
@@ -97,7 +97,7 @@ describe('LanguageToggle', () => {
       mockLanguage = 'en';
       render(<LanguageToggle />);
 
-      const plButton = screen.getByText('PL');
+      const plButton = screen.getByTestId('language-btn-pl');
       expect(plButton).toHaveClass('text-[var(--text-faint)]');
     });
   });

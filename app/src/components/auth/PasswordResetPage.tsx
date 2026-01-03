@@ -67,12 +67,14 @@ const PasswordResetPage: React.FC<PasswordResetPageProps> = ({ token }) => {
           <div className="space-y-3">
             <button
               onClick={handleNavigateToLogin}
+              data-testid="password-reset-btn-signin"
               className="cta-button w-full py-3 px-6 font-body font-medium text-white bg-[var(--accent)]"
             >
               {t('resetPassword.invalidLink.goToSignIn')}
             </button>
             <button
               onClick={handleNavigateToLanding}
+              data-testid="password-reset-btn-home"
               className="w-full py-2 font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             >
               {t('resetPassword.invalidLink.backToHome')}

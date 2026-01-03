@@ -53,7 +53,7 @@ export function Layout({ children }: LayoutProps) {
           <h1 style={styles.logoText}>Prompt Admin</h1>
         </div>
         <nav style={styles.nav}>
-          <NavLink to="/prompts" style={navLinkStyles}>
+          <NavLink to="/prompts" style={navLinkStyles} data-testid="admin-nav-prompts">
             <svg
               width="20"
               height="20"
@@ -70,7 +70,7 @@ export function Layout({ children }: LayoutProps) {
             </svg>
             Prompts
           </NavLink>
-          <NavLink to="/ab-tests" style={navLinkStyles}>
+          <NavLink to="/ab-tests" style={navLinkStyles} data-testid="admin-nav-abtests">
             <svg
               width="20"
               height="20"
@@ -116,6 +116,7 @@ export function Layout({ children }: LayoutProps) {
             onClick={() => void logout()}
             style={styles.logoutButton}
             type="button"
+            data-testid="admin-btn-logout"
           >
             <svg
               width="16"

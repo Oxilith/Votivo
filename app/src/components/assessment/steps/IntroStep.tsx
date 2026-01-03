@@ -33,7 +33,7 @@ export const IntroStep: React.FC<IntroStepProps> = ({
   const { t } = useTranslation('assessment');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="intro-step">
       <div
         className="opacity-0"
         style={{ animation: 'fade-up 0.6s var(--ease-out) 0.1s forwards' }}
@@ -65,6 +65,7 @@ export const IntroStep: React.FC<IntroStepProps> = ({
         {!isFirstStep && onBack && (
           <button
             onClick={onBack}
+            data-testid="assessment-back-button"
             className="px-6 py-3 font-body text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-sm transition-colors"
           >
             {t('navigation.back')}
@@ -72,6 +73,7 @@ export const IntroStep: React.FC<IntroStepProps> = ({
         )}
         <button
           onClick={onNext}
+          data-testid="assessment-continue-button"
           className="cta-button px-6 py-3 bg-[var(--accent)] text-white font-body font-medium rounded-sm"
         >
           {content.buttonText}

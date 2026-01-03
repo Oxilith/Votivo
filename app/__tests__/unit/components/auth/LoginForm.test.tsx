@@ -61,6 +61,13 @@ vi.mock('@/stores/useAuthStore', () => ({
   }),
 }));
 
+// Mock components from @/components
+vi.mock('@/components', () => ({
+  InkLoader: () => <span data-testid="ink-loader" />,
+  EyeIcon: () => <span data-testid="eye-icon" />,
+  EyeOffIcon: () => <span data-testid="eye-off-icon" />,
+}));
+
 describe('LoginForm', () => {
   const defaultProps = {
     onSwitchToRegister: vi.fn(),
@@ -316,7 +323,7 @@ describe('LoginForm', () => {
       const user = userEvent.setup();
       render(<LoginForm {...defaultProps} />);
 
-      await user.click(screen.getByText('Forgot password?'));
+      await user.click(screen.getByTestId('login-btn-forgot-password'));
 
       expect(defaultProps.onForgotPassword).toHaveBeenCalled();
     });
@@ -325,7 +332,7 @@ describe('LoginForm', () => {
       const user = userEvent.setup();
       render(<LoginForm {...defaultProps} />);
 
-      await user.click(screen.getByText('Sign up'));
+      await user.click(screen.getByTestId('login-btn-register'));
 
       expect(defaultProps.onSwitchToRegister).toHaveBeenCalled();
     });

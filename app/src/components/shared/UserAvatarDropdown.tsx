@@ -18,7 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentUser } from '@/stores';
 
 interface UserAvatarDropdownProps {
-  onNavigateToProfile: () => void;
+  /** Navigate to profile page - only shown in dropdown if provided */
+  onNavigateToProfile?: () => void;
   onSignOut: () => void;
 }
 
@@ -55,7 +56,7 @@ const UserAvatarDropdown: FC<UserAvatarDropdownProps> = ({
 
   const handleProfileClick = () => {
     setIsOpen(false);
-    onNavigateToProfile();
+    onNavigateToProfile?.();
   };
 
   const handleSignOutClick = () => {
@@ -72,23 +73,35 @@ const UserAvatarDropdown: FC<UserAvatarDropdownProps> = ({
         aria-label={t('nav.profile')}
         aria-expanded={isOpen}
         aria-haspopup="true"
+        data-testid="user-avatar-dropdown"
       >
         {userInitial}
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 bg-[var(--bg-primary)] border border-[var(--border)] shadow-md z-50">
+        <div
+          className="absolute right-0 mt-2 w-40 bg-[var(--bg-primary)] border border-[var(--border)] shadow-md z-50"
+          role="menu"
+          aria-orientation="vertical"
+          data-testid="user-menu"
+        >
           <div className="py-1">
-            <button
-              onClick={handleProfileClick}
-              className="w-full text-left px-4 py-2 font-body text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
-            >
-              {t('nav.profile')}
-            </button>
+            {onNavigateToProfile && (
+              <button
+                onClick={handleProfileClick}
+                role="menuitem"
+                className="w-full text-left px-4 py-2 font-body text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
+                data-testid="profile-button"
+              >
+                {t('nav.profile')}
+              </button>
+            )}
             <button
               onClick={handleSignOutClick}
+              role="menuitem"
               className="w-full text-left px-4 py-2 font-body text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors"
+              data-testid="sign-out-button"
             >
               {t('nav.signOut')}
             </button>

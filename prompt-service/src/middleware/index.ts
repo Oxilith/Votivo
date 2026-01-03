@@ -32,4 +32,5 @@ export {
   tokenRefreshLimiter,
   userDataLimiter,
   profileLimiter,
+  adminLoginLimiter,
 } from './rate-limit.middleware';

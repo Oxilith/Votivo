@@ -227,6 +227,22 @@
     "back": "← Back",
     "continue": "Continue →",
     "complete": "Complete Assessment & View AI Insights",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "skipToLast": "Skip to Last",
+    "retakeAssessment": "Retake",
+    "import": "Import"
+  },
+  "validation": {
+    "required": "Please complete this step before continuing",
+    "incomplete": "Please complete all steps before finishing"
+  },
+  "save": {
+    "error": {
+      "title": "Failed to Save Assessment",
+      "default": "Unable to save your assessment. Please try again.",
+      "retry": "Try Again",
+      "note": "Your responses are stored locally and won't be lost.",
+      "saving": "Saving..."
+    }
   }
 }

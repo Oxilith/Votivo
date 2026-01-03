@@ -87,8 +87,6 @@ services:
         - linux/amd64
         - linux/arm64
     container_name: votive-app
-    environment:
-      - DOTENV_PRIVATE_KEY=${DOTENV_PRIVATE_KEY}
     ports:
       - "443:443"
       - "80:80"

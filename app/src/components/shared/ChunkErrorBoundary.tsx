@@ -133,6 +133,7 @@ class ChunkErrorBoundaryBase extends Component<
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={this.handleRetry}
+                data-testid="chunk-error-btn-retry"
                 className="px-6 py-2.5 bg-[var(--accent)] text-white font-body text-sm
                          hover:bg-[var(--accent-soft)] transition-colors duration-200"
               >
@@ -140,6 +141,7 @@ class ChunkErrorBoundaryBase extends Component<
               </button>
               <button
                 onClick={this.handleReload}
+                data-testid="chunk-error-btn-reload"
                 className="px-6 py-2.5 border border-[var(--border-strong)] text-[var(--text-secondary)]
                          font-body text-sm hover:bg-[var(--bg-secondary)] transition-colors duration-200"
               >

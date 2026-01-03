@@ -38,7 +38,9 @@ describe('useAssessmentStore', () => {
     // Reset store to initial state
     useAssessmentStore.setState({
       responses: {},
-      lastUpdated: null,
+      savedAt: null,
+      lastReachedPhase: 0,
+      lastReachedStep: 0,
     });
   });
 
@@ -47,7 +49,13 @@ describe('useAssessmentStore', () => {
       const state = useAssessmentStore.getState();
 
       expect(state.responses).toEqual({});
-      expect(state.lastUpdated).toBeNull();
+      expect(state.savedAt).toBeNull();
+    });
+
+    it('should have null savedAt initially', () => {
+      const state = useAssessmentStore.getState();
+
+      expect(state.savedAt).toBeNull();
     });
 
     it('should report 0% completion when empty', () => {
@@ -71,7 +79,6 @@ describe('useAssessmentStore', () => {
 
       const state = useAssessmentStore.getState();
       expect(state.responses.peak_energy_times).toEqual(['early_morning']);
-      expect(state.lastUpdated).not.toBeNull();
     });
 
     it('should update multiple responses independently', () => {
@@ -134,7 +141,7 @@ describe('useAssessmentStore', () => {
 
       const state = useAssessmentStore.getState();
       expect(state.responses).toEqual({});
-      expect(state.lastUpdated).toBeNull();
+      expect(state.savedAt).toBeNull();
     });
   });
 
@@ -203,6 +210,120 @@ describe('useAssessmentStore', () => {
       const responses = getResponses();
       expect(responses.peak_energy_times).toEqual(['early_morning']);
       expect(responses.energy_consistency).toBe(3);
+    });
+  });
+
+  describe('setSavedAt', () => {
+    it('should set savedAt timestamp', () => {
+      const { setSavedAt } = useAssessmentStore.getState();
+      const timestamp = '2024-01-15T10:30:00.000Z';
+
+      setSavedAt(timestamp);
+
+      expect(useAssessmentStore.getState().savedAt).toBe(timestamp);
+    });
+
+    it('should mark assessment as completed (readonly)', () => {
+      const { setSavedAt } = useAssessmentStore.getState();
+
+      // Initially not saved
+      expect(useAssessmentStore.getState().savedAt).toBeNull();
+
+      // Save assessment
+      setSavedAt(new Date().toISOString());
+
+      // Now saved (readonly)
+      expect(useAssessmentStore.getState().savedAt).not.toBeNull();
+    });
+  });
+
+  describe('updateLastReached', () => {
+    it('should update lastReached when position is further', () => {
+      const { updateLastReached } = useAssessmentStore.getState();
+
+      updateLastReached(1, 2);
+
+      const state = useAssessmentStore.getState();
+      expect(state.lastReachedPhase).toBe(1);
+      expect(state.lastReachedStep).toBe(2);
+    });
+
+    it('should update when phase is greater', () => {
+      const { updateLastReached } = useAssessmentStore.getState();
+
+      updateLastReached(0, 5);
+      updateLastReached(2, 0); // Higher phase, lower step
+
+      const state = useAssessmentStore.getState();
+      expect(state.lastReachedPhase).toBe(2);
+      expect(state.lastReachedStep).toBe(0);
+    });
+
+    it('should update when same phase but greater step', () => {
+      const { updateLastReached } = useAssessmentStore.getState();
+
+      updateLastReached(1, 2);
+      updateLastReached(1, 5);
+
+      const state = useAssessmentStore.getState();
+      expect(state.lastReachedPhase).toBe(1);
+      expect(state.lastReachedStep).toBe(5);
+    });
+
+    it('should NOT update when position is not further', () => {
+      const { updateLastReached } = useAssessmentStore.getState();
+
+      updateLastReached(2, 3);
+      updateLastReached(1, 5); // Lower phase
+
+      const state = useAssessmentStore.getState();
+      expect(state.lastReachedPhase).toBe(2);
+      expect(state.lastReachedStep).toBe(3);
+    });
+
+    it('should NOT update when same phase but lower step', () => {
+      const { updateLastReached } = useAssessmentStore.getState();
+
+      updateLastReached(2, 5);
+      updateLastReached(2, 3); // Same phase, lower step
+
+      const state = useAssessmentStore.getState();
+      expect(state.lastReachedPhase).toBe(2);
+      expect(state.lastReachedStep).toBe(5);
+    });
+  });
+
+  describe('hasResponsesInStore', () => {
+    it('should return false when store is empty', () => {
+      const { hasResponsesInStore } = useAssessmentStore.getState();
+
+      expect(hasResponsesInStore()).toBe(false);
+    });
+
+    it('should return true when store has responses', () => {
+      const { updateResponse, hasResponsesInStore } = useAssessmentStore.getState();
+
+      updateResponse('peak_energy_times', ['early_morning']);
+
+      expect(hasResponsesInStore()).toBe(true);
+    });
+  });
+
+  describe('clearResponses with lastReached', () => {
+    it('should reset lastReached values when clearing', () => {
+      const { updateResponse, updateLastReached, clearResponses, setSavedAt } =
+        useAssessmentStore.getState();
+
+      updateResponse('peak_energy_times', ['early_morning']);
+      updateLastReached(2, 5);
+      setSavedAt(new Date().toISOString());
+
+      clearResponses();
+
+      const state = useAssessmentStore.getState();
+      expect(state.lastReachedPhase).toBe(0);
+      expect(state.lastReachedStep).toBe(0);
+      expect(state.savedAt).toBeNull();
     });
   });
 });

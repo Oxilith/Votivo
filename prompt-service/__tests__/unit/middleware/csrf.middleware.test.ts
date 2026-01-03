@@ -151,10 +151,16 @@ describe('CSRF Middleware', () => {
   });
 
   describe('clearCsrfToken', () => {
-    it('should clear CSRF cookie', () => {
+    it('should clear CSRF cookie with matching options', () => {
       clearCsrfToken(mockRes as Response);
 
-      expect(mockRes.clearCookie).toHaveBeenCalledWith(CSRF_COOKIE, { path: '/' });
+      // Must use same options as setCsrfToken for browser to properly clear cookie
+      expect(mockRes.clearCookie).toHaveBeenCalledWith(CSRF_COOKIE, {
+        httpOnly: true,
+        secure: false, // NODE_ENV !== 'production' in tests
+        sameSite: 'strict',
+        path: '/',
+      });
     });
   });
 });

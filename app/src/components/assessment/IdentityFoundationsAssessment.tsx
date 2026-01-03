@@ -1,5 +1,5 @@
 /**
- * @file src/components/assessment/IdentityFoundationsAssessment.tsx
+ * @file app/src/components/assessment/IdentityFoundationsAssessment.tsx
  * @purpose Container component orchestrating multi-phase identity assessment questionnaire
  * @functionality
  * - Renders current step based on navigation state
@@ -7,33 +7,38 @@
  * - Coordinates navigation via useAssessmentNavigation hook
  * - Manages response state for all questions
  * - Handles completion callback with explicit save for authenticated users
+ * - Blocks navigation to insights when save fails (shows error alert with retry)
  * - Tracks when user reaches synthesis phase for navigation state
- * - Supports view-only mode for viewing saved assessments with PageHeader
+ * - Supports view-only mode showing only synthesis (no progress bar or navigation)
  * - Supports dark mode and internationalization
  * - Uses shared PageNavigation component for consistent navigation
- * - Includes progress bar and footer for consistent design
+ * - Includes unified header with Skip to Last and Import/Export/Retake buttons
+ * - Auto-jumps to last reached step when returning with responses in store
+ * - Includes progress bar and footer for consistent design (edit mode only)
  * - Includes decorative ink brush SVG
  * @dependencies
- * - React (useState, useEffect, useRef)
+ * - React (useState, useEffect, useRef, useMemo, useCallback)
  * - react-i18next (useTranslation)
  * - @/types (AssessmentResponses, AssessmentProps)
- * - @/stores (useUIStore, useIsAuthenticated)
+ * - @/stores (useUIStore, useIsAuthenticated, useAssessmentStore)
  * - @/services (authService)
  * - ./steps (IntroStep, MultiSelectStep, etc.)
  * - ./navigation (AssessmentProgress, NavigationControls)
  * - ./hooks (useAssessmentNavigation)
  * - ./types (Phase)
- * - @/components (FooterSection, PageNavigation, InkBrushDecoration, ErrorCircleIcon)
- * - ./AssessmentPageHeader
+ * - @/components (FooterSection, PageNavigation, InkBrushDecoration, ErrorCircleIcon, Alert)
+ * - ./AssessmentHeader
  * - @/utils (importFromJson)
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AssessmentResponses, AssessmentProps } from '@/types';
 import { useUIStore } from '@/stores/useUIStore';
-import { useIsAuthenticated } from '@/stores/useAuthStore';
-import { authService } from '@/services/api/AuthService';
+import { useIsAuthenticated, useAuthStore } from '@/stores/useAuthStore';
+import { authService } from '@/services/api';
+import { logger } from '@/utils';
+import { REQUIRED_FIELDS } from '@votive/shared';
 import {
   IntroStep,
   MultiSelectStep,
@@ -50,9 +55,12 @@ import {
   PageNavigation,
   ErrorCircleIcon,
   InkBrushDecoration,
+  Alert,
 } from '@/components';
-import AssessmentPageHeader from './AssessmentPageHeader';
+import AssessmentHeader from './AssessmentHeader';
+import SavePromptModal from './SavePromptModal';
 import { importFromJson } from '@/utils';
+import { useAssessmentStore } from '@/stores';
 
 const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   initialResponses,
@@ -61,6 +69,8 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   onImport,
   onExport,
   onNavigateToLanding,
+  onNavigateToAssessment: _onNavigateToAssessment,
+  onRetakeAssessment,
   onNavigateToInsights,
   onNavigateToAuth,
   onNavigateToProfile,
@@ -74,10 +84,29 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   const [responses, setResponses] = useState<Partial<AssessmentResponses>>(effectiveInitialResponses);
   const [importError, setImportError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auth state
   const isAuthenticated = useIsAuthenticated();
+  const invalidateAssessmentsList = useAuthStore((state) => state.invalidateAssessmentsList);
+
+  // Assessment store - for navigation persistence
+  const lastReachedPhase = useAssessmentStore((state) => state.lastReachedPhase);
+  const lastReachedStep = useAssessmentStore((state) => state.lastReachedStep);
+  const updateLastReached = useAssessmentStore((state) => state.updateLastReached);
+  const hasResponsesInStore = useAssessmentStore((state) => state.hasResponsesInStore());
+  const setSavedAt = useAssessmentStore((state) => state.setSavedAt);
+  const savedAt = useAssessmentStore((state) => state.savedAt);
+
+  // Local state for save prompt modal (shows each time user reaches synthesis unauthenticated)
+  const [isModalDismissed, setIsModalDismissed] = useState(false);
+
+  // UI store for pending auth flags and save error
+  const setPendingAuthReturn = useUIStore((state) => state.setPendingAuthReturn);
+  const setPendingAssessmentSave = useUIStore((state) => state.setPendingAssessmentSave);
+  const assessmentSaveError = useUIStore((state) => state.assessmentSaveError);
+  const setAssessmentSaveError = useUIStore((state) => state.setAssessmentSaveError);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -103,8 +132,6 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   const handleExportClick = () => {
     onExport?.();
   };
-
-  const hasResponses = Object.keys(responses).length > 0;
 
   // Phase configuration with all steps
   const phases: Phase[] = [
@@ -285,8 +312,26 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
     },
   ];
 
-  // Navigation hook
+  // Navigation hook - pass initial position for auto-jump when returning with responses in store
+  // Check if all required fields are complete (needed for effectiveReadOnly before navigation)
+  const isAssessmentComplete = useMemo(() => {
+    return REQUIRED_FIELDS.every((field) => {
+      const value = responses[field];
+      if (value === undefined) return false;
+      if (Array.isArray(value)) return value.length > 0;
+      if (typeof value === 'string') return value.trim().length > 0;
+      return true;
+    });
+  }, [responses]);
+
+  // Derive readonly from saved assessment state (not just isReadOnly prop)
+  // A completed assessment (savedAt !== null) is readonly with a Retake option
+  const isCompletedAssessment = savedAt !== null;
+  const effectiveReadOnly = isReadOnly || isCompletedAssessment;
+
   const {
+    currentPhase,
+    currentStep,
     currentPhaseData,
     currentStepData,
     totalSteps,
@@ -294,7 +339,16 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
     isFirstStep,
     goNext,
     goBack,
-  } = useAssessmentNavigation({ phases, startAtSynthesis });
+    setPhaseAndStep,
+  } = useAssessmentNavigation({
+    phases,
+    startAtSynthesis,
+    // Auto-jump to last reached position if we have responses and not in readonly
+    initialPhase: !effectiveReadOnly && hasResponsesInStore ? lastReachedPhase : undefined,
+    initialStep: !effectiveReadOnly && hasResponsesInStore ? lastReachedStep : undefined,
+    // Update lastReached when advancing
+    onReachNewPosition: !effectiveReadOnly ? updateLastReached : undefined,
+  });
 
   // UI Store for tracking synthesis reached
   const setHasReachedSynthesis = useUIStore((state) => state.setHasReachedSynthesis);
@@ -306,37 +360,151 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
     }
   }, [currentPhaseData.id, setHasReachedSynthesis]);
 
-  // Update response handler
-  const updateResponse = (key: string, value: string | number | string[]) => {
-    setResponses((prev: Partial<AssessmentResponses>) => ({ ...prev, [key]: value }));
-  };
-
-  // Complete handler - saves assessment to database for authenticated users
-  const handleCompleteAsync = async () => {
-    if (isAuthenticated && !isReadOnly) {
-      setIsSaving(true);
-      try {
-        const hasResponseData = Object.keys(responses).length > 0;
-        if (hasResponseData) {
-          await authService.saveAssessment(responses as AssessmentResponses);
-        }
-      } catch (error) {
-        console.error('Failed to save assessment:', error);
-        // Continue to insights even if save fails - user can still see their results
-      } finally {
-        setIsSaving(false);
+  // Auto-set default value (3) for scale steps when they are first rendered
+  useEffect(() => {
+    if (currentStepData?.type === 'scale' && currentStepData.id && !effectiveReadOnly) {
+      const stepId = currentStepData.id as keyof AssessmentResponses;
+      const currentValue = responses[stepId];
+      // Only set default if no value exists yet
+      if (currentValue === undefined) {
+        setResponses((prev) => ({ ...prev, [stepId]: 3 }));
       }
     }
-    onComplete(responses as AssessmentResponses);
+  }, [currentStepData, effectiveReadOnly, responses]);
+
+  // Update response handler - clears validation error when user makes changes
+  const updateResponse = (key: string, value: string | number | string[]) => {
+    setResponses((prev: Partial<AssessmentResponses>) => ({ ...prev, [key]: value }));
+    // Clear validation error when user makes a change
+    if (validationError) {
+      setValidationError(null);
+    }
   };
 
-  const handleComplete = () => {
+  // Check if the current step has valid data
+  const isCurrentStepValid = useMemo(() => {
+    if (!currentStepData) return true;
+
+    // Intro and synthesis steps don't require validation
+    if (currentStepData.type === 'intro' || currentStepData.type === 'synthesis') {
+      return true;
+    }
+
+    const stepId = currentStepData.id as keyof AssessmentResponses;
+    const value = responses[stepId];
+
+    if (value === undefined) return false;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (typeof value === 'number') return true; // Scale steps always have a value (default 3)
+    return false;
+  }, [currentStepData, responses]);
+
+  // Validated next handler - only advances if current step is valid
+  const handleNext = useCallback(() => {
+    if (!isCurrentStepValid) {
+      setValidationError(t('validation.required'));
+      return;
+    }
+    setValidationError(null);
+    goNext();
+  }, [isCurrentStepValid, goNext, t]);
+
+  // Save assessment to database and return success status
+  const saveAssessmentToDatabase = useCallback(async (): Promise<{ success: boolean; timestamp?: string }> => {
+    if (!isAuthenticated || effectiveReadOnly) return { success: true }; // Skip save for these cases
+
+    const hasResponseData = Object.keys(responses).length > 0;
+    if (!hasResponseData) return { success: true }; // Nothing to save
+
+    setIsSaving(true);
+    setAssessmentSaveError(null);
+
+    try {
+      const savedAssessment = await authService.saveAssessment(responses as AssessmentResponses);
+      setSavedAt(savedAssessment.createdAt);
+      invalidateAssessmentsList();
+      return { success: true, timestamp: savedAssessment.createdAt };
+    } catch (error) {
+      logger.error('Failed to save assessment', error);
+      const errorMessage = error instanceof Error ? error.message : t('save.error.default', 'Unable to save your assessment. Please try again.');
+      setAssessmentSaveError(errorMessage);
+      return { success: false };
+    } finally {
+      setIsSaving(false);
+    }
+  }, [isAuthenticated, effectiveReadOnly, responses, setSavedAt, invalidateAssessmentsList, setAssessmentSaveError, t]);
+
+  // Complete handler - validates and triggers completion flow (async for save await)
+  const handleCompleteAsync = useCallback(async () => {
+    if (!isAssessmentComplete) {
+      logger.error('Attempted to save incomplete assessment', undefined, { responses });
+      setValidationError(t('validation.incomplete'));
+      return;
+    }
+
+    // For unauthenticated users, redirect to auth with pending save flag
+    if (!isAuthenticated) {
+      setPendingAssessmentSave(true);
+      setPendingAuthReturn('insights');
+      onNavigateToAuth?.();
+      return;
+    }
+
+    // Await save to get server timestamp - block navigation on failure
+    const result = await saveAssessmentToDatabase();
+    if (!result.success) {
+      // Don't navigate - stay in synthesis, error alert will be shown
+      return;
+    }
+
+    onComplete(responses as AssessmentResponses);
+  }, [isAssessmentComplete, responses, t, isAuthenticated, setPendingAssessmentSave, setPendingAuthReturn, onNavigateToAuth, saveAssessmentToDatabase, onComplete]);
+
+  // Sync wrapper for event handlers
+  const handleComplete = useCallback(() => {
     void handleCompleteAsync();
-  };
+  }, [handleCompleteAsync]);
+
+  // Skip to last reached step handler
+  const handleSkipToLast = useCallback(() => {
+    setPhaseAndStep(lastReachedPhase, lastReachedStep);
+  }, [setPhaseAndStep, lastReachedPhase, lastReachedStep]);
+
+  // Retake assessment handler (clears store and navigates to fresh assessment)
+  const handleRetakeAssessment = useCallback(() => {
+    // Clear local component state
+    setResponses({});
+    setPhaseAndStep(0, 0);
+    setValidationError(null);
+    // Navigate to /assessment/new for fresh start (clears stores, doesn't load from DB)
+    onRetakeAssessment?.();
+  }, [setPhaseAndStep, onRetakeAssessment]);
 
   // Determine if navigation should be shown (hide only for intro steps)
   const showNavigation = currentStepData?.type !== 'intro';
   const isSynthesisStep = currentStepData?.type === 'synthesis';
+
+  // Show save prompt modal at synthesis for unauthenticated users (unless dismissed this session)
+  const showSavePromptModal = isSynthesisStep && !isAuthenticated && !isModalDismissed && !effectiveReadOnly;
+
+  // Modal action handlers
+  const handleSignIn = useCallback(() => {
+    // Set pending return so after auth they come back to assessment
+    setPendingAuthReturn('assessment');
+    onNavigateToAuth?.();
+  }, [setPendingAuthReturn, onNavigateToAuth]);
+
+  const handleCreateAccount = useCallback(() => {
+    // Set pending return so after auth they come back to assessment
+    setPendingAuthReturn('assessment');
+    // Navigate to auth with register mode
+    onNavigateToAuth?.();
+  }, [setPendingAuthReturn, onNavigateToAuth]);
+
+  const handleDismissModal = useCallback(() => {
+    setIsModalDismissed(true);
+  }, []);
 
   // Render current step
   const renderStep = () => {
@@ -361,7 +529,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
             step={currentStepData}
             value={multiSelectValue}
             onChange={(value) => { updateResponse(currentStepData.id, value); }}
-            isReadOnly={isReadOnly}
+            isReadOnly={effectiveReadOnly}
           />
         );
       }
@@ -372,7 +540,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
             step={currentStepData}
             value={responses[currentStepData.id as keyof AssessmentResponses] as string | undefined}
             onChange={(value) => { updateResponse(currentStepData.id, value); }}
-            isReadOnly={isReadOnly}
+            isReadOnly={effectiveReadOnly}
           />
         );
 
@@ -384,7 +552,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
             step={currentStepData}
             value={scaleValue}
             onChange={(value) => { updateResponse(currentStepData.id, value); }}
-            isReadOnly={isReadOnly}
+            isReadOnly={effectiveReadOnly}
           />
         );
       }
@@ -397,7 +565,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
             step={currentStepData}
             value={textValue}
             onChange={(value) => { updateResponse(currentStepData.id, value); }}
-            isReadOnly={isReadOnly}
+            isReadOnly={effectiveReadOnly}
           />
         );
       }
@@ -416,7 +584,7 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative" data-testid="assessment-page">
       {/* Hidden file input for import - placed at root level for browser compatibility */}
       <input
         ref={fileInputRef}
@@ -429,30 +597,34 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
       {/* Fixed Ink Brush Decoration - Right side */}
       <InkBrushDecoration />
 
-      {/* Page Navigation */}
+      {/* Page Navigation - import/export now in AssessmentHeader */}
       <PageNavigation
         currentPage="assessment"
         onNavigateToLanding={onNavigateToLanding}
         onNavigateToAssessment={undefined} // Already on assessment
         onNavigateToInsights={onNavigateToInsights}
         onNavigateToAuth={onNavigateToAuth}
-        onImport={isReadOnly ? undefined : handleImportClick}
-        onExportAssessment={isReadOnly ? undefined : (hasResponses ? handleExportClick : undefined)}
         onNavigateToProfile={onNavigateToProfile}
         onSignOut={onSignOut}
       />
 
-      {/* View-only Page Header */}
-      {isReadOnly && viewOnlyAssessment && (
-        <AssessmentPageHeader
-          createdAt={viewOnlyAssessment.createdAt}
-          onExport={handleExportClick}
-        />
-      )}
+      {/* Unified Assessment Header - always visible */}
+      <AssessmentHeader
+        isReadOnly={effectiveReadOnly}
+        createdAt={viewOnlyAssessment?.createdAt}
+        currentPhase={currentPhase}
+        currentStep={currentStep}
+        lastReachedPhase={lastReachedPhase}
+        lastReachedStep={lastReachedStep}
+        onSkipToLast={handleSkipToLast}
+        onRetake={handleRetakeAssessment}
+        onImport={handleImportClick}
+        onExport={handleExportClick}
+      />
 
-      {/* Import error message */}
+      {/* Import error message - positioned below header */}
       {importError && (
-        <div className={`fixed ${isReadOnly && viewOnlyAssessment ? 'top-32 lg:top-36' : 'top-20 lg:top-24'} left-4 right-4 lg:left-10 lg:right-10 z-30 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center gap-2`}>
+        <div className="fixed top-32 lg:top-36 left-4 right-4 lg:left-10 lg:right-10 z-30 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
           <ErrorCircleIcon size="sm" className="flex-shrink-0" />
           <span>{importError}</span>
           <button
@@ -464,31 +636,70 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
         </div>
       )}
 
-      {/* Progress Header - with top padding for floating nav (extra padding when view-only header is shown) */}
-      <div className={isReadOnly && viewOnlyAssessment ? 'pt-32 lg:pt-36' : 'pt-20 lg:pt-24'}>
-        <AssessmentProgress
-          phaseTitle={currentPhaseData.title}
-          phaseSubtitle={currentPhaseData.subtitle}
-          currentStep={currentTotalStep}
-          totalSteps={totalSteps}
-        />
+      {/* Progress Header - hidden in readonly mode (synthesis only) */}
+      {!effectiveReadOnly && (
+        <div className="pt-32 lg:pt-36">
+          <AssessmentProgress
+            phaseTitle={currentPhaseData.title}
+            phaseSubtitle={currentPhaseData.subtitle}
+            currentStep={currentTotalStep}
+            totalSteps={totalSteps}
+          />
+        </div>
+      )}
+
+      {/* Content - always account for header space (readonly needs more to clear AssessmentHeader) */}
+      <div className={`flex-1 max-w-6xl mx-auto px-6 py-8 w-full ${effectiveReadOnly ? 'pt-40 lg:pt-44' : ''}`}>
+        {effectiveReadOnly ? (
+          <SynthesisStep responses={responses} phases={phases} />
+        ) : (
+          renderStep()
+        )}
       </div>
 
-      {/* Content */}
-      <div className="flex-1 max-w-6xl mx-auto px-6 py-8 w-full">{renderStep()}</div>
+      {/* Save error alert - shown in synthesis when save fails */}
+      {isSynthesisStep && assessmentSaveError && !effectiveReadOnly && (
+        <div className="max-w-2xl mx-auto px-6 mb-4">
+          <Alert.Error
+            title={t('save.error.title')}
+            description={assessmentSaveError}
+            note={t('save.error.note')}
+            data-testid="assessment-save-error-alert"
+          >
+            <Alert.Actions>
+              <Alert.Action
+                onClick={handleComplete}
+                loading={isSaving}
+                data-testid="assessment-save-error-alert-retry"
+              >
+                {t('save.error.retry')}
+              </Alert.Action>
+            </Alert.Actions>
+          </Alert.Error>
+        </div>
+      )}
 
       {/* Navigation - hide in read-only mode */}
-      {!isReadOnly && (
+      {!effectiveReadOnly && (
         <NavigationControls
           onBack={goBack}
-          onNext={goNext}
+          onNext={handleNext}
           isFirstStep={isFirstStep}
           showNavigation={showNavigation}
           isSynthesis={isSynthesisStep}
           onComplete={handleComplete}
           isSaving={isSaving}
+          validationError={validationError}
         />
       )}
+
+      {/* Save prompt modal for unauthenticated users at synthesis */}
+      <SavePromptModal
+        isOpen={showSavePromptModal}
+        onSignIn={handleSignIn}
+        onCreateAccount={handleCreateAccount}
+        onDismiss={handleDismissModal}
+      />
 
       {/* Footer */}
       <FooterSection />

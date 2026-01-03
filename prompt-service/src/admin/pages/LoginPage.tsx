@@ -72,8 +72,9 @@ export function LoginPage() {
               style={styles.input}
               autoFocus
               disabled={isLoading}
+              data-testid="admin-input-apikey"
             />
-            {error && <p style={styles.error}>{error}</p>}
+            {error && <p style={styles.error} data-testid="admin-login-error">{error}</p>}
           </div>
 
           <button
@@ -84,6 +85,7 @@ export function LoginPage() {
               cursor: isLoading ? 'not-allowed' : 'pointer',
             }}
             disabled={isLoading}
+            data-testid="admin-btn-login"
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>

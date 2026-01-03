@@ -48,7 +48,6 @@ export { default as AlertTriangleIcon } from './AlertTriangleIcon';
 // Action icons
 export { default as SearchIcon } from './SearchIcon';
 export { default as RefreshIcon } from './RefreshIcon';
-export { default as LoadingSpinnerIcon } from './LoadingSpinnerIcon';
 
 // Brand icons
 export { default as GitHubIcon } from './GitHubIcon';

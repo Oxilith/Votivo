@@ -133,6 +133,7 @@ secrets.json
 
 # Test results
 TestResults/
+test-results/
 *.trx
 
 # Azure

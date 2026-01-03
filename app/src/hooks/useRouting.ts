@@ -50,6 +50,8 @@ export interface RouteParams {
   token?: string;
   hash?: string;
   resourceId?: string;
+  /** True when route is /assessment/new - indicates fresh start, don't load from DB */
+  isFreshStart?: boolean;
 }
 
 /**
@@ -64,6 +66,7 @@ const ROUTES: Partial<Record<string, RouteConfig>> = {
   '/reset-password': { view: 'reset-password' },
   '/sign-in': { view: 'auth', authMode: 'login' },
   '/sign-up': { view: 'auth', authMode: 'register' },
+  '/forgot-password': { view: 'auth', authMode: 'login' }, // Redirects to auth, login form has forgot-password link
 };
 
 /**
@@ -96,12 +99,22 @@ export function parseRoute(pathname: string, search: string, hash: string): Rout
     };
   }
 
-  // Check for resource ID patterns: /assessment/:id or /insights/:id
-  const assessmentMatch = /^\/assessment\/([^/]+)$/.exec(pathname);
-  if (assessmentMatch) {
+  // Check for /assessment/new (fresh start) first
+  if (pathname === '/assessment/new') {
     return {
       view: 'assessment',
-      resourceId: assessmentMatch[1],
+      isFreshStart: true,
+      token: urlParams.get('token') ?? undefined,
+      hash: hash ? hash.slice(1) : undefined,
+    };
+  }
+
+  // Check for resource ID patterns: /assessment/:id or /insights/:id
+  const assessmentIdMatch = /^\/assessment\/([^/]+)$/.exec(pathname);
+  if (assessmentIdMatch) {
+    return {
+      view: 'assessment',
+      resourceId: assessmentIdMatch[1],
       token: urlParams.get('token') ?? undefined,
       hash: hash ? hash.slice(1) : undefined,
     };
@@ -129,6 +142,8 @@ export interface NavigateOptions {
   token?: string;
   hash?: string;
   resourceId?: string;
+    /** Navigate to /assessment/new for fresh start */
+  freshStart?: boolean;
   replace?: boolean;
 }
 
@@ -147,8 +162,12 @@ export function buildPath(
     path = VIEW_TO_PATH[view];
   }
 
+  // Handle /assessment/new for fresh start
+  if (view === 'assessment' && options?.freshStart) {
+    path = '/assessment/new';
+  }
   // Append resource ID for assessment and insights views
-  if (options?.resourceId && (view === 'assessment' || view === 'insights')) {
+  else if (options?.resourceId && (view === 'assessment' || view === 'insights')) {
     path += `/${options.resourceId}`;
   }
 
@@ -171,6 +190,15 @@ export function useRouting() {
   const authModeRef = useRef<AuthMode>('login');
   const isNavigatingRef = useRef(false);
   const isInitializedRef = useRef(false);
+
+  // Capture initial route params once on mount (before any effects run)
+  // Using lazy initializer pattern - the function only runs on first render
+  const initialParamsRef = useRef<RouteParams | null>(null);
+  initialParamsRef.current ??= parseRoute(
+    window.location.pathname,
+    window.location.search,
+    window.location.hash
+  );
 
   /**
    * Navigate to a new route
@@ -229,17 +257,17 @@ export function useRouting() {
     return authModeRef.current;
   }, []);
 
-  // Initialize route on mount
+  // Effect 1: URL normalization and auth mode setup on mount
   useEffect(() => {
-    const params = getRouteParams();
+    const params = initialParamsRef.current;
+    if (!params) return;
 
-    // Set initial auth mode
+    // Set initial auth mode from URL
     if (params.authMode) {
       authModeRef.current = params.authMode;
     }
 
-    // Update URL to match the route (in case of trailing slashes, etc.)
-    // Include resourceId to preserve ID-based routes
+    // Normalize URL (fix trailing slashes, etc.)
     const expectedPath = buildPath(params.view, {
       authMode: params.authMode,
       token: params.token,
@@ -254,15 +282,20 @@ export function useRouting() {
         expectedPath
       );
     }
+  }, []);
 
-    // Mark as initialized before updating view to prevent URL sync effect from running prematurely
+  // Effect 2: Sync store view with initial URL (one-time, uses captured initial params)
+  useEffect(() => {
+    const params = initialParamsRef.current;
+    if (!params) return;
+
+    // Mark as initialized
     isInitializedRef.current = true;
 
-    // Only update view if it differs from current
-    if (params.view !== currentView) {
-      setView(params.view);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // Update store if initial URL view differs from store's default
+    // We compare against the captured initial params, not potentially stale currentView
+    setView(params.view);
+  }, [setView]);
 
   // Handle browser back/forward navigation
   useEffect(() => {
@@ -289,6 +322,9 @@ export function useRouting() {
   }, [getRouteParams, setView]);
 
   // Sync URL when view changes externally (e.g., from setView calls)
+  // Use a ref to track if initial sync has completed to avoid race conditions
+  const hasInitialSyncCompletedRef = useRef(false);
+
   useEffect(() => {
     // Skip if we're already navigating or not initialized yet
     if (isNavigatingRef.current || !isInitializedRef.current) return;
@@ -299,6 +335,15 @@ export function useRouting() {
     // If current URL already represents this view (including ID-based routes), don't modify
     // This prevents /assessment/123 from being replaced with /assessment
     if (currentParams.view === currentView) {
+      // Mark initial sync as complete when view matches URL
+      hasInitialSyncCompletedRef.current = true;
+      return;
+    }
+
+    // On initial page load, the URL is the source of truth.
+    // Don't push a new URL until we've synced with the initial URL at least once.
+    // This prevents race conditions where we push '/' before setView('profile') takes effect.
+    if (!hasInitialSyncCompletedRef.current) {
       return;
     }
 

@@ -4,6 +4,11 @@
     "description": "Complete the assessment first to unlock AI-powered analysis of your identity patterns.",
     "button": "Go to Assessment"
   },
+  "dirty": {
+    "title": "Assessment Incomplete",
+    "message": "You have pending changes in your assessment. Complete the assessment to save and enable new analysis.",
+    "action": "Complete Assessment"
+  },
   "ready": {
     "title": "Ready to Analyze",
     "description": "Click below to send your assessment data to Claude for deep pattern analysis. This typically takes around 15 minutes.",
@@ -48,5 +53,12 @@
   "reanalyze": {
     "button": "Re-analyze (may find new patterns)",
     "description": "Each analysis can surface different insights based on Claude's interpretation"
+  },
+  "saveError": {
+    "title": "Analysis Not Saved",
+    "message": "Your analysis is displayed but couldn't be saved to your account.",
+    "retry": "Save Now",
+    "dismiss": "Dismiss",
+    "saving": "Saving..."
   }
 }

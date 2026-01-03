@@ -227,6 +227,22 @@
     "back": "← Wstecz",
     "continue": "Kontynuuj →",
     "complete": "Zakończ ocenę i zobacz analizę AI",
-    "saving": "Zapisywanie..."
+    "saving": "Zapisywanie...",
+    "skipToLast": "Przejdź dalej",
+    "retakeAssessment": "Od nowa",
+    "import": "Importuj"
+  },
+  "validation": {
+    "required": "Proszę wypełnić ten krok przed kontynuowaniem",
+    "incomplete": "Proszę wypełnić wszystkie kroki przed zakończeniem"
+  },
+  "save": {
+    "error": {
+      "title": "Nie udało się zapisać oceny",
+      "default": "Nie można zapisać Twojej oceny. Spróbuj ponownie.",
+      "retry": "Spróbuj ponownie",
+      "note": "Twoje odpowiedzi są przechowywane lokalnie i nie zostaną utracone.",
+      "saving": "Zapisywanie..."
+    }
   }
 }

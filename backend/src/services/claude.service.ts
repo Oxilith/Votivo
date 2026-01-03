@@ -9,6 +9,7 @@
  * - Supports extended thinking when configured
  * - Records A/B test conversions on successful analysis
  * - Throws PromptServiceUnavailableError when prompt-service is unavailable
+ * - Supports mock mode for E2E testing (MOCK_CLAUDE_API=true)
  * @dependencies
  * - @anthropic-ai/sdk for Claude API
  * - @/config for API key and feature flags
@@ -33,6 +34,71 @@ const anthropic = new Anthropic({
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
+
+/**
+ * Mock analysis result for E2E testing.
+ * This is returned when MOCK_CLAUDE_API=true to avoid real API calls during E2E tests.
+ * Structure matches AIAnalysisResult from shared/src/analysis.types.ts
+ */
+const MOCK_ANALYSIS_RESULT: AIAnalysisResult = {
+  patterns: [
+    {
+      title: 'Morning Productivity Pattern',
+      icon: 'sunrise',
+      severity: 'high',
+      description: 'Peak cognitive performance in early morning hours with a consistent decline after midday.',
+      evidence: ['Reports peak energy in early morning', 'Identifies afternoon as low-energy period'],
+      implication: 'Morning block should be protected for deep work requiring highest cognitive load.',
+      leverage: 'Schedule most demanding tasks before noon.',
+    },
+    {
+      title: 'Learning-Oriented Identity',
+      icon: 'book',
+      severity: 'medium',
+      description: 'Strong identification with continuous growth and self-improvement.',
+      evidence: ['Values learning and growth', 'Naturally seeks to understand systems'],
+      implication: 'New habits are more likely to stick when framed as skill development.',
+      leverage: 'Frame changes as learning opportunities rather than obligations.',
+    },
+  ],
+  contradictions: [
+    {
+      title: 'Growth vs. Avoidance',
+      icon: 'scale',
+      description: 'Values growth but procrastinates on ambiguous tasks.',
+      sides: ['Desire for mastery and improvement', 'Avoidance of unclear challenges'],
+      hypothesis: 'Fear of failure or perfectionism may be triggering avoidance behaviors.',
+      question: 'What would happen if you approached ambiguous tasks as experiments rather than tests?',
+    },
+  ],
+  blindSpots: [
+    {
+      title: 'Energy Management',
+      icon: 'eye-off',
+      observation: 'May be underestimating the impact of context switching on productivity.',
+      evidence: 'Fragmented attention patterns noted across multiple responses.',
+      reframe: 'Consider that protecting focus time is not selfish but essential for quality output.',
+    },
+  ],
+  leveragePoints: [
+    {
+      title: 'Morning Planning Session',
+      insight: 'This keystone behavior already exists and can anchor additional positive habits.',
+    },
+  ],
+  risks: [
+    {
+      title: 'Unsustainable Pace',
+      description: 'High expectations combined with avoidance patterns may lead to boom-bust productivity cycles.',
+    },
+  ],
+  identitySynthesis: {
+    currentIdentityCore: 'A growth-oriented individual who thrives with structure and clarity.',
+    hiddenStrengths: ['Deep analytical thinking', 'Consistent morning routine', 'Self-awareness about patterns'],
+    keyTension: 'Desire for mastery conflicts with avoidance of ambiguity.',
+    nextIdentityStep: 'Establish a weekly review to connect daily actions with longer-term growth goals.',
+  },
+};
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -85,6 +151,15 @@ export async function analyzeAssessment(
   language: AnalysisLanguage,
   userProfile?: UserProfileForAnalysis
 ): Promise<{ analysis: AIAnalysisResult; rawResponse: string }> {
+  // Mock mode for E2E testing - return fixture data without calling real API
+  if (config.mockClaudeApi) {
+    logger.info('Mock mode enabled - returning fixture analysis result');
+    return {
+      analysis: MOCK_ANALYSIS_RESULT,
+      rawResponse: JSON.stringify(MOCK_ANALYSIS_RESULT, null, 2),
+    };
+  }
+
   const { promptConfig, variantId } = await resolvePromptConfig(
     'IDENTITY_ANALYSIS',
     config.thinkingEnabled

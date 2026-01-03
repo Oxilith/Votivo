@@ -36,7 +36,7 @@ RUN npm run build -w app
 # Production
 FROM nginx:1.28.1-alpine
 
-RUN apk add --no-cache openssl && \
+RUN apk add --no-cache openssl nodejs npm && \
     mkdir -p /etc/nginx/ssl
 
 COPY app/nginx.conf /etc/nginx/conf.d/default.conf

@@ -58,6 +58,19 @@ vi.mock('@/stores/useAuthStore', () => ({
   useCurrentUser: () => mockCurrentUser,
 }));
 
+// Mock assessment store - savedAt determines if assessment is completed (readonly)
+const mockSavedAt: string | null = '2024-01-01T00:00:00Z'; // Default to completed
+
+vi.mock('@/stores/useAssessmentStore', () => ({
+  useAssessmentStore: (selector?: (state: { savedAt: string | null }) => unknown) => {
+    const state = { savedAt: mockSavedAt };
+    if (typeof selector === 'function') {
+      return selector(state);
+    }
+    return state;
+  },
+}));
+
 // Mock authService
 vi.mock('@/services/api/AuthService', () => ({
   authService: {
@@ -70,6 +83,8 @@ vi.mock('@/components', () => ({
   FooterSection: () => <div data-testid="footer" />,
   PageNavigation: () => <div data-testid="page-navigation" />,
   InkBrushDecoration: () => <div data-testid="ink-brush" />,
+  InkLoader: () => <div data-testid="ink-loader" />,
+  PendingChangesAlert: () => <div data-testid="pending-changes-alert" />,
   ErrorCircleIcon: () => <span data-testid="error-icon" />,
   SearchIcon: () => <span data-testid="search-icon" />,
   SwitchHorizontalIcon: () => <span data-testid="switch-icon" />,
@@ -222,7 +237,7 @@ describe('IdentityInsightsAI', () => {
         />
       );
 
-      await user.click(screen.getByText('noAssessment.button'));
+      await user.click(screen.getByTestId('insights-btn-start-assessment'));
 
       expect(onNavigateToAssessment).toHaveBeenCalled();
     });
@@ -241,7 +256,7 @@ describe('IdentityInsightsAI', () => {
       const user = userEvent.setup();
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('ready.button'));
+      await user.click(screen.getByTestId('insights-btn-analyze'));
 
       expect(mockAnalyze).toHaveBeenCalledWith(mockResponses, 'english', undefined);
     });
@@ -253,8 +268,7 @@ describe('IdentityInsightsAI', () => {
 
       render(<IdentityInsightsAI {...defaultProps} />);
 
-      expect(screen.getByText('loading.title')).toBeInTheDocument();
-      expect(screen.getByText('loading.description')).toBeInTheDocument();
+      expect(screen.getByTestId('ink-loader')).toBeInTheDocument();
     });
   });
 
@@ -281,7 +295,7 @@ describe('IdentityInsightsAI', () => {
       mockAnalysisError = 'Analysis failed';
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('error.tryAgain'));
+      await user.click(screen.getByTestId('insights-btn-try-again'));
 
       expect(mockAnalyze).toHaveBeenCalled();
     });
@@ -292,7 +306,7 @@ describe('IdentityInsightsAI', () => {
 
       render(<IdentityInsightsAI {...defaultProps} />);
 
-      expect(screen.getByText('error.downloadRaw')).toBeInTheDocument();
+      expect(screen.getByTestId('insights-btn-download-raw')).toBeInTheDocument();
     });
 
     it('should call downloadRawResponse when download button is clicked', async () => {
@@ -301,7 +315,7 @@ describe('IdentityInsightsAI', () => {
       mockRawResponse = '{"some": "data"}';
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('error.downloadRaw'));
+      await user.click(screen.getByTestId('insights-btn-download-raw'));
 
       expect(mockDownloadRawResponse).toHaveBeenCalled();
     });
@@ -334,7 +348,7 @@ describe('IdentityInsightsAI', () => {
       const user = userEvent.setup();
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('tabs.contradictions'));
+      await user.click(screen.getByTestId('insights-tab-contradictions'));
 
       const insightCards = screen.getAllByTestId('insight-card');
       expect(insightCards[0]).toHaveTextContent('Values health');
@@ -344,7 +358,7 @@ describe('IdentityInsightsAI', () => {
       const user = userEvent.setup();
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('tabs.synthesis'));
+      await user.click(screen.getByTestId('insights-tab-synthesis'));
 
       expect(screen.getByText('synthesisTab.whoYouAre')).toBeInTheDocument();
       expect(screen.getByText('You are a dedicated professional')).toBeInTheDocument();
@@ -354,7 +368,7 @@ describe('IdentityInsightsAI', () => {
       const user = userEvent.setup();
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('tabs.synthesis'));
+      await user.click(screen.getByTestId('insights-tab-synthesis'));
 
       expect(screen.getByText('synthesisTab.hiddenStrengths')).toBeInTheDocument();
       expect(screen.getByText('Empathy')).toBeInTheDocument();
@@ -365,7 +379,7 @@ describe('IdentityInsightsAI', () => {
       const user = userEvent.setup();
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('tabs.synthesis'));
+      await user.click(screen.getByTestId('insights-tab-synthesis'));
 
       expect(screen.getByText('synthesisTab.keyTension')).toBeInTheDocument();
       expect(screen.getByText('Balance work and life')).toBeInTheDocument();
@@ -375,7 +389,7 @@ describe('IdentityInsightsAI', () => {
       const user = userEvent.setup();
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('tabs.synthesis'));
+      await user.click(screen.getByTestId('insights-tab-synthesis'));
 
       expect(screen.getByText('synthesisTab.nextStep')).toBeInTheDocument();
       expect(screen.getByText('Practice saying no')).toBeInTheDocument();
@@ -403,7 +417,7 @@ describe('IdentityInsightsAI', () => {
       const user = userEvent.setup();
 
       render(<IdentityInsightsAI {...defaultProps} />);
-      await user.click(screen.getByText('reanalyze.button'));
+      await user.click(screen.getByTestId('insights-btn-reanalyze'));
 
       expect(mockAnalyze).toHaveBeenCalled();
     });

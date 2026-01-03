@@ -7,7 +7,7 @@ This guide covers Docker Hub deployment and publishing for Votive. For container
 | Repository | Description |
 |------------|-------------|
 | `oxilith/votive-backend` | Express API proxy (multi-arch) |
-| `oxilith/votive-frontend` | Nginx + React SPA (multi-arch) |
+| `oxilith/votive-app` | Nginx + React SPA (multi-arch) |
 | `oxilith/votive-prompt-service` | Prompt management microservice (multi-arch) |
 | `oxilith/votive-worker` | Background job scheduler (multi-arch) |
 | `oxilith/votive-oci` | OCI compose artifact for single-command deployment |
@@ -136,7 +136,7 @@ For security architecture details, see [Architecture > Security](architecture.md
 
 ```bash
 # Clean previous builds (optional but recommended)
-docker rmi oxilith/votive-frontend:latest 2>/dev/null
+docker rmi oxilith/votive-app:latest 2>/dev/null
 docker rmi oxilith/votive-backend:latest 2>/dev/null
 docker rmi oxilith/votive-prompt-service:latest 2>/dev/null
 docker rmi oxilith/votive-worker:latest 2>/dev/null

@@ -652,6 +652,7 @@ export class UserAuthController {
     }
 
     const assessments = await userService.getAssessments(userId);
+    res.set('Cache-Control', 'no-store');
     res.json(assessments);
   }
 
@@ -717,6 +718,7 @@ export class UserAuthController {
     }
 
     const analyses = await userService.getAnalyses(userId);
+    res.set('Cache-Control', 'no-store');
     res.json(analyses);
   }
 

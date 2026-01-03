@@ -3,6 +3,7 @@
  * @purpose Shared layout for authentication pages with Ink & Stone styling
  * @functionality
  * - Provides consistent floating header matching landing page NavSection
+ * - Includes background mask to prevent content showing through header
  * - Includes language switcher (EN/PL) for internationalization
  * - Includes fixed ink brush SVG decoration
  * - Provides centered content card with proper styling
@@ -51,12 +52,21 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children, maxWidth = 'md' }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
+    <div className="min-h-screen bg-[var(--bg-primary)]" data-testid="auth-page">
       {/* Ink Brush Decoration */}
       <InkBrushDecoration />
 
+      {/* Background mask - sits below nav, above page content */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-x-0 top-0 z-40 pointer-events-none h-[64px] lg:h-[72px] bg-[var(--bg-primary)]/85 backdrop-blur-[12px]"
+      />
+
       {/* Floating Header - matches NavSection */}
-      <nav className="fixed top-4 left-4 right-4 lg:top-6 lg:left-10 lg:right-10 z-50 flex justify-between items-center px-4 py-3 lg:px-6 bg-[var(--bg-primary)]/85 backdrop-blur-[12px] border border-[var(--border)] transition-colors">
+      <nav
+        data-testid="nav-header"
+        className="fixed top-4 left-4 right-4 lg:top-6 lg:left-10 lg:right-10 z-50 flex justify-between items-center px-4 py-3 lg:px-6 bg-[var(--bg-primary)]/85 backdrop-blur-[12px] border border-[var(--border)] transition-colors"
+      >
         {/* Logo and Brand */}
         <button
           onClick={handleNavigateToLanding}
@@ -71,8 +81,12 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children, maxWidth = 'md' }) => {
         {/* Controls */}
         <div className="flex items-center gap-4">
           {/* Language Toggle - Inline EN | PL */}
-          <div className="flex items-center gap-0.5 font-mono text-xs text-[var(--text-faint)]">
+          <div
+            data-testid="language-toggle"
+            className="flex items-center gap-0.5 font-mono text-xs text-[var(--text-faint)]"
+          >
             <button
+              data-testid="language-btn-en"
               onClick={() => { changeLanguage('en'); }}
               className={`px-1.5 py-1 transition-colors ${
                 i18n.language === 'en'
@@ -84,6 +98,7 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children, maxWidth = 'md' }) => {
             </button>
             <span className="text-[var(--border-strong)]">|</span>
             <button
+              data-testid="language-btn-pl"
               onClick={() => { changeLanguage('pl'); }}
               className={`px-1.5 py-1 transition-colors ${
                 i18n.language === 'pl'
@@ -97,6 +112,7 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children, maxWidth = 'md' }) => {
 
           {/* Theme Toggle */}
           <button
+            data-testid="theme-toggle"
             onClick={toggleTheme}
             className="w-8 h-8 flex items-center justify-center border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}

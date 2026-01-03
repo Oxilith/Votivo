@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/ScaleStep.tsx
+ * @file app/src/components/assessment/steps/ScaleStep.tsx
  * @purpose Renders 1-5 scale rating question with Ink & Stone styling
  * @functionality
  * - Displays question with optional context
@@ -30,9 +30,12 @@ export const ScaleStep: React.FC<ScaleStepProps> = ({ step, value, onChange, isR
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="scale-step">
       <div>
-        <h3 className="font-display text-xl font-medium text-[var(--text-primary)] mb-2">
+        <h3
+          id={`question-${step.id}`}
+          className="font-display text-xl font-medium text-[var(--text-primary)] mb-2"
+        >
           {step.question}
         </h3>
         {step.context && (
@@ -44,12 +47,19 @@ export const ScaleStep: React.FC<ScaleStepProps> = ({ step, value, onChange, isR
           <span className="max-w-32">{step.lowLabel}</span>
           <span className="max-w-32 text-right">{step.highLabel}</span>
         </div>
-        <div className="flex gap-2 justify-center">
+        <div
+          className="flex gap-2 justify-center"
+          role="radiogroup"
+          aria-labelledby={`question-${step.id}`}
+        >
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
+              role="radio"
+              aria-checked={currentValue === num}
               onClick={() => { handleClick(num); }}
               disabled={isReadOnly}
+              data-testid="scale-option"
               className={`w-14 h-14 border-2 rounded-sm text-lg font-display font-medium transition-all ${
                 currentValue === num
                   ? 'bg-[var(--accent)] text-white border-transparent'

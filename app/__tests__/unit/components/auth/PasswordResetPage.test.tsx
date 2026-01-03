@@ -88,7 +88,7 @@ describe('PasswordResetPage', () => {
       const user = userEvent.setup();
       render(<PasswordResetPage />);
 
-      await user.click(screen.getByText('resetPassword.invalidLink.goToSignIn'));
+      await user.click(screen.getByTestId('password-reset-btn-signin'));
 
       expect(mockNavigate).toHaveBeenCalledWith('auth', { authMode: 'login' });
     });
@@ -97,7 +97,7 @@ describe('PasswordResetPage', () => {
       const user = userEvent.setup();
       render(<PasswordResetPage />);
 
-      await user.click(screen.getByText('resetPassword.invalidLink.backToHome'));
+      await user.click(screen.getByTestId('password-reset-btn-home'));
 
       expect(mockNavigate).toHaveBeenCalledWith('landing');
     });

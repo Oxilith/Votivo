@@ -10,11 +10,13 @@
  * - react for useState, useEffect, ReactNode
  * - react-router-dom for Navigate
  * - ../api/auth for authentication verification
+ * - ./InkLoader for loading state display
  */
 
 import { useState, useEffect, type ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { checkAuth } from '@/admin';
+import { InkLoader } from './InkLoader';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -43,12 +45,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }, []);
 
   if (authState === 'loading') {
-    return (
-      <div style={styles.loading}>
-        <div style={styles.spinner} />
-        <p>Verifying authentication...</p>
-      </div>
-    );
+    return <InkLoader variant="fullscreen" message="Verifying authentication..." data-testid="admin-loading" />;
   }
 
   if (authState === 'unauthenticated') {
@@ -57,23 +54,3 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   return <>{children}</>;
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  loading: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    gap: '1rem',
-    color: '#6b7280',
-  },
-  spinner: {
-    width: '32px',
-    height: '32px',
-    border: '3px solid #e5e7eb',
-    borderTopColor: '#3b82f6',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-  },
-};

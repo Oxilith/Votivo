@@ -5,16 +5,19 @@
  * - Provides login endpoint that validates API key and sets session cookie
  * - Provides logout endpoint that clears session cookie
  * - Provides verify endpoint to check authentication status
+ * - Applies rate limiting only to login endpoint (not verify/logout)
  * @dependencies
  * - express Router
  * - @/utils/crypto for timing-safe comparison
  * - @/utils/auth for shared auth config validation
  * - @/config for configuration
+ * - @/middleware for rate limiting
  */
 
 import { Router, type Request, type Response } from 'express';
 import { config } from '@/config';
 import { AUTH_CONSTANTS } from '@/constants';
+import { adminLoginLimiter } from '@/middleware';
 import { timingSafeCompare, validateAuthConfig } from '@/utils';
 
 const router = Router();
@@ -22,8 +25,9 @@ const router = Router();
 /**
  * POST /api/auth/login
  * Validates admin API key and sets HttpOnly session cookie
+ * Rate limited to prevent brute-force attacks (uses config.rateLimit.login)
  */
-router.post('/login', (req: Request, res: Response): void => {
+router.post('/login', adminLoginLimiter, (req: Request, res: Response): void => {
   const { apiKey } = req.body as { apiKey?: string };
 
   if (!apiKey || typeof apiKey !== 'string') {

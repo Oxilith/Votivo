@@ -1,11 +1,13 @@
 /**
- * @file src/components/shared/index.ts
+ * @file app/src/components/shared/index.ts
  * @purpose Barrel export for shared UI components
  * @functionality
+ * - Exports Alert component for error, warning, info, success messages
  * - Exports ChunkErrorBoundary component for lazy-load error handling
  * - Exports DateBadge component
  * - Exports ExportDropdown component
  * - Exports InkBrushDecoration component
+ * - Exports InkLoader component for consistent loading states
  * - Exports LanguageToggle component
  * - Exports LoadingFallback component for Suspense boundaries
  * - Exports PageNavigation component
@@ -13,10 +15,12 @@
  * - Exports UserAvatarDropdown component
  * - Re-exports all icons from icons sub-barrel
  * @dependencies
+ * - ./Alert
  * - ./ChunkErrorBoundary
  * - ./DateBadge
  * - ./ExportDropdown
  * - ./InkBrushDecoration
+ * - ./InkLoader
  * - ./LanguageToggle
  * - ./LoadingFallback
  * - ./PageNavigation
@@ -25,10 +29,12 @@
  * - ./icons
  */
 
+export { default as Alert } from './Alert';
 export { default as ChunkErrorBoundary } from './ChunkErrorBoundary';
 export { default as DateBadge } from './DateBadge';
 export { default as ExportDropdown } from './ExportDropdown';
 export { default as InkBrushDecoration } from './InkBrushDecoration';
+export { default as InkLoader } from './InkLoader';
 export { default as LanguageToggle } from './LanguageToggle';
 export { default as LoadingFallback } from './LoadingFallback';
 export { default as PageNavigation } from './PageNavigation';

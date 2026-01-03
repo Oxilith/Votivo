@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/MultiSelectStep.tsx
+ * @file app/src/components/assessment/steps/MultiSelectStep.tsx
  * @purpose Renders multi-select checkbox question with Ink & Stone styling
  * @functionality
  * - Displays question with optional context
@@ -35,21 +35,31 @@ export const MultiSelectStep: React.FC<MultiSelectStepProps> = ({ step, value, o
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="multi-select-step">
       <div>
-        <h3 className="font-display text-xl font-medium text-[var(--text-primary)] mb-2">
+        <h3
+          id={`question-${step.id}`}
+          className="font-display text-xl font-medium text-[var(--text-primary)] mb-2"
+        >
           {step.question}
         </h3>
         {step.context && (
           <p className="font-body text-[var(--text-secondary)] text-sm">{step.context}</p>
         )}
       </div>
-      <div className="grid gap-2">
+      <div
+        className="grid gap-2"
+        role="group"
+        aria-labelledby={`question-${step.id}`}
+      >
         {step.options.map((option: SelectOption) => (
           <button
             key={option.id}
+            role="checkbox"
+            aria-checked={selected.includes(option.id)}
             onClick={() => { toggleOption(option.id); }}
             disabled={isReadOnly}
+            data-testid={`multi-select-option-${option.id}`}
             className={`text-left p-4 border-2 rounded-sm transition-all ${
               selected.includes(option.id)
                 ? 'border-[var(--accent)] bg-[var(--accent)]/5'

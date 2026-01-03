@@ -59,21 +59,21 @@ export function PromptCreatePage() {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} data-testid="prompt-create-page">
       <div style={styles.header}>
-        <Link to="/prompts" style={styles.backLink}>
+        <Link to="/prompts" style={styles.backLink} data-testid="prompt-btn-back">
           &larr; Back to Prompts
         </Link>
         <h1 style={styles.title}>Create New Prompt</h1>
       </div>
 
       {error && (
-        <div style={styles.error}>
+        <div style={styles.error} role="alert" data-testid="prompt-create-error">
           <p>{error}</p>
         </div>
       )}
 
-      <form onSubmit={(e) => void handleSubmit(e)} style={styles.form}>
+      <form onSubmit={(e) => void handleSubmit(e)} style={styles.form} aria-label="Create prompt">
         <div style={styles.card}>
           <h2 style={styles.sectionTitle}>Basic Information</h2>
 
@@ -86,6 +86,7 @@ export function PromptCreatePage() {
               style={styles.input}
               placeholder="e.g., IDENTITY_ANALYSIS"
               required
+              data-testid="prompt-input-key"
             />
             <span style={styles.hint}>Unique identifier (uppercase, underscores)</span>
           </div>
@@ -99,6 +100,7 @@ export function PromptCreatePage() {
               style={styles.input}
               placeholder="e.g., Identity Analysis Prompt"
               required
+              data-testid="prompt-input-name"
             />
           </div>
 
@@ -109,6 +111,7 @@ export function PromptCreatePage() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               style={{ ...styles.input, minHeight: '80px' }}
               placeholder="Brief description of the prompt's purpose"
+              data-testid="prompt-input-description"
             />
           </div>
 
@@ -119,6 +122,7 @@ export function PromptCreatePage() {
               onChange={(e) => setFormData({ ...formData, model: e.target.value })}
               style={styles.select}
               required
+              data-testid="prompt-select-model"
             >
               {CLAUDE_MODELS.map((model: { value: string; label: string }) => (
                 <option key={model.value} value={model.value}>
@@ -140,6 +144,7 @@ export function PromptCreatePage() {
               style={{ ...styles.input, minHeight: '300px', fontFamily: 'monospace' }}
               placeholder="Enter your prompt content here..."
               required
+              data-testid="prompt-input-content"
             />
           </div>
         </div>
@@ -273,10 +278,10 @@ export function PromptCreatePage() {
         </div>
 
         <div style={styles.actions}>
-          <Link to="/prompts" style={styles.cancelButton}>
+          <Link to="/prompts" style={styles.cancelButton} data-testid="prompt-btn-cancel">
             Cancel
           </Link>
-          <button type="submit" style={styles.saveButton} disabled={saving}>
+          <button type="submit" style={styles.saveButton} disabled={saving} data-testid="prompt-btn-submit">
             {saving ? 'Creating...' : 'Create Prompt'}
           </button>
         </div>

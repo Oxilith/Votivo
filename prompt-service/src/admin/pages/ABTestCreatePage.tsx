@@ -47,21 +47,21 @@ export function ABTestCreatePage() {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} data-testid="abtest-create-page">
       <div style={styles.header}>
-        <Link to="/ab-tests" style={styles.backLink}>
+        <Link to="/ab-tests" style={styles.backLink} data-testid="abtest-btn-back">
           &larr; Back to A/B Tests
         </Link>
         <h1 style={styles.title}>Create New A/B Test</h1>
       </div>
 
       {error && (
-        <div style={styles.error}>
+        <div style={styles.error} role="alert" data-testid="abtest-create-error">
           <p>{error}</p>
         </div>
       )}
 
-      <form onSubmit={(e) => void handleSubmit(e)} style={styles.form}>
+      <form onSubmit={(e) => void handleSubmit(e)} style={styles.form} aria-label="Create A/B test">
         <div style={styles.card}>
           <h2 style={styles.sectionTitle}>Test Configuration</h2>
 
@@ -75,6 +75,7 @@ export function ABTestCreatePage() {
                 onChange={(e) => setFormData({ ...formData, promptId: e.target.value })}
                 style={styles.select}
                 required
+                data-testid="abtest-select-prompt"
               >
                 <option value="">Select a prompt</option>
                 {prompts.map((prompt: PromptDTO) => (
@@ -98,6 +99,7 @@ export function ABTestCreatePage() {
               style={styles.input}
               placeholder="e.g., Tone Comparison Test"
               required
+              data-testid="abtest-input-name"
             />
           </div>
 
@@ -108,6 +110,7 @@ export function ABTestCreatePage() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               style={{ ...styles.input, minHeight: '80px' }}
               placeholder="Describe the hypothesis and goal of this test"
+              data-testid="abtest-input-description"
             />
           </div>
         </div>
@@ -146,10 +149,10 @@ export function ABTestCreatePage() {
         </div>
 
         <div style={styles.actions}>
-          <Link to="/ab-tests" style={styles.cancelButton}>
+          <Link to="/ab-tests" style={styles.cancelButton} data-testid="abtest-btn-cancel">
             Cancel
           </Link>
-          <button type="submit" style={styles.saveButton} disabled={saving}>
+          <button type="submit" style={styles.saveButton} disabled={saving} data-testid="abtest-btn-submit">
             {saving ? 'Creating...' : 'Create A/B Test'}
           </button>
         </div>

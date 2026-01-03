@@ -54,7 +54,7 @@ export const SynthesisStep: React.FC<SynthesisStepProps> = ({
   const willpowerPattern = willpowerStep?.options.find((o) => o.id === responses.willpower_pattern);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" data-testid="synthesis-step">
       <div>
         <h2 className="font-display text-2xl font-semibold text-[var(--text-primary)] mb-2">
           {t('synthesis.heading')}

@@ -34,11 +34,17 @@ const AssessmentPageHeader: FC<AssessmentPageHeaderProps> = ({
   const { t } = useTranslation('header');
 
   return (
-    <div className="fixed top-20 lg:top-24 left-4 right-4 lg:left-10 lg:right-10 z-40 flex items-center justify-between px-4 py-2 lg:px-6 bg-[var(--bg-secondary)]/90 backdrop-blur-[8px] border border-[var(--border)] transition-colors">
+    <div
+      data-testid="page-header"
+      className="fixed top-20 lg:top-24 left-4 right-4 lg:left-10 lg:right-10 z-40 flex items-center justify-between px-4 py-2 lg:px-6 bg-[var(--bg-secondary)]/90 backdrop-blur-[8px] border border-[var(--border)] transition-colors"
+    >
       {/* Left: Badge and Title */}
       <div className="flex items-center gap-4">
         {/* View Only Badge */}
-        <span className="px-2 py-0.5 text-xs font-mono uppercase tracking-wider text-[var(--accent)] bg-[var(--accent)]/10 border border-[var(--accent)]/30">
+        <span
+          data-testid="view-only-badge"
+          className="px-2 py-0.5 text-xs font-mono uppercase tracking-wider text-[var(--accent)] bg-[var(--accent)]/10 border border-[var(--accent)]/30"
+        >
           {t('viewOnly.badge')}
         </span>
 
@@ -56,6 +62,7 @@ const AssessmentPageHeader: FC<AssessmentPageHeaderProps> = ({
         <button
           type="button"
           onClick={onExport}
+          data-testid="export-btn-assessment"
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--border-strong)] transition-colors"
         >
           <DownloadIcon size="sm" />

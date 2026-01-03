@@ -183,11 +183,6 @@ export const useIsAuthenticated = () => useAuthStore((state) => state.user !== n
 export const useCurrentUser = () => useAuthStore((state) => state.user);
 
 /**
- * Selector for auth loading state
- */
-export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
-
-/**
  * Selector for auth initialization state
  */
 export const useAuthInitialized = () => useAuthStore((state) => state.isInitialized);

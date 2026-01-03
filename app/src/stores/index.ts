@@ -18,7 +18,6 @@ export {
   useAuthStore,
   useIsAuthenticated,
   useCurrentUser,
-  useAuthLoading,
   useAuthInitialized,
   useAuthError,
   useAuthHydrated,

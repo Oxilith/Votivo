@@ -58,6 +58,8 @@ This guide covers security considerations and configuration requirements for dep
 | `RATE_LIMIT_TOKEN_REFRESH` | No | 20 | Token refresh requests per window |
 | `RATE_LIMIT_USER_DATA` | No | 30 | Assessment/analysis requests per window |
 | `RATE_LIMIT_PROFILE` | No | 15 | Profile operations per window |
+| `RATE_LIMIT_ADMIN_API` | No | 100 | Admin API requests per window |
+| `RATE_LIMIT_ADMIN_WINDOW_MS` | No | 900000 | Admin API rate limit window (15 min) |
 
 **Important:** `SESSION_SECRET` must differ from `ADMIN_API_KEY` in production for security. In development, at least one of `SESSION_SECRET` or `ADMIN_API_KEY` must be set—the service will fail to start with a clear error message if neither is configured. When only `ADMIN_API_KEY` is set, it's used as the session secret and a warning is logged.
 

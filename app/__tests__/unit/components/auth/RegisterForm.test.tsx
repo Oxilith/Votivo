@@ -86,6 +86,13 @@ vi.mock('shared', () => ({
   PASSWORD_MAX_LENGTH: 128,
 }));
 
+// Mock components from @/components
+vi.mock('@/components', () => ({
+  InkLoader: () => <span data-testid="ink-loader" />,
+  EyeIcon: () => <span data-testid="eye-icon" />,
+  EyeOffIcon: () => <span data-testid="eye-off-icon" />,
+}));
+
 describe('RegisterForm', () => {
   const defaultProps = {
     onSwitchToLogin: vi.fn(),
@@ -410,7 +417,7 @@ describe('RegisterForm', () => {
       const user = userEvent.setup();
       render(<RegisterForm {...defaultProps} />);
 
-      await user.click(screen.getByText('Sign in'));
+      await user.click(screen.getByTestId('register-btn-login'));
 
       expect(defaultProps.onSwitchToLogin).toHaveBeenCalled();
     });

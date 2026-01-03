@@ -23,7 +23,7 @@ import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormInput from './FormInput';
 import FormButton from './FormButton';
-import { authService } from '@/services/api/AuthService';
+import { authService } from '@/services/api';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 /**
@@ -110,7 +110,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto" data-testid="login-form">
       <div className="text-center mb-8">
         <h2 className="font-display text-3xl text-[var(--text-primary)] mb-2">
           {t('login.title')}
@@ -120,7 +120,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" aria-label={t('login.title')}>
         <FormInput
           label={t('login.email')}
           type="email"
@@ -147,6 +147,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
           <div
             className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-600 dark:border-red-400"
             role="alert"
+            aria-live="polite"
+            data-testid="login-error"
           >
             <p className="font-body text-sm text-red-600 dark:text-red-400">
               {apiError}
@@ -159,6 +161,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             type="button"
             onClick={onForgotPassword}
             className="font-body text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
+            data-testid="login-btn-forgot-password"
           >
             {t('login.forgotPassword')}
           </button>
@@ -173,6 +176,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type="button"
           onClick={onSwitchToRegister}
           className="font-medium text-[var(--accent)] hover:text-[var(--accent-soft)] transition-colors"
+          data-testid="login-btn-register"
         >
           {t('login.signUp')}
         </button>

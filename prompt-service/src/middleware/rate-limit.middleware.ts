@@ -100,3 +100,13 @@ export const profileLimiter = createLimiter(
   config.rateLimit.profile,
   'Too many profile requests, please try again later'
 );
+
+/**
+ * Rate limiter for admin login endpoint
+ * Default: 5 requests per minute (uses same config as user login)
+ * Purpose: Brute force protection for admin API key authentication
+ */
+export const adminLoginLimiter = createLimiter(
+  config.rateLimit.login,
+  'Too many login attempts, please try again later'
+);

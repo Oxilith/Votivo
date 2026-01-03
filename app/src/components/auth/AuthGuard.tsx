@@ -10,13 +10,13 @@
  * - React (useEffect, useRef)
  * - @/stores (useIsAuthenticated, useAuthInitialized)
  * - @/hooks (useRouting)
- * - @/components (LoadingSpinnerIcon)
+ * - @/components (InkLoader)
  */
 
 import React, { useEffect, useRef, type ReactNode } from 'react';
 import { useIsAuthenticated, useAuthInitialized } from '@/stores';
 import { useRouting } from '@/hooks';
-import { LoadingSpinnerIcon } from '@/components';
+import { InkLoader } from '@/components';
 
 /**
  * Props for AuthGuard component
@@ -29,18 +29,6 @@ export interface AuthGuardProps {
   /** Fallback component to show while checking auth */
   fallback?: ReactNode;
 }
-
-/**
- * Loading spinner for auth check
- */
-const AuthLoading: React.FC = () => (
-  <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
-    <div className="text-center">
-      <LoadingSpinnerIcon size="lg" className="text-[var(--accent)] mx-auto mb-4" />
-      <p className="font-body text-[var(--text-secondary)]">Loading...</p>
-    </div>
-  </div>
-);
 
 /**
  * AuthGuard - Protects views that require authentication
@@ -77,7 +65,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Show loading while initializing or redirecting
   if (!isInitialized || (mode === 'required' && !isAuthenticated)) {
-    return <>{fallback ?? <AuthLoading />}</>;
+    return <>{fallback ?? <InkLoader variant="fullscreen" />}</>;
   }
 
   // Render children (for optional mode, always render regardless of auth state)

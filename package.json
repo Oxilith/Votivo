@@ -7,7 +7,8 @@
     "backend",
     "app",
     "prompt-service",
-    "worker"
+    "worker",
+    "e2e"
   ],
   "scripts": {
     "build": "npm run build -w shared && npm run build -w backend && npm run build -w worker && npm run build -w prompt-service && npm run build -w app",
@@ -25,12 +26,23 @@
     "db:migrate": "npm run db:migrate -w prompt-service",
     "db:generate": "npm run db:generate --workspaces --if-present",
     "db:seed": "npm run db:seed -w prompt-service",
-    "db:studio": "npm run db:studio -w prompt-service"
+    "db:seed:test": "npm run db:seed:test -w prompt-service",
+    "db:studio": "npm run db:studio -w prompt-service",
+    "test:e2e": "npx dotenvx run -f .env.test -- npm run e2e -w e2e",
+    "test:e2e:headed": "npx dotenvx run -f .env.test -- npm run e2e:headed -w e2e",
+    "test:e2e:ui": "npx dotenvx run -f .env.test -- npm run e2e:ui -w e2e",
+    "test:e2e:failed": "npx dotenvx run -f .env.test -- npm run e2e:failed -w e2e",
+    "test:e2e:grep": "npx dotenvx run -f .env.test -- npm run e2e:grep -w e2e",
+    "test:e2e:report": "npx dotenvx run -f .env.test -- npm run e2e:report -w e2e",
+    "test:e2e:codegen": "npx dotenvx run -f .env.test -- npm run e2e:codegen -w e2e",
+    "test:e2e:trace": "npx dotenvx run -f .env.test -- npm run e2e:trace -w e2e",
+    "test:e2e:serial": "npx dotenvx run -f .env.test -- npm run e2e:serial -w e2e"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.51.4",
     "zod": "^4.3.3"
   },
   "devDependencies": {

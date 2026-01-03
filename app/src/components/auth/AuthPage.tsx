@@ -23,7 +23,7 @@ import AuthLayout from './AuthLayout';
 import { LoginForm, RegisterForm, FormInput, FormButton } from './forms';
 import { useRouting } from '@/hooks';
 import { MailIcon } from '@/components';
-import { authService } from '@/services/api/AuthService';
+import { authService } from '@/services/api';
 
 /**
  * Authentication mode
@@ -73,7 +73,7 @@ const PasswordResetRequestForm: React.FC<{
 
   if (submitted) {
     return (
-      <div className="text-center">
+      <div className="text-center" data-testid="forgot-password-success">
         <div className="w-16 h-16 mx-auto mb-6 border-2 border-[var(--accent)] flex items-center justify-center">
           <MailIcon size="lg" className="text-[var(--accent)]" />
         </div>
@@ -87,6 +87,7 @@ const PasswordResetRequestForm: React.FC<{
           type="button"
           onClick={onBack}
           className="font-body font-medium text-[var(--accent)] hover:text-[var(--accent-soft)] transition-colors"
+          data-testid="forgot-password-btn-back"
         >
           {t('forgotPassword.backToLogin')}
         </button>
@@ -95,7 +96,7 @@ const PasswordResetRequestForm: React.FC<{
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto" data-testid="forgot-password-form">
       <div className="text-center mb-8">
         <h2 className="font-display text-3xl text-[var(--text-primary)] mb-2">
           {t('forgotPassword.title')}
@@ -105,7 +106,7 @@ const PasswordResetRequestForm: React.FC<{
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" aria-label={t('forgotPassword.title')}>
         <FormInput
           label={t('forgotPassword.email')}
           type="email"
@@ -125,6 +126,7 @@ const PasswordResetRequestForm: React.FC<{
           type="button"
           onClick={onBack}
           className="font-medium text-[var(--accent)] hover:text-[var(--accent-soft)] transition-colors"
+          data-testid="forgot-password-btn-login"
         >
           {t('forgotPassword.backToLogin')}
         </button>

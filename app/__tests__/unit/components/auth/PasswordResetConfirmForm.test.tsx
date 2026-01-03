@@ -203,10 +203,10 @@ describe('PasswordResetConfirmForm', () => {
       await user.click(screen.getByTestId('submit-btn'));
 
       await waitFor(() => {
-        expect(screen.getByText('resetPassword.goToLogin')).toBeInTheDocument();
+        expect(screen.getByTestId('password-reset-confirm-btn-login')).toBeInTheDocument();
       });
 
-      await user.click(screen.getByText('resetPassword.goToLogin'));
+      await user.click(screen.getByTestId('password-reset-confirm-btn-login'));
 
       expect(onNavigateToLogin).toHaveBeenCalled();
     });
@@ -257,7 +257,7 @@ describe('PasswordResetConfirmForm', () => {
 
       render(<PasswordResetConfirmForm {...defaultProps} onNavigateToLogin={onNavigateToLogin} />);
 
-      await user.click(screen.getByText('resetPassword.signIn'));
+      await user.click(screen.getByTestId('password-reset-confirm-btn-signin'));
 
       expect(onNavigateToLogin).toHaveBeenCalled();
     });

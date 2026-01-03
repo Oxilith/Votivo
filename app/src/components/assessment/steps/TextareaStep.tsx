@@ -22,9 +22,12 @@ interface TextareaStepProps {
 
 export const TextareaStep: React.FC<TextareaStepProps> = ({ step, value, onChange, isReadOnly = false }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="textarea-step">
       <div>
-        <h3 className="font-display text-xl font-medium text-[var(--text-primary)] mb-2">
+        <h3
+          id={`question-${step.id}`}
+          className="font-display text-xl font-medium text-[var(--text-primary)] mb-2"
+        >
           {step.question}
         </h3>
         {step.context && (
@@ -37,6 +40,8 @@ export const TextareaStep: React.FC<TextareaStepProps> = ({ step, value, onChang
         placeholder={step.placeholder}
         rows={step.rows ?? 5}
         readOnly={isReadOnly}
+        aria-labelledby={`question-${step.id}`}
+        data-testid="textarea-input"
         className={`w-full p-4 border-2 border-[var(--border)] rounded-sm focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 resize-none font-body text-[var(--text-primary)] placeholder-[var(--text-muted)] bg-[var(--bg-primary)] transition-colors ${isReadOnly ? 'cursor-not-allowed opacity-75 bg-[var(--bg-secondary)]' : ''}`}
       />
     </div>

@@ -60,7 +60,7 @@ const InsightCard: React.FC<InsightCardProps> = ({ item }) => {
   const { t } = useTranslation('insights');
 
   return (
-    <div className={`p-5 ${cardStyles.base} space-y-3`}>
+    <div data-testid="insight-card" className={`p-5 ${cardStyles.base} space-y-3`}>
       {/* Header with icon, title, and optional severity badge */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">

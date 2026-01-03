@@ -4,6 +4,11 @@
     "description": "Najpierw ukończ ocenę, aby odblokować analizę wzorców tożsamości wspieraną przez AI.",
     "button": "Przejdź do oceny"
   },
+  "dirty": {
+    "title": "Ocena niekompletna",
+    "message": "Masz niezapisane zmiany w ocenie. Ukończ ocenę, aby zapisać i umożliwić nową analizę.",
+    "action": "Ukończ ocenę"
+  },
   "ready": {
     "title": "Gotowe do analizy",
     "description": "Kliknij poniżej aby wysłać dane oceny do Claude w celu głębokiej analizy wzorców. Zajmuje to zazwyczaj około 15 minut.",
@@ -48,5 +53,12 @@
   "reanalyze": {
     "button": "Analizuj ponownie (może znaleźć nowe wzorce)",
     "description": "Każda analiza może ujawnić inne spostrzeżenia w oparciu o interpretację Claude"
+  },
+  "saveError": {
+    "title": "Analiza niezapisana",
+    "message": "Twoja analiza jest wyświetlana, ale nie można jej zapisać na Twoim koncie.",
+    "retry": "Zapisz teraz",
+    "dismiss": "Zamknij",
+    "saving": "Zapisywanie..."
   }
 }

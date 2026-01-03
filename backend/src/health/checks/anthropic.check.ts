@@ -18,6 +18,14 @@ import type { HealthCheck, ComponentHealth } from '@/health';
 const HEALTH_CHECK_MODEL = 'claude-sonnet-4-20250514';
 
 async function checkAnthropicHealth(): Promise<ComponentHealth> {
+  // Mock mode for E2E testing - skip real API validation
+  if (config.mockClaudeApi) {
+    return {
+      status: 'healthy',
+      message: 'Anthropic API check skipped (mock mode enabled)',
+    };
+  }
+
   if (!config.anthropicApiKey) {
     return {
       status: 'unhealthy',

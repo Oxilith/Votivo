@@ -21,9 +21,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import AuthLayout from './AuthLayout';
-import { CheckIcon, LoadingSpinnerIcon, ErrorCircleIcon } from '@/components';
+import { CheckIcon, InkLoader, ErrorCircleIcon } from '@/components';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { authService } from '@/services/api/AuthService';
+import { authService } from '@/services/api';
 import { useRouting } from '@/hooks';
 
 /**
@@ -115,17 +115,7 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
       <div className="text-center">
         {/* Loading State */}
         {state === 'loading' && (
-          <>
-            <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-              <LoadingSpinnerIcon size="lg" className="text-[var(--accent)]" />
-            </div>
-            <h2 className="font-display text-2xl text-[var(--text-primary)] mb-2">
-              {t('verifyEmail.loading.title')}
-            </h2>
-            <p className="font-body text-[var(--text-secondary)]">
-              {t('verifyEmail.loading.description')}
-            </p>
-          </>
+          <InkLoader variant="contained" message={t('verifyEmail.loading.title')} />
         )}
 
         {/* Success State */}
@@ -142,6 +132,7 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
             </p>
             <button
               onClick={handleNavigateToProfile}
+              data-testid="email-verify-btn-profile"
               className="cta-button px-6 py-3 font-body font-medium text-white bg-[var(--accent)]"
             >
               {t('verifyEmail.success.goToProfile')}
@@ -165,6 +156,7 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
               <button
                 onClick={handleResendVerification}
                 disabled={resendLoading || resendSuccess}
+                data-testid="email-verify-btn-resend-error"
                 className="cta-button w-full py-3 px-6 font-body font-medium text-white bg-[var(--accent)] disabled:opacity-50"
               >
                 {resendLoading ? t('verifyEmail.resending') : resendSuccess ? t('verifyEmail.resent') : t('verifyEmail.resend')}
@@ -176,6 +168,7 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
               )}
               <button
                 onClick={handleNavigateToLanding}
+                data-testid="email-verify-btn-home-error"
                 className="w-full py-2 font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
               >
                 {t('verifyEmail.backToHome')}
@@ -210,6 +203,7 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
               <button
                 onClick={handleResendVerification}
                 disabled={resendLoading || resendSuccess}
+                data-testid="email-verify-btn-resend"
                 className="w-full py-3 px-6 font-body font-medium text-[var(--text-primary)] bg-[var(--bg-primary)] border border-[var(--border)] transition-colors hover:border-[var(--accent)] disabled:opacity-50"
               >
                 {resendLoading ? t('verifyEmail.resending') : resendSuccess ? t('verifyEmail.resent') : t('verifyEmail.resend')}
@@ -221,6 +215,7 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
               )}
               <button
                 onClick={handleNavigateToLanding}
+                data-testid="email-verify-btn-home"
                 className="w-full py-2 font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
               >
                 {t('verifyEmail.backToHome')}

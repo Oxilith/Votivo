@@ -275,10 +275,10 @@ describe('AuthPage', () => {
       await user.click(screen.getByTestId('form-button'));
 
       await waitFor(() => {
-        expect(screen.getByText('forgotPassword.backToLogin')).toBeInTheDocument();
+        expect(screen.getByTestId('forgot-password-btn-back')).toBeInTheDocument();
       });
 
-      await user.click(screen.getByText('forgotPassword.backToLogin'));
+      await user.click(screen.getByTestId('forgot-password-btn-back'));
 
       expect(screen.getByTestId('login-form')).toBeInTheDocument();
     });
@@ -287,9 +287,7 @@ describe('AuthPage', () => {
       const user = userEvent.setup();
       render(<AuthPage initialMode="forgot-password" />);
 
-      // There are two back to login links, get the second one (in the form)
-      const backLinks = screen.getAllByText('forgotPassword.backToLogin');
-      await user.click(backLinks[0]);
+      await user.click(screen.getByTestId('forgot-password-btn-login'));
 
       expect(screen.getByTestId('login-form')).toBeInTheDocument();
     });

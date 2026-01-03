@@ -42,7 +42,16 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery, onNavigateToAuth, o
   };
 
   return (
-    <nav className="fixed top-4 left-4 right-4 lg:top-6 lg:left-10 lg:right-10 z-50 flex justify-between items-center px-4 py-3 lg:px-6 bg-[var(--bg-primary)]/85 backdrop-blur-[12px] border border-[var(--border)] transition-colors">
+    <>
+      {/* Background mask - sits below nav, above page content */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-x-0 top-0 z-40 pointer-events-none h-[64px] lg:h-[72px] bg-[var(--bg-primary)]/85 backdrop-blur-[12px]"
+      />
+      <nav
+        data-testid="nav-header"
+        className="fixed top-4 left-4 right-4 lg:top-6 lg:left-10 lg:right-10 z-50 flex justify-between items-center px-4 py-3 lg:px-6 bg-[var(--bg-primary)]/85 backdrop-blur-[12px] border border-[var(--border)] transition-colors"
+      >
       {/* Logo and Brand */}
       <a href="#" className="flex items-center gap-2 group">
         <VotiveLogo size="sm" />
@@ -54,21 +63,24 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery, onNavigateToAuth, o
       {/* Right Side - Links, CTA, Controls */}
       <div className="flex items-center gap-6 lg:gap-10">
         {/* Navigation Links - Hidden on mobile */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-6" data-testid="landing-nav-links">
           <a
             href="#philosophy"
+            data-testid="nav-link-philosophy"
             className="nav-link font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
           >
             {t('nav.philosophy')}
           </a>
           <a
             href="#journey"
+            data-testid="nav-link-journey"
             className="nav-link font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
           >
             {t('nav.journey')}
           </a>
           <a
             href="#insights"
+            data-testid="nav-link-insights"
             className="nav-link font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
           >
             {t('nav.insights')}
@@ -86,8 +98,12 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery, onNavigateToAuth, o
         {/* Controls */}
         <div className="flex items-center gap-4">
           {/* Language Toggle - Inline EN | PL */}
-          <div className="flex items-center gap-0.5 font-mono text-xs text-[var(--text-faint)]">
+          <div
+            data-testid="language-toggle"
+            className="flex items-center gap-0.5 font-mono text-xs text-[var(--text-faint)]"
+          >
             <button
+              data-testid="language-btn-en"
               onClick={() => { changeLanguage('en'); }}
               className={`px-1.5 py-1 transition-colors ${
                 i18n.language === 'en'
@@ -99,6 +115,7 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery, onNavigateToAuth, o
             </button>
             <span className="text-[var(--border-strong)]">|</span>
             <button
+              data-testid="language-btn-pl"
               onClick={() => { changeLanguage('pl'); }}
               className={`px-1.5 py-1 transition-colors ${
                 i18n.language === 'pl'
@@ -112,6 +129,7 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery, onNavigateToAuth, o
 
           {/* Theme Toggle - Square with border */}
           <button
+            data-testid="theme-toggle"
             onClick={toggleTheme}
             className="w-8 h-8 flex items-center justify-center border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
             aria-label={isDark ? t('header:theme.toggleLight') : t('header:theme.toggleDark')}
@@ -129,12 +147,14 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery, onNavigateToAuth, o
             <div className="hidden sm:flex items-center gap-3">
               <button
                 onClick={onNavigateToAuth}
+                data-testid="nav-btn-signin"
                 className="font-body text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
               >
                 {t('nav.signIn')}
               </button>
               <button
                 onClick={onNavigateToSignUp}
+                data-testid="nav-btn-signup"
                 className="px-3 py-1.5 font-body text-sm font-medium text-[var(--accent)] border border-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-colors"
               >
                 {t('nav.signUp')}
@@ -151,7 +171,8 @@ const NavSection: FC<NavSectionProps> = ({ onStartDiscovery, onNavigateToAuth, o
           </button>
         </div>
       </div>
-    </nav>
+      </nav>
+    </>
   );
 };
 

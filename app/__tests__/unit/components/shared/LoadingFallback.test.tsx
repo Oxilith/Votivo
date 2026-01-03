@@ -4,14 +4,14 @@
  * @functionality
  * - Tests fullscreen variant (default)
  * - Tests contained variant
- * - Tests loading animation elements
+ * - Verifies delegation to InkLoader
  * @dependencies
  * - vitest globals
  * - @testing-library/react
  * - LoadingFallback under test
  */
 
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import LoadingFallback from '@/components/shared/LoadingFallback';
 
 describe('LoadingFallback', () => {
@@ -33,20 +33,19 @@ describe('LoadingFallback', () => {
   });
 
   describe('animation elements', () => {
-    it('should render three animated dots', () => {
+    it('should render SVG loading animation', () => {
       const { container } = render(<LoadingFallback />);
 
-      const dots = container.querySelectorAll('.animate-staggered-pulse');
-      expect(dots).toHaveLength(3);
+      const svg = container.querySelector('svg');
+      expect(svg).toBeInTheDocument();
+      expect(svg).toHaveClass('animate-spin');
     });
 
-    it('should apply staggered animation delays', () => {
+    it('should render two animated circles', () => {
       const { container } = render(<LoadingFallback />);
 
-      const dots = container.querySelectorAll('.animate-staggered-pulse');
-      expect(dots[0]).toHaveStyle({ animationDelay: '0ms' });
-      expect(dots[1]).toHaveStyle({ animationDelay: '150ms' });
-      expect(dots[2]).toHaveStyle({ animationDelay: '300ms' });
+      const circles = container.querySelectorAll('circle');
+      expect(circles).toHaveLength(2);
     });
   });
 
@@ -63,6 +62,14 @@ describe('LoadingFallback', () => {
 
       const wrapper = container.firstChild as HTMLElement;
       expect(wrapper).toHaveClass('bg-[var(--bg-primary)]');
+    });
+  });
+
+  describe('accessibility', () => {
+    it('should have role="status"', () => {
+      render(<LoadingFallback />);
+
+      expect(screen.getByRole('status')).toBeInTheDocument();
     });
   });
 });

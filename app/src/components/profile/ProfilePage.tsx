@@ -28,7 +28,7 @@ import {
   PageNavigation,
   FooterSection,
   CheckIcon,
-  LoadingSpinnerIcon,
+  InkLoader,
   ErrorCircleIcon,
   RefreshIcon,
   InkBrushDecoration,
@@ -38,7 +38,7 @@ import { useCurrentUser } from '@/stores/useAuthStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { useAssessmentStore } from '@/stores/useAssessmentStore';
 import { useAnalysisStore } from '@/stores/useAnalysisStore';
-import { authService } from '@/services/api/AuthService';
+import { authService } from '@/services/api';
 import type { Gender, ProfileUpdateRequest, PasswordChangeRequest } from '@/types';
 import { logger } from '@/utils';
 import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH } from '@votive/shared';
@@ -70,7 +70,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   const { t, i18n } = useTranslation(['profile', 'auth']);
   const user = useCurrentUser();
   const { clearAuth, setUser } = useAuthStore();
-  const { setView } = useUIStore();
+  const { setView, resetUIState } = useUIStore();
   const { clearResponses } = useAssessmentStore();
   const { clearAnalysis } = useAnalysisStore();
 
@@ -191,16 +191,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   const handleLogoutAsync = useCallback(async () => {
     try {
       await authService.logout();
-    } catch {
-      // Ignore logout errors
+    } catch (error) {
+      // Logout errors are expected - proceed with local cleanup
+      logger.debug('Logout request failed, proceeding with local cleanup', { error });
     } finally {
       // Clear all user data from stores
       clearResponses();
       clearAnalysis();
       clearAuth();
+      resetUIState();
       setView('landing');
     }
-  }, [clearResponses, clearAnalysis, clearAuth, setView]);
+  }, [clearResponses, clearAnalysis, clearAuth, resetUIState, setView]);
 
   const handleLogout = useCallback(() => {
     void handleLogoutAsync();
@@ -318,15 +320,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   };
 
   const tabs: { id: ProfileTab; labelKey: string }[] = [
-    { id: 'profile', labelKey: 'profile.tabs.profile' },
-    { id: 'password', labelKey: 'profile.tabs.password' },
-    { id: 'assessments', labelKey: 'profile.tabs.assessments' },
-    { id: 'analyses', labelKey: 'profile.tabs.analyses' },
-    { id: 'danger', labelKey: 'profile.tabs.danger' },
+    { id: 'profile', labelKey: 'tabs.profile' },
+    { id: 'password', labelKey: 'tabs.password' },
+    { id: 'assessments', labelKey: 'tabs.assessments' },
+    { id: 'analyses', labelKey: 'tabs.analyses' },
+    { id: 'danger', labelKey: 'tabs.danger' },
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col" data-testid="profile-page">
       {/* Fixed Ink Brush Decoration - Right side */}
       <InkBrushDecoration />
 
@@ -355,12 +357,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar tabs */}
-          <nav className="md:w-48 flex-shrink-0">
-            <ul className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+          <nav className="md:w-48 flex-shrink-0" aria-label="Profile sections">
+            <ul className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0" role="tablist" aria-orientation="vertical">
               {tabs.map((tab) => (
-                <li key={tab.id}>
+                <li key={tab.id} role="presentation">
                   <button
                     onClick={() => { setActiveTab(tab.id); }}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    aria-controls={`profile-tabpanel-${tab.id}`}
+                    data-testid={`profile-tab-${tab.id}`}
                     className={`
                       w-full text-left px-4 py-2 font-body text-sm rounded-sm transition-colors whitespace-nowrap
                       ${activeTab === tab.id
@@ -379,7 +385,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
           {/* Tab content */}
           <div className="flex-1">
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm p-6">
+            <div
+              className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-sm p-6"
+              role="tabpanel"
+              id={`profile-tabpanel-${activeTab}`}
+              aria-labelledby={`profile-tab-${activeTab}`}
+              data-testid={`profile-tabpanel-${activeTab}`}
+            >
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <form onSubmit={handleProfileSubmit} className="space-y-6">
@@ -446,19 +458,25 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                   </div>
 
                   {profileError && (
-                    <p className="font-body text-sm text-red-600 dark:text-red-400">
+                    <p
+                      data-testid="profile-error"
+                      className="font-body text-sm text-red-600 dark:text-red-400"
+                    >
                       {profileError}
                     </p>
                   )}
 
                   {profileSuccess && (
-                    <p className="font-body text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
+                    <p
+                      data-testid="profile-success"
+                      className="font-body text-sm text-green-600 dark:text-green-400 flex items-center gap-2"
+                    >
                       <CheckIcon size="sm" />
                       {t('profileTab.updated')}
                     </p>
                   )}
 
-                  <FormButton isLoading={profileLoading}>
+                  <FormButton isLoading={profileLoading} data-testid="profile-btn-save">
                     {t('profileTab.saveChanges')}
                   </FormButton>
                 </form>
@@ -500,19 +518,25 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                   />
 
                   {passwordError && (
-                    <p className="font-body text-sm text-red-600 dark:text-red-400">
+                    <p
+                      data-testid="password-error"
+                      className="font-body text-sm text-red-600 dark:text-red-400"
+                    >
                       {passwordError}
                     </p>
                   )}
 
                   {passwordSuccess && (
-                    <p className="font-body text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
+                    <p
+                      data-testid="password-success"
+                      className="font-body text-sm text-green-600 dark:text-green-400 flex items-center gap-2"
+                    >
                       <CheckIcon size="sm" />
                       {t('passwordTab.changed')}
                     </p>
                   )}
 
-                  <FormButton isLoading={passwordLoading}>
+                  <FormButton isLoading={passwordLoading} data-testid="profile-btn-change-password">
                     {t('passwordTab.changePassword')}
                   </FormButton>
                 </form>
@@ -526,10 +550,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                   </h2>
 
                   {assessmentsLoading ? (
-                    <div className="text-center py-12">
-                      <LoadingSpinnerIcon size="lg" className="text-[var(--accent)] mx-auto mb-4" />
-                      <p className="font-body text-[var(--text-secondary)]">{t('assessmentsTab.loading')}</p>
-                    </div>
+                    <InkLoader variant="contained" message={t('assessmentsTab.loading')} />
                   ) : assessmentsError ? (
                     <div className="flex flex-col items-center justify-center gap-3 py-12">
                       <ErrorCircleIcon size="lg" className="text-red-500 dark:text-red-400" />
@@ -543,7 +564,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                       </button>
                     </div>
                   ) : !assessmentsList || assessmentsList.length === 0 ? (
-                    <div className="text-center py-12">
+                    <div className="text-center py-12" data-testid="assessments-empty-state">
                       <p className="font-body text-[var(--text-secondary)]">
                         {t('assessmentsTab.empty')}
                       </p>
@@ -553,6 +574,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                       {assessmentsList.map((assessment) => (
                         <li
                           key={assessment.id}
+                          data-testid={`assessment-item-${assessment.id}`}
                           onClick={() => onNavigateToAssessmentById?.(assessment.id)}
                           className="p-4 border border-[var(--border)] rounded-sm hover:border-[var(--accent)] transition-colors cursor-pointer"
                         >
@@ -577,10 +599,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                   </h2>
 
                   {analysesLoading ? (
-                    <div className="text-center py-12">
-                      <LoadingSpinnerIcon size="lg" className="text-[var(--accent)] mx-auto mb-4" />
-                      <p className="font-body text-[var(--text-secondary)]">{t('analysesTab.loading')}</p>
-                    </div>
+                    <InkLoader variant="contained" message={t('analysesTab.loading')} />
                   ) : analysesError ? (
                     <div className="flex flex-col items-center justify-center gap-3 py-12">
                       <ErrorCircleIcon size="lg" className="text-red-500 dark:text-red-400" />
@@ -594,7 +613,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                       </button>
                     </div>
                   ) : !analysesList || analysesList.length === 0 ? (
-                    <div className="text-center py-12">
+                    <div className="text-center py-12" data-testid="analyses-empty-state">
                       <p className="font-body text-[var(--text-secondary)]">
                         {t('analysesTab.empty')}
                       </p>
@@ -604,6 +623,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                       {analysesList.map((analysis) => (
                         <li
                           key={analysis.id}
+                          data-testid={`analysis-item-${analysis.id}`}
                           onClick={() => onNavigateToInsightsById?.(analysis.id)}
                           className="p-4 border border-[var(--border)] rounded-sm hover:border-[var(--accent)] transition-colors cursor-pointer"
                         >
@@ -648,6 +668,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                         type="button"
                         onClick={() => { setShowDeleteConfirm(true); }}
                         className="px-4 py-2 font-body text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-sm transition-colors"
+                        data-testid="profile-btn-delete-account"
                       >
                         {t('dangerTab.deleteButton')}
                       </button>
@@ -662,6 +683,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                             onClick={handleDeleteAccount}
                             disabled={deleteLoading}
                             className="px-4 py-2 font-body text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-sm transition-colors disabled:opacity-50"
+                            data-testid="profile-btn-confirm-delete"
                           >
                             {deleteLoading ? t('dangerTab.deleting') : t('dangerTab.confirmDelete')}
                           </button>
@@ -669,6 +691,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                             type="button"
                             onClick={() => { setShowDeleteConfirm(false); }}
                             className="px-4 py-2 font-body text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                            data-testid="profile-btn-cancel-delete"
                           >
                             {t('dangerTab.cancel')}
                           </button>

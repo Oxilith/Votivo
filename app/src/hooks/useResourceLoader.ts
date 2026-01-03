@@ -1,11 +1,14 @@
 /**
- * @file src/hooks/useResourceLoader.ts
+ * @file app/src/hooks/useResourceLoader.ts
  * @purpose Manages loading assessment and analysis resources from database based on URL or authentication state
  * @functionality
  * - Loads specific resources by ID for view-only mode (no store modifications)
  * - Falls back to most recent resource from database when store is empty (authenticated users)
  * - Returns view-only data for ID-based routes to be used as component props
  * - Handles loading states and error handling for resource fetch operations
+ * - Loads associated assessment when loading analysis to ensure both stores are populated
+ * - Uses hydrateFromDB to load saved assessments from database
+ * - Sets readonly mode for completed (saved) assessments
  * @dependencies
  * - React (useEffect, useCallback, useState)
  * - @/stores (useAuthStore, useAssessmentStore, useAnalysisStore, useUIStore)
@@ -44,7 +47,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
   const isAuthenticated = user !== null;
   const isAuthInitialized = useAuthInitialized();
   const isAuthHydrated = useAuthHydrated();
-  const { responses, setResponses } = useAssessmentStore();
+  const { responses, savedAt, hydrateFromDB } = useAssessmentStore();
   const analysis = useAnalysisStore((state) => state.analysis);
   const setAnalysis = useAnalysisStore((state) => state.setAnalysis);
   const { setReadOnlyMode, clearReadOnlyMode, setLoading, setStartAtSynthesis, setHasReachedSynthesis, incrementAssessmentKey } = useUIStore();
@@ -111,16 +114,32 @@ export function useResourceLoader(): UseResourceLoaderResult {
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         const mostRecent = sorted[0];
-        setResponses(mostRecent.responses);
+        // Use hydrateFromDB to load saved assessment with savedAt timestamp
+        hydrateFromDB(mostRecent.responses, mostRecent.createdAt);
         return mostRecent.id;
       }
       return undefined;
     } catch (err) {
       // Silently fail for most recent - user may not have any saved
-      console.warn('Failed to load most recent assessment:', err);
+      logger.warn('Failed to load most recent assessment:', { error: err });
       return undefined;
     }
-  }, [setResponses]);
+  }, [hydrateFromDB]);
+
+  /**
+   * Load assessment by ID and populate store
+   */
+  const loadAssessmentByIdToStore = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      const assessment = await authService.getAssessmentById(id);
+      // Use hydrateFromDB to load saved assessment with savedAt timestamp
+      hydrateFromDB(assessment.responses, assessment.createdAt);
+      return true;
+    } catch (err) {
+      logger.warn('Failed to load assessment by ID:', { error: err });
+      return false;
+    }
+  }, [hydrateFromDB]);
 
   /**
    * Load most recent analysis from database
@@ -145,7 +164,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
       return undefined;
     } catch (err) {
       // Silently fail for most recent - user may not have any saved
-      console.warn('Failed to load most recent analysis:', err);
+      logger.warn('Failed to load most recent analysis:', { error: err });
       return undefined;
     }
   }, [setAnalysis]);
@@ -188,7 +207,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
       }
 
       const routeParams = getRouteParams();
-      const { view, resourceId } = routeParams;
+      const { view, resourceId, isFreshStart } = routeParams;
 
       // Skip if not on assessment or insights view
       if (view !== 'assessment' && view !== 'insights') {
@@ -211,7 +230,10 @@ export function useResourceLoader(): UseResourceLoaderResult {
       }
 
       // Skip if we've already loaded this specific resource
-      const resourceKey = resourceId ? `${view}:${resourceId}` : `${view}:latest`;
+      // Include savedAt in key so readonly detection re-runs after assessment is completed
+      const resourceKey = resourceId
+        ? `${view}:${resourceId}`
+        : `${view}:latest:${savedAt ?? 'none'}`;
       if (loadedResourceRef.current === resourceKey && lastViewRef.current === view) {
         return;
       }
@@ -222,7 +244,15 @@ export function useResourceLoader(): UseResourceLoaderResult {
 
       try {
         if (view === 'assessment') {
-          if (resourceId) {
+          if (isFreshStart) {
+            // Fresh start route (/assessment/new) - don't load from DB
+            // Clear any existing view-only state and readonly mode
+            setViewOnlyAssessment(null);
+            setViewOnlyAnalysis(null);
+            clearReadOnlyMode();
+            setStartAtSynthesis(false);
+            loadedResourceRef.current = `${view}:fresh`;
+          } else if (resourceId) {
             // Load specific assessment by ID for view-only (does NOT modify store)
             const assessmentData = await loadAssessmentByIdViewOnly(resourceId);
             setViewOnlyAssessment(assessmentData);
@@ -246,10 +276,23 @@ export function useResourceLoader(): UseResourceLoaderResult {
             setViewOnlyAnalysis(null);
             clearReadOnlyMode();
           } else {
-            // Clear any view-only state and read-only mode for edit mode
-            setViewOnlyAssessment(null);
-            setViewOnlyAnalysis(null);
-            clearReadOnlyMode();
+            // Store has data - check if assessment is completed (savedAt !== null)
+            if (savedAt !== null) {
+              // Store has completed assessment - show in readonly mode
+              // Use store data directly (no viewOnlyAssessment needed)
+              setViewOnlyAssessment(null);
+              setViewOnlyAnalysis(null);
+              setReadOnlyMode('local-saved');
+              setStartAtSynthesis(true);
+              setHasReachedSynthesis(true);
+              incrementAssessmentKey();
+              loadedResourceRef.current = `${view}:local-saved:${savedAt}`;
+            } else {
+              // Assessment not completed - editable mode
+              setViewOnlyAssessment(null);
+              setViewOnlyAnalysis(null);
+              clearReadOnlyMode();
+            }
           }
         } else {
           // view === 'insights' at this point (early return handles other views)
@@ -261,17 +304,30 @@ export function useResourceLoader(): UseResourceLoaderResult {
             // Set read-only mode with assessmentId if available
             setReadOnlyMode(resourceId, analysisData.assessmentId ?? undefined);
             loadedResourceRef.current = resourceKey;
-          } else if (isAnalysisStoreEmpty()) {
-            // Load most recent if store is empty (editable) - copies to store
-            const result = await loadMostRecentAnalysis();
-            if (result) {
-              loadedResourceRef.current = `${view}:${result.analysisId}`;
-            }
-            // Clear any view-only state and read-only mode for edit mode
-            setViewOnlyAssessment(null);
-            setViewOnlyAnalysis(null);
-            clearReadOnlyMode();
           } else {
+            // No specific resourceId - load latest data from DB
+            // Assessment is the primary entity, analysis is derived from it
+
+            // Step 1: Ensure assessment is in store (load latest if empty)
+            let currentAssessmentId: string | undefined;
+            if (isAssessmentStoreEmpty()) {
+              currentAssessmentId = await loadMostRecentAssessment();
+            }
+
+            // Step 2: Load analysis for that assessment if analysis store is empty
+            if (isAnalysisStoreEmpty() && currentAssessmentId) {
+              // Find analysis that matches this assessment
+              const analyses = await authService.getAnalyses();
+              if (Array.isArray(analyses) && analyses.length > 0) {
+                // Find analysis linked to current assessment
+                const matchingAnalysis = analyses.find(a => a.assessmentId === currentAssessmentId);
+                if (matchingAnalysis) {
+                  setAnalysis(matchingAnalysis.result, '');
+                  loadedResourceRef.current = `${view}:${matchingAnalysis.id}`;
+                }
+              }
+            }
+
             // Clear any view-only state and read-only mode for edit mode
             setViewOnlyAssessment(null);
             setViewOnlyAnalysis(null);
@@ -300,16 +356,19 @@ export function useResourceLoader(): UseResourceLoaderResult {
     getRouteParams,
     loadAssessmentByIdViewOnly,
     loadAnalysisByIdViewOnly,
+    loadAssessmentByIdToStore,
     loadMostRecentAssessment,
     loadMostRecentAnalysis,
     isAssessmentStoreEmpty,
     isAnalysisStoreEmpty,
+    savedAt,
     setReadOnlyMode,
     clearReadOnlyMode,
     setLoading,
     setStartAtSynthesis,
     setHasReachedSynthesis,
     incrementAssessmentKey,
+    setAnalysis,
   ]);
 
   return {

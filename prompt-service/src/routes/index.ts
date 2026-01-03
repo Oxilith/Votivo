@@ -4,14 +4,15 @@
  * @functionality
  * - Combines auth, prompt, A/B test, resolve, and user-auth routes
  * - Applies admin auth middleware to protected routes (prompts, ab-tests)
- * - Applies rate limiting to admin routes (100 req/15min)
- * - Applies strict rate limiting to auth routes (5 req/min) to prevent brute-force attacks
+ * - Applies configurable rate limiting to admin routes (RATE_LIMIT_ADMIN_API, RATE_LIMIT_ADMIN_WINDOW_MS)
+ * - Auth routes use per-route rate limiting (login only, see auth.routes.ts)
  * - User-auth routes use per-route rate limiting (see user-auth.routes.ts)
  * - Applies lenient rate limiting to resolve routes (1000 req/min) for service-to-service
  * - Provides a single router for mounting in Express app
  * @dependencies
  * - express Router
  * - express-rate-limit for rate limiting
+ * - @/config for rate limit configuration
  * - @/routes/auth.routes
  * - @/routes/prompt.routes
  * - @/routes/ab-test.routes
@@ -28,26 +29,21 @@ import { abTestRoutes } from './ab-test.routes';
 import { resolveRoutes } from './resolve.routes';
 import { userAuthRoutes } from './user-auth.routes';
 import { adminAuthMiddleware } from '@/middleware';
+import { config } from '@/config';
 
 const router = Router();
 
-// Rate limiter for admin endpoints
+// Rate limiter for admin endpoints (configurable via RATE_LIMIT_ADMIN_API and RATE_LIMIT_ADMIN_WINDOW_MS)
 const adminRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests per window
+  windowMs: config.rateLimit.adminWindowMs,
+  max: config.rateLimit.adminApi,
   message: { error: 'Too many requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Rate limiter for auth endpoints (stricter to prevent brute-force attacks)
-const authRateLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 5, // 5 attempts per minute
-  message: { error: 'Too many login attempts, please try again later' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Note: Auth routes use per-route rate limiting (see auth.routes.ts)
+// Only login is rate limited, verify/logout are not rate limited
 
 // Rate limiter for resolve endpoint (more lenient - service-to-service)
 const resolveRateLimiter = rateLimit({
@@ -64,8 +60,9 @@ const resolveRateLimiter = rateLimit({
 // Public routes (used by backend service) - rate limited to prevent abuse
 router.use('/resolve', resolveRateLimiter, resolveRoutes);
 
-// Auth routes (public - for login/logout) - rate limited to prevent brute-force attacks
-router.use('/auth', authRateLimiter, authRoutes);
+// Auth routes (public - for login/logout) - per-route rate limiting in auth.routes.ts
+// Only login is rate limited; verify/logout are not rate limited
+router.use('/auth', authRoutes);
 
 // User auth routes - per-route rate limiting applied in user-auth.routes.ts
 router.use('/user-auth', userAuthRoutes);

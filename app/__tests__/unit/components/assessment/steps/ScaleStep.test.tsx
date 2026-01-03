@@ -50,33 +50,33 @@ describe('ScaleStep', () => {
     expect(screen.getByText('Very high')).toBeInTheDocument();
   });
 
-  it('should render all 5 scale buttons', () => {
+  it('should render all 5 scale options', () => {
     render(<ScaleStep step={mockStep} value={0} onChange={() => {}} />);
     for (let i = 1; i <= 5; i++) {
-      expect(screen.getByRole('button', { name: String(i) })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: String(i) })).toBeInTheDocument();
     }
   });
 
-  it('should call onChange when a scale button is clicked', async () => {
+  it('should call onChange when a scale option is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
     render(<ScaleStep step={mockStep} value={0} onChange={onChange} />);
-    await user.click(screen.getByRole('button', { name: '3' }));
+    await user.click(screen.getByRole('radio', { name: '3' }));
 
     expect(onChange).toHaveBeenCalledWith(3);
   });
 
   it('should highlight the selected value', () => {
     render(<ScaleStep step={mockStep} value={4} onChange={() => {}} />);
-    const button4 = screen.getByRole('button', { name: '4' });
-    expect(button4).toHaveClass('bg-[var(--accent)]');
+    const option4 = screen.getByRole('radio', { name: '4' });
+    expect(option4).toHaveClass('bg-[var(--accent)]');
   });
 
   it('should not highlight unselected values', () => {
     render(<ScaleStep step={mockStep} value={4} onChange={() => {}} />);
-    const button3 = screen.getByRole('button', { name: '3' });
-    expect(button3).not.toHaveClass('bg-[var(--accent)]');
+    const option3 = screen.getByRole('radio', { name: '3' });
+    expect(option3).not.toHaveClass('bg-[var(--accent)]');
   });
 
   it('should not allow selection in read-only mode', async () => {
@@ -84,22 +84,22 @@ describe('ScaleStep', () => {
     const onChange = vi.fn();
 
     render(<ScaleStep step={mockStep} value={2} onChange={onChange} isReadOnly />);
-    await user.click(screen.getByRole('button', { name: '4' }));
+    await user.click(screen.getByRole('radio', { name: '4' }));
 
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('should disable buttons in read-only mode', () => {
+  it('should disable options in read-only mode', () => {
     render(<ScaleStep step={mockStep} value={2} onChange={() => {}} isReadOnly />);
     for (let i = 1; i <= 5; i++) {
-      expect(screen.getByRole('button', { name: String(i) })).toBeDisabled();
+      expect(screen.getByRole('radio', { name: String(i) })).toBeDisabled();
     }
   });
 
   it('should apply read-only styling', () => {
     render(<ScaleStep step={mockStep} value={2} onChange={() => {}} isReadOnly />);
-    const button = screen.getByRole('button', { name: '1' });
-    expect(button).toHaveClass('cursor-not-allowed');
-    expect(button).toHaveClass('opacity-75');
+    const option = screen.getByRole('radio', { name: '1' });
+    expect(option).toHaveClass('cursor-not-allowed');
+    expect(option).toHaveClass('opacity-75');
   });
 });

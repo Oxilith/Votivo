@@ -66,7 +66,7 @@ describe('IntroStep', () => {
     const onNext = vi.fn();
 
     render(<IntroStep {...defaultProps} onNext={onNext} />);
-    await user.click(screen.getByText('Continue'));
+    await user.click(screen.getByTestId('assessment-continue-button'));
 
     expect(onNext).toHaveBeenCalled();
   });
@@ -87,7 +87,7 @@ describe('IntroStep', () => {
     const onBack = vi.fn();
 
     render(<IntroStep {...defaultProps} isFirstStep={false} onBack={onBack} />);
-    await user.click(screen.getByText('navigation.back'));
+    await user.click(screen.getByTestId('assessment-back-button'));
 
     expect(onBack).toHaveBeenCalled();
   });

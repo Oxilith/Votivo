@@ -1,11 +1,13 @@
 /**
- * @file components/assessment/hooks/useAssessmentNavigation.ts
+ * @file app/src/components/assessment/hooks/useAssessmentNavigation.ts
  * @purpose Custom hook for managing assessment navigation state
  * @functionality
  * - Tracks current phase and step indices
  * - Provides goNext and goBack navigation functions
  * - Calculates total progress across all phases
  * - Determines if on first/last step
+ * - Auto-jumps to last reached step when responses exist in store
+ * - Updates last reached position when advancing
  * @dependencies
  * - React (useState, useMemo, useCallback)
  * - @/components (Phase)
@@ -17,6 +19,12 @@ import type { Phase } from '@/components';
 interface UseAssessmentNavigationProps {
   phases: Phase[];
   startAtSynthesis?: boolean;
+  /** Initial phase to start at (used for auto-jump to last reached) */
+  initialPhase?: number;
+  /** Initial step to start at (used for auto-jump to last reached) */
+  initialStep?: number;
+  /** Callback to update the furthest reached position in the store */
+  onReachNewPosition?: (phase: number, step: number) => void;
 }
 
 interface UseAssessmentNavigationReturn {
@@ -36,12 +44,25 @@ interface UseAssessmentNavigationReturn {
 export function useAssessmentNavigation({
   phases,
   startAtSynthesis = false,
+  initialPhase,
+  initialStep,
+  onReachNewPosition,
 }: UseAssessmentNavigationProps): UseAssessmentNavigationReturn {
-  // Synthesis is at phase index 3 (last phase)
+  // Synthesis is always the last phase
   const synthesisPhaseIndex = phases.length - 1;
 
-  const [currentPhase, setCurrentPhase] = useState(startAtSynthesis ? synthesisPhaseIndex : 0);
-  const [currentStep, setCurrentStep] = useState(0);
+  // Lazy initialization for starting position - prioritizes initial values from store
+  const [currentPhase, setCurrentPhase] = useState(() => {
+    if (startAtSynthesis) return synthesisPhaseIndex;
+    if (initialPhase !== undefined) return initialPhase;
+    return 0;
+  });
+
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (startAtSynthesis) return 0;
+    if (initialStep !== undefined) return initialStep;
+    return 0;
+  });
 
   const currentPhaseData = phases[currentPhase] ?? phases[0];
   const currentStepData = currentPhaseData.steps[currentStep];
@@ -65,13 +86,28 @@ export function useAssessmentNavigation({
     currentStep === currentPhaseData.steps.length - 1;
 
   const goNext = useCallback(() => {
+    let nextPhase = currentPhase;
+    let nextStep = currentStep;
+
     if (currentStep < currentPhaseData.steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      nextStep = currentStep + 1;
     } else if (currentPhase < phases.length - 1) {
-      setCurrentPhase(currentPhase + 1);
-      setCurrentStep(0);
+      nextPhase = currentPhase + 1;
+      nextStep = 0;
+    } else {
+      // Already at the last step, nothing to do
+      return;
     }
-  }, [currentStep, currentPhase, currentPhaseData.steps.length, phases.length]);
+
+    // Update state
+    setCurrentPhase(nextPhase);
+    setCurrentStep(nextStep);
+
+    // Notify about reaching a new position (for updating lastReached in store)
+    if (onReachNewPosition) {
+      onReachNewPosition(nextPhase, nextStep);
+    }
+  }, [currentStep, currentPhase, currentPhaseData.steps.length, phases.length, onReachNewPosition]);
 
   const goBack = useCallback(() => {
     if (currentStep > 0) {

@@ -88,9 +88,17 @@ export function setCsrfToken(res: Response): string {
  * Clear CSRF token cookie
  *
  * Call this on logout to remove CSRF protection.
+ * Must use same options as setCsrfToken for browser to properly clear cookie.
  *
  * @param res - Express response object
  */
 export function clearCsrfToken(res: Response): void {
-  res.clearCookie(CSRF_COOKIE, { path: '/' });
+  // Must include same options as when cookie was set (except maxAge)
+  // for browser to properly clear it
+  res.clearCookie(CSRF_COOKIE, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+    path: '/',
+  });
 }
