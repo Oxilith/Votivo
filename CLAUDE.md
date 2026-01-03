@@ -303,6 +303,8 @@ Key variables:
 
 ## Testing
 
+**Testing Strategy**: See [docs/testing-strategy.md](docs/testing-strategy.md) for the complete testing pyramid, patterns, and conventions.
+
 Coverage thresholds vary by package:
 
 | Package | Lines | Functions | Branches | Statements |
@@ -313,9 +315,15 @@ Coverage thresholds vary by package:
 | shared | 80% | 70% | 10% | 80% |
 | worker | 85% | 85% | 85% | 85% |
 
+**File naming conventions:**
+- `*.test.ts` / `*.test.tsx` - Unit tests (Vitest)
+- `*.flow.test.ts` - Integration tests (Vitest + Supertest)
+- `*.spec.ts` - E2E tests (Playwright)
+
+**Frameworks:**
 - Frontend: React Testing Library + MSW for mocking
-- Backend: Supertest for API tests
-- Test files: `**/__tests__/*.test.ts` or `**/*.test.tsx`
+- Backend: Supertest for API integration tests
+- E2E: Playwright with Page Object Model
 
 Sample test personas in `/personas/` for quick testing.
 

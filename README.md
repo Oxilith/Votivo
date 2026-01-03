@@ -184,6 +184,7 @@ npm run db:studio        # Open Prisma Studio
 | [Docker Hub Workflow](docs/docker-hub.md) | Container deployment, publishing, and troubleshooting |
 | [Known Limitations](docs/known-limitations.md) | Cache behavior, scaling considerations, and operational details |
 | [Motivation](docs/Motivation.md) | Theoretical framework and psychology principles |
+| [Testing Strategy](docs/testing-strategy.md) | Test pyramid, patterns, and conventions |
 
 ## API Endpoints
 
