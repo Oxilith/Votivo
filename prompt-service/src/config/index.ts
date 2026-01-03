@@ -91,11 +91,16 @@ const configSchema = z.object({
   }),
 
   // Account Lockout Configuration (progressive lockout after failed login attempts)
-  lockout: z.object({
-    maxAttempts: z.coerce.number().default(15), // Lock after 15 failures
-    initialDurationMins: z.coerce.number().default(15), // First lockout: 15 minutes
-    maxDurationMins: z.coerce.number().default(1440), // Max lockout: 24 hours
-  }),
+  lockout: z
+    .object({
+      maxAttempts: z.coerce.number().default(15), // Lock after 15 failures
+      initialDurationMins: z.coerce.number().default(15), // First lockout: 15 minutes
+      maxDurationMins: z.coerce.number().default(1440), // Max lockout: 24 hours
+    })
+    .refine((data) => data.initialDurationMins < data.maxDurationMins, {
+      message: 'initialDurationMins must be less than maxDurationMins',
+      path: ['initialDurationMins'],
+    }),
 });
 
 type Config = z.infer<typeof configSchema> & {

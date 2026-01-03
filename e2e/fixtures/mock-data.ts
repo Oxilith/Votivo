@@ -30,6 +30,7 @@ export const ADMIN_API_KEY = (() => {
  * - Contains uppercase
  * - Contains lowercase
  * - Contains number
+ * Note: Special characters (like !) are allowed but not required
  */
 export const DEFAULT_TEST_PASSWORD = 'TestPass123!';
 

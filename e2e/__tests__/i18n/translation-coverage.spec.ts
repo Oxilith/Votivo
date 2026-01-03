@@ -16,13 +16,14 @@ import { test, expect } from '../../fixtures';
 
 /**
  * Pattern to detect untranslated i18n keys
- * Matches patterns like: landing.hero.title, assessment.steps.intro
+ * Matches patterns like: landing.hero.title, assessment.steps.intro, profile.tabs
+ * Supports 2+ segments and camelCase (e.g., assessment.Hero.title)
  * Excludes:
  * - URLs (www.domain.com)
  * - Semantic versioning (v1.2.3)
  * - File extensions (.tsx, .ts)
  */
-const UNTRANSLATED_KEY_PATTERN = /\b[a-z]+\.[a-z]+\.[a-z]+\b/gi;
+const UNTRANSLATED_KEY_PATTERN = /\b[a-zA-Z][a-zA-Z0-9]*(?:\.[a-zA-Z][a-zA-Z0-9]*)+\b/g;
 
 /**
  * Known false positives to exclude from detection
@@ -38,7 +39,7 @@ const FALSE_POSITIVES = [
   '.css',
   'i18n.',
   'node.',
-  '.local', // For test email domains like test.votive.local
+  'test.votive.local', // Test email domain used in E2E fixtures
 ];
 
 /**

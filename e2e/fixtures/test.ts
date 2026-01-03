@@ -27,6 +27,12 @@ import {
 import { DEFAULT_TEST_PASSWORD, E2E_TIMEOUTS } from './mock-data';
 
 /**
+ * Error marker for non-retriable registration failures (e.g., duplicate user).
+ * Used to detect and skip retry logic for permanent errors.
+ */
+const NO_RETRY_MARKER = '[NO_RETRY]';
+
+/**
  * Test user interface with all required registration fields
  */
 export interface TestUser {
@@ -173,7 +179,7 @@ export const test = base.extend<TestFixtures>({
           // Check for duplicate user error - don't retry if user already exists
           // Note: This text check is kept for error classification, but the error is detected via data-testid
           if (errorText?.toLowerCase().includes('already exists') || errorText?.toLowerCase().includes('already registered')) {
-            throw new Error(`Registration failed: ${errorText} (not retrying - duplicate user)`);
+            throw new Error(`Registration failed: ${errorText} ${NO_RETRY_MARKER}`);
           }
           lastError = new Error(`Registration failed: ${errorText}`);
         } else {
@@ -184,8 +190,8 @@ export const test = base.extend<TestFixtures>({
         }
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        // Don't retry if it's a duplicate user error
-        if (lastError.message.includes('not retrying')) {
+        // Don't retry if it's a non-retriable error (e.g., duplicate user)
+        if (lastError.message.includes(NO_RETRY_MARKER)) {
           throw lastError;
         }
       }

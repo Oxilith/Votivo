@@ -362,10 +362,11 @@ const AlertBase = forwardRef<HTMLDivElement, AlertProps>(
     const primaryActionRef = useRef<HTMLButtonElement>(null);
     const firstActionClaimed = useRef(false);
 
-    // Reset claim on variant change
+    // Reset claim on variant or children change
+    // Children change when action buttons are added/removed
     useEffect(() => {
       firstActionClaimed.current = false;
-    }, [variant]);
+    }, [variant, children]);
 
     const claimFirstAction = useCallback(() => {
       if (!firstActionClaimed.current) {

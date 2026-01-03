@@ -130,8 +130,8 @@ jobs:
     name: E2E Tests
     needs: build
     runs-on: ubuntu-latest
-    # Only run E2E tests on main branch (not on every PR)
-    if: github.ref == 'refs/heads/main'
+    # Run E2E tests on main and develop branches (not on every PR)
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     timeout-minutes: 20
     concurrency:
       group: e2e-${{ github.ref }}
@@ -168,6 +168,7 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
+          DOTENV_PRIVATE_KEY_TEST: ${{ secrets.DOTENV_PRIVATE_KEY_TEST }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v6
