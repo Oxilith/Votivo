@@ -1,5 +1,5 @@
 /**
- * @file src/components/assessment/index.ts
+ * @file app/src/components/assessment/index.ts
  * @purpose Barrel export for assessment components
  * @functionality
  * - Exports assessment page header component

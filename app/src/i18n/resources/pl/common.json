@@ -11,5 +11,24 @@
     "unexpectedDescription": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
     "retry": "Spróbuj ponownie",
     "reload": "Odśwież stronę"
+  },
+  "alert": {
+    "error": {
+      "defaultTitle": "Błąd"
+    },
+    "warning": {
+      "defaultTitle": "Ostrzeżenie"
+    },
+    "info": {
+      "defaultTitle": "Informacja"
+    },
+    "success": {
+      "defaultTitle": "Sukces"
+    },
+    "actions": {
+      "retry": "Spróbuj ponownie",
+      "dismiss": "Odrzuć",
+      "close": "Zamknij"
+    }
   }
 }

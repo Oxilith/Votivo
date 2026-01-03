@@ -235,5 +235,14 @@
   "validation": {
     "required": "Please complete this step before continuing",
     "incomplete": "Please complete all steps before finishing"
+  },
+  "save": {
+    "error": {
+      "title": "Failed to Save Assessment",
+      "default": "Unable to save your assessment. Please try again.",
+      "retry": "Try Again",
+      "note": "Your responses are stored locally and won't be lost.",
+      "saving": "Saving..."
+    }
   }
 }

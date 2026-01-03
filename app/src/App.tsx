@@ -94,8 +94,9 @@ function App() {
         // Use combined endpoint for efficient auth restoration
         const result = await authService.refreshTokenWithUser();
         setAuth(result.user, result.accessToken, result.csrfToken);
-      } catch {
+      } catch (error) {
         // No valid session - clear any stale auth state
+        logger.debug('Session refresh failed, clearing auth', { error });
         clearAuth();
       } finally {
         setLoading(false);
@@ -218,8 +219,9 @@ function App() {
   const handleSignOutAsync = useCallback(async () => {
     try {
       await authService.logout();
-    } catch {
+    } catch (error) {
       // Logout errors are expected (e.g., expired token) - proceed with local cleanup
+      logger.debug('Logout request failed, proceeding with local cleanup', { error });
     } finally {
       clearResponses();
       clearAnalysis();

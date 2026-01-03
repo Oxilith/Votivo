@@ -1,5 +1,5 @@
 /**
- * @file src/components/insights/IdentityInsightsAI.tsx
+ * @file app/src/components/insights/IdentityInsightsAI.tsx
  * @purpose AI-powered analysis display with Ink & Stone styling (requires authentication)
  * @functionality
  * - Receives assessment responses as props
@@ -14,7 +14,8 @@
  * - Supports view-only mode for viewing saved analyses with PageHeader
  * - Supports dark mode theme switching
  * - Supports internationalization (English/Polish)
- * - Auto-saves analysis for authenticated users
+ * - Auto-saves analysis via store action with error tracking
+ * - Shows save error alert with retry option when save fails
  * - Blocks analysis when assessment has unsaved changes (dirty state)
  * @dependencies
  * - React (useState, useCallback, useRef, useEffect)
@@ -27,7 +28,7 @@
  * - shared (UserProfileForAnalysis)
  * - @/components/landing/sections/FooterSection
  * - @/components/shared/PageNavigation
- * - @/components/shared/PendingChangesAlert
+ * - @/components/shared/Alert
  * - @/components/insights/InsightsPageHeader
  * - @/components/shared/InkBrushDecoration
  * - @/components/shared/icons (ErrorCircleIcon, SearchIcon, etc.)
@@ -57,7 +58,7 @@ import {
   PageNavigation,
   InkBrushDecoration,
   InkLoader,
-  PendingChangesAlert,
+  Alert,
   ErrorCircleIcon,
   SearchIcon,
   SwitchHorizontalIcon,
@@ -70,7 +71,7 @@ import {
   ArrowRightIcon,
 } from '@/components';
 import InsightsPageHeader from './InsightsPageHeader';
-import { importFromJson, logger } from '@/utils';
+import { importFromJson } from '@/utils';
 
 interface Tab {
   id: string;
@@ -107,6 +108,11 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
     analysisError: error,
     analyze,
     downloadRawResponse,
+    // Save status
+    saveError,
+    isSaving,
+    saveAnalysis,
+    clearSaveError,
   } = useAnalysisStore();
 
   // In view-only mode, use the viewOnlyAnalysis.result instead of store analysis
@@ -129,11 +135,11 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
 
       // Link analysis to assessment: use viewingAssessmentId if set, otherwise get most recent
       const saveAnalysisAsync = async () => {
-        try {
-          let assessmentIdToLink = viewingAssessmentId ?? undefined;
+        let assessmentIdToLink = viewingAssessmentId ?? undefined;
 
-          // If no viewingAssessmentId, get the most recent assessment to link to
-          if (!assessmentIdToLink) {
+        // If no viewingAssessmentId, get the most recent assessment to link to
+        if (!assessmentIdToLink) {
+          try {
             const assessments = await authService.getAssessments();
             if (Array.isArray(assessments) && assessments.length > 0) {
               const sorted = [...assessments].sort(
@@ -141,17 +147,17 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
               );
               assessmentIdToLink = sorted[0].id;
             }
+          } catch {
+            // If fetching assessments fails, proceed without linking
           }
-
-          await authService.saveAnalysis(storeAnalysis, assessmentIdToLink);
-        } catch (error) {
-          // Silently fail - user can still see their analysis
-          logger.error('Failed to save analysis', error);
         }
+
+        // Use store action to save with error tracking
+        void saveAnalysis(storeAnalysis, assessmentIdToLink);
       };
       void saveAnalysisAsync();
     }
-  }, [storeAnalysis, loading, isReadOnly, viewingAssessmentId]);
+  }, [storeAnalysis, loading, isReadOnly, viewingAssessmentId, saveAnalysis]);
 
   const handleFileSelectAsync = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -200,6 +206,12 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
   const analyzeWithClaude = useCallback(() => {
     void analyzeWithClaudeAsync();
   }, [analyzeWithClaudeAsync]);
+
+  // Handler for retrying save when it fails
+  const handleRetrySave = useCallback(() => {
+    if (!storeAnalysis) return;
+    void saveAnalysis(storeAnalysis, viewingAssessmentId ?? undefined);
+  }, [storeAnalysis, saveAnalysis, viewingAssessmentId]);
 
   const tabs: Tab[] = analysis
     ? [
@@ -348,10 +360,17 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
             {/* Show warning alert when assessment is not completed */}
             {isAssessmentIncomplete && onNavigateToAssessment ? (
               <div className="max-w-lg mx-auto" data-testid="insights-incomplete-warning">
-                <PendingChangesAlert
-                  onNavigateToAssessment={onNavigateToAssessment}
+                <Alert.Warning
+                  title={t('dirty.title', 'Assessment Incomplete')}
+                  description={t('dirty.message')}
                   data-testid="insights-pending-changes-alert"
-                />
+                >
+                  <Alert.Actions>
+                    <Alert.Action onClick={onNavigateToAssessment} data-testid="insights-pending-changes-alert-action">
+                      {t('dirty.action')}
+                    </Alert.Action>
+                  </Alert.Actions>
+                </Alert.Warning>
               </div>
             ) : isAssessmentIncomplete ? null : (
               <button
@@ -463,6 +482,29 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
               </div>
             </div>
 
+            {/* Save error alert - shown when analysis save fails */}
+            {!isReadOnly && saveError && (
+              <div className="mb-6">
+                <Alert.Warning
+                  title={t('saveError.title')}
+                  description={t('saveError.message')}
+                  note={saveError}
+                  onDismiss={clearSaveError}
+                  data-testid="analysis-save-error-alert"
+                >
+                  <Alert.Actions>
+                    <Alert.Action
+                      onClick={handleRetrySave}
+                      loading={isSaving}
+                      data-testid="analysis-save-error-alert-retry"
+                    >
+                      {t('saveError.retry')}
+                    </Alert.Action>
+                  </Alert.Actions>
+                </Alert.Warning>
+              </div>
+            )}
+
             {/* Content */}
             <div
               className="space-y-4"
@@ -537,10 +579,17 @@ const IdentityInsightsAI: React.FC<InsightsProps> = ({
               <div className="mt-8 text-center">
                 {isAssessmentIncomplete && onNavigateToAssessment ? (
                   <div className="max-w-lg mx-auto" data-testid="insights-reanalyze-incomplete-warning">
-                    <PendingChangesAlert
-                      onNavigateToAssessment={onNavigateToAssessment}
+                    <Alert.Warning
+                      title={t('dirty.title', 'Assessment Incomplete')}
+                      description={t('dirty.message')}
                       data-testid="insights-reanalyze-pending-changes-alert"
-                    />
+                    >
+                      <Alert.Actions>
+                        <Alert.Action onClick={onNavigateToAssessment} data-testid="insights-reanalyze-pending-changes-alert-action">
+                          {t('dirty.action')}
+                        </Alert.Action>
+                      </Alert.Actions>
+                    </Alert.Warning>
                   </div>
                 ) : isAssessmentIncomplete ? null : (
                   <>

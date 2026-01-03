@@ -1,5 +1,5 @@
 /**
- * @file src/hooks/useResourceLoader.ts
+ * @file app/src/hooks/useResourceLoader.ts
  * @purpose Manages loading assessment and analysis resources from database based on URL or authentication state
  * @functionality
  * - Loads specific resources by ID for view-only mode (no store modifications)
@@ -121,7 +121,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
       return undefined;
     } catch (err) {
       // Silently fail for most recent - user may not have any saved
-      console.warn('Failed to load most recent assessment:', err);
+      logger.warn('Failed to load most recent assessment:', { error: err });
       return undefined;
     }
   }, [hydrateFromDB]);
@@ -136,7 +136,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
       hydrateFromDB(assessment.responses, assessment.createdAt);
       return true;
     } catch (err) {
-      console.warn('Failed to load assessment by ID:', err);
+      logger.warn('Failed to load assessment by ID:', { error: err });
       return false;
     }
   }, [hydrateFromDB]);
@@ -164,7 +164,7 @@ export function useResourceLoader(): UseResourceLoaderResult {
       return undefined;
     } catch (err) {
       // Silently fail for most recent - user may not have any saved
-      console.warn('Failed to load most recent analysis:', err);
+      logger.warn('Failed to load most recent analysis:', { error: err });
       return undefined;
     }
   }, [setAnalysis]);

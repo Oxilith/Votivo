@@ -142,7 +142,7 @@ export interface NavigateOptions {
   token?: string;
   hash?: string;
   resourceId?: string;
-  /** Navigate to /assessment/new for fresh start */
+    /** Navigate to /assessment/new for fresh start */
   freshStart?: boolean;
   replace?: boolean;
 }

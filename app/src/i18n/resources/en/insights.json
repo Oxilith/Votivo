@@ -5,6 +5,7 @@
     "button": "Go to Assessment"
   },
   "dirty": {
+    "title": "Assessment Incomplete",
     "message": "You have pending changes in your assessment. Complete the assessment to save and enable new analysis.",
     "action": "Complete Assessment"
   },
@@ -52,5 +53,12 @@
   "reanalyze": {
     "button": "Re-analyze (may find new patterns)",
     "description": "Each analysis can surface different insights based on Claude's interpretation"
+  },
+  "saveError": {
+    "title": "Analysis Not Saved",
+    "message": "Your analysis is displayed but couldn't be saved to your account.",
+    "retry": "Save Now",
+    "dismiss": "Dismiss",
+    "saving": "Saving..."
   }
 }

@@ -191,8 +191,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   const handleLogoutAsync = useCallback(async () => {
     try {
       await authService.logout();
-    } catch {
-      // Ignore logout errors
+    } catch (error) {
+      // Logout errors are expected - proceed with local cleanup
+      logger.debug('Logout request failed, proceeding with local cleanup', { error });
     } finally {
       // Clear all user data from stores
       clearResponses();

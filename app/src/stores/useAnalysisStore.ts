@@ -1,5 +1,5 @@
 /**
- * @file stores/useAnalysisStore.ts
+ * @file app/src/stores/useAnalysisStore.ts
  * @purpose Zustand store for AI analysis results management
  * @functionality
  * - Stores Claude analysis results
@@ -8,18 +8,21 @@
  * - Provides analyze action that calls the API via service layer
  * - Passes optional user profile for demographic context
  * - Supports export functionality
+ * - Tracks save status for database persistence
  * @dependencies
  * - zustand
  * - @/types/assessment.types (AIAnalysisResult, AssessmentResponses)
- * - @/services (claudeService, ApiClientError, AnalysisLanguage)
+ * - @/services (claudeService, authService, ApiClientError, AnalysisLanguage)
+ * - @/utils/logger
  * - shared (UserProfileForAnalysis)
  */
 
 import { create } from 'zustand';
 import type { AIAnalysisResult, AssessmentResponses } from '@/types';
-import { claudeService, ApiClientError } from '@/services';
+import { claudeService, authService, ApiClientError } from '@/services';
 import type { AnalysisLanguage } from '@/services';
 import type { UserProfileForAnalysis } from '@votive/shared';
+import { logger } from '@/utils/logger';
 
 interface AnalysisState {
   // State
@@ -27,6 +30,11 @@ interface AnalysisState {
   rawResponse: string | null;
   isAnalyzing: boolean;
   analysisError: string | null;
+
+  // Save status tracking
+  isSaved: boolean;
+  saveError: string | null;
+  isSaving: boolean;
 
   // Actions
   analyze: (
@@ -37,6 +45,10 @@ interface AnalysisState {
   setAnalysis: (analysis: AIAnalysisResult, rawResponse: string) => void;
   clearAnalysis: () => void;
   clearError: () => void;
+
+  // Save to database
+  saveAnalysis: (analysis: AIAnalysisResult, assessmentId?: string | null) => Promise<void>;
+  clearSaveError: () => void;
 
   // Export
   exportAnalysisToJson: () => void;
@@ -49,6 +61,11 @@ export const useAnalysisStore = create<AnalysisState>()((set, get) => ({
   rawResponse: null,
   isAnalyzing: false,
   analysisError: null,
+
+  // Save status tracking
+  isSaved: true, // No analysis = nothing to save
+  saveError: null,
+  isSaving: false,
 
   // Actions
   analyze: async (responses, language, userProfile) => {
@@ -64,16 +81,18 @@ export const useAnalysisStore = create<AnalysisState>()((set, get) => ({
         analysis,
         rawResponse,
         isAnalyzing: false,
+        isSaved: false, // New analysis needs to be saved
+        saveError: null,
       });
     } catch (error) {
       let errorMessage = 'Failed to analyze responses';
 
       if (error instanceof ApiClientError) {
         errorMessage = error.message;
-        console.error('Analysis API error:', { code: error.code, status: error.status, details: error.details });
+        logger.error('Analysis API error:', { code: error.code, status: error.status, details: error.details });
       } else if (error instanceof Error) {
         errorMessage = error.message;
-        console.error('Analysis error:', error);
+        logger.error('Analysis error:', error);
       }
 
       set({
@@ -84,7 +103,7 @@ export const useAnalysisStore = create<AnalysisState>()((set, get) => ({
   },
 
   setAnalysis: (analysis, rawResponse) => {
-    set({ analysis, rawResponse, analysisError: null });
+    set({ analysis, rawResponse, analysisError: null, isSaved: false, saveError: null });
   },
 
   clearAnalysis: () => {
@@ -92,11 +111,32 @@ export const useAnalysisStore = create<AnalysisState>()((set, get) => ({
       analysis: null,
       rawResponse: null,
       analysisError: null,
+      isSaved: true,
+      saveError: null,
+      isSaving: false,
     });
   },
 
   clearError: () => {
     set({ analysisError: null });
+  },
+
+  // Save to database
+  saveAnalysis: async (analysis, assessmentId) => {
+    set({ isSaving: true, saveError: null });
+
+    try {
+      await authService.saveAnalysis(analysis, assessmentId ?? undefined);
+      set({ isSaved: true, isSaving: false });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save analysis';
+      logger.error('Failed to save analysis to database', error);
+      set({ saveError: errorMessage, isSaving: false });
+    }
+  },
+
+  clearSaveError: () => {
+    set({ saveError: null });
   },
 
   // Export functions

@@ -1,5 +1,5 @@
 /**
- * @file src/components/assessment/IdentityFoundationsAssessment.tsx
+ * @file app/src/components/assessment/IdentityFoundationsAssessment.tsx
  * @purpose Container component orchestrating multi-phase identity assessment questionnaire
  * @functionality
  * - Renders current step based on navigation state
@@ -7,6 +7,7 @@
  * - Coordinates navigation via useAssessmentNavigation hook
  * - Manages response state for all questions
  * - Handles completion callback with explicit save for authenticated users
+ * - Blocks navigation to insights when save fails (shows error alert with retry)
  * - Tracks when user reaches synthesis phase for navigation state
  * - Supports view-only mode showing only synthesis (no progress bar or navigation)
  * - Supports dark mode and internationalization
@@ -25,7 +26,7 @@
  * - ./navigation (AssessmentProgress, NavigationControls)
  * - ./hooks (useAssessmentNavigation)
  * - ./types (Phase)
- * - @/components (FooterSection, PageNavigation, InkBrushDecoration, ErrorCircleIcon)
+ * - @/components (FooterSection, PageNavigation, InkBrushDecoration, ErrorCircleIcon, Alert)
  * - ./AssessmentHeader
  * - @/utils (importFromJson)
  */
@@ -54,6 +55,7 @@ import {
   PageNavigation,
   ErrorCircleIcon,
   InkBrushDecoration,
+  Alert,
 } from '@/components';
 import AssessmentHeader from './AssessmentHeader';
 import SavePromptModal from './SavePromptModal';
@@ -100,9 +102,11 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
   // Local state for save prompt modal (shows each time user reaches synthesis unauthenticated)
   const [isModalDismissed, setIsModalDismissed] = useState(false);
 
-  // UI store for pending auth flags
+  // UI store for pending auth flags and save error
   const setPendingAuthReturn = useUIStore((state) => state.setPendingAuthReturn);
   const setPendingAssessmentSave = useUIStore((state) => state.setPendingAssessmentSave);
+  const assessmentSaveError = useUIStore((state) => state.assessmentSaveError);
+  const setAssessmentSaveError = useUIStore((state) => state.setAssessmentSaveError);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -406,27 +410,30 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
     goNext();
   }, [isCurrentStepValid, goNext, t]);
 
-  // Save assessment to database and return saved timestamp
-  const saveAssessmentToDatabase = useCallback(async (): Promise<string | null> => {
-    if (!isAuthenticated || effectiveReadOnly) return null;
+  // Save assessment to database and return success status
+  const saveAssessmentToDatabase = useCallback(async (): Promise<{ success: boolean; timestamp?: string }> => {
+    if (!isAuthenticated || effectiveReadOnly) return { success: true }; // Skip save for these cases
 
     const hasResponseData = Object.keys(responses).length > 0;
-    if (!hasResponseData) return null;
+    if (!hasResponseData) return { success: true }; // Nothing to save
 
     setIsSaving(true);
+    setAssessmentSaveError(null);
+
     try {
       const savedAssessment = await authService.saveAssessment(responses as AssessmentResponses);
       setSavedAt(savedAssessment.createdAt);
       invalidateAssessmentsList();
-      return savedAssessment.createdAt;
+      return { success: true, timestamp: savedAssessment.createdAt };
     } catch (error) {
       logger.error('Failed to save assessment', error);
-      // Continue to insights even if save fails - user can still see their results
-      return null;
+      const errorMessage = error instanceof Error ? error.message : t('save.error.default', 'Unable to save your assessment. Please try again.');
+      setAssessmentSaveError(errorMessage);
+      return { success: false };
     } finally {
       setIsSaving(false);
     }
-  }, [isAuthenticated, effectiveReadOnly, responses, setSavedAt, invalidateAssessmentsList]);
+  }, [isAuthenticated, effectiveReadOnly, responses, setSavedAt, invalidateAssessmentsList, setAssessmentSaveError, t]);
 
   // Complete handler - validates and triggers completion flow (async for save await)
   const handleCompleteAsync = useCallback(async () => {
@@ -444,8 +451,13 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
       return;
     }
 
-    // Await save to get server timestamp, then navigate
-    await saveAssessmentToDatabase();
+    // Await save to get server timestamp - block navigation on failure
+    const result = await saveAssessmentToDatabase();
+    if (!result.success) {
+      // Don't navigate - stay in synthesis, error alert will be shown
+      return;
+    }
+
     onComplete(responses as AssessmentResponses);
   }, [isAssessmentComplete, responses, t, isAuthenticated, setPendingAssessmentSave, setPendingAuthReturn, onNavigateToAuth, saveAssessmentToDatabase, onComplete]);
 
@@ -644,6 +656,28 @@ const IdentityFoundationsAssessment: React.FC<AssessmentProps> = ({
           renderStep()
         )}
       </div>
+
+      {/* Save error alert - shown in synthesis when save fails */}
+      {isSynthesisStep && assessmentSaveError && !effectiveReadOnly && (
+        <div className="max-w-2xl mx-auto px-6 mb-4">
+          <Alert.Error
+            title={t('save.error.title')}
+            description={assessmentSaveError}
+            note={t('save.error.note')}
+            data-testid="assessment-save-error-alert"
+          >
+            <Alert.Actions>
+              <Alert.Action
+                onClick={handleComplete}
+                loading={isSaving}
+                data-testid="assessment-save-error-alert-retry"
+              >
+                {t('save.error.retry')}
+              </Alert.Action>
+            </Alert.Actions>
+          </Alert.Error>
+        </div>
+      )}
 
       {/* Navigation - hide in read-only mode */}
       {!effectiveReadOnly && (

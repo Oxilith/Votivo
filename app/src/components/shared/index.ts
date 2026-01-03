@@ -1,7 +1,8 @@
 /**
- * @file src/components/shared/index.ts
+ * @file app/src/components/shared/index.ts
  * @purpose Barrel export for shared UI components
  * @functionality
+ * - Exports Alert component for error, warning, info, success messages
  * - Exports ChunkErrorBoundary component for lazy-load error handling
  * - Exports DateBadge component
  * - Exports ExportDropdown component
@@ -10,11 +11,11 @@
  * - Exports LanguageToggle component
  * - Exports LoadingFallback component for Suspense boundaries
  * - Exports PageNavigation component
- * - Exports PendingChangesAlert component for dirty state warning
  * - Exports ThemeToggle component
  * - Exports UserAvatarDropdown component
  * - Re-exports all icons from icons sub-barrel
  * @dependencies
+ * - ./Alert
  * - ./ChunkErrorBoundary
  * - ./DateBadge
  * - ./ExportDropdown
@@ -23,12 +24,12 @@
  * - ./LanguageToggle
  * - ./LoadingFallback
  * - ./PageNavigation
- * - ./PendingChangesAlert
  * - ./ThemeToggle
  * - ./UserAvatarDropdown
  * - ./icons
  */
 
+export { default as Alert } from './Alert';
 export { default as ChunkErrorBoundary } from './ChunkErrorBoundary';
 export { default as DateBadge } from './DateBadge';
 export { default as ExportDropdown } from './ExportDropdown';
@@ -37,7 +38,6 @@ export { default as InkLoader } from './InkLoader';
 export { default as LanguageToggle } from './LanguageToggle';
 export { default as LoadingFallback } from './LoadingFallback';
 export { default as PageNavigation } from './PageNavigation';
-export { default as PendingChangesAlert } from './PendingChangesAlert';
 export { default as ThemeToggle } from './ThemeToggle';
 export { default as UserAvatarDropdown } from './UserAvatarDropdown';
 

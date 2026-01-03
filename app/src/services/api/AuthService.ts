@@ -38,7 +38,7 @@ import type {
 } from '@/types';
 import type { AssessmentResponses, AIAnalysisResult } from '@votive/shared';
 import { parseAssessmentResponses, parseAIAnalysisResult } from '@votive/shared';
-import { apiClient, setCsrfTokenGetter } from './ApiClient';
+import { apiClient, ApiClientError, setCsrfTokenGetter } from './ApiClient';
 import { useAuthStore } from '@/stores';
 import { logger } from '@/utils';
 
@@ -415,9 +415,16 @@ apiClient.setUnauthorizedHandler(async () => {
     // Update the auth store with the new access token
     useAuthStore.getState().setAccessToken(response.accessToken);
     return response.accessToken;
-  } catch {
-    // Refresh failed - clear auth state to force re-login
-    useAuthStore.getState().clearAuth();
+  } catch (error) {
+    // Only clear auth for actual auth failures, not network errors
+    if (error instanceof ApiClientError && error.status === 401) {
+      logger.debug('Token refresh failed with 401, clearing auth');
+      useAuthStore.getState().clearAuth();
+    } else {
+      logger.warn('Token refresh failed with non-auth error', { error });
+      // Still clear auth for other errors as we can't recover
+      useAuthStore.getState().clearAuth();
+    }
     return null;
   }
 });

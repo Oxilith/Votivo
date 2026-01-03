@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/ScaleStep.tsx
+ * @file app/src/components/assessment/steps/ScaleStep.tsx
  * @purpose Renders 1-5 scale rating question with Ink & Stone styling
  * @functionality
  * - Displays question with optional context

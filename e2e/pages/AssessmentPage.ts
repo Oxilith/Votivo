@@ -27,7 +27,7 @@ import { BasePage } from './BasePage';
  * Each phase has multiple steps with different input types:
  * - multiSelect: Multiple choice checkboxes
  * - singleSelect: Radio button selection
- * - scale: Slider input (1-5)
+ * - scale: Button selection (1-5)
  * - textarea: Free text input
  */
 export class AssessmentPage extends BasePage {

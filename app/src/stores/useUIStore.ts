@@ -32,6 +32,9 @@ interface UIState {
   viewingResourceId: string | null; // ID of assessment or analysis being viewed
   viewingAssessmentId: string | null; // Assessment ID for linking new analyses
 
+  // Save error state (for assessment save failures)
+  assessmentSaveError: string | null;
+
   // Loading/Error state
   isLoading: boolean;
   error: string | null;
@@ -52,6 +55,9 @@ interface UIState {
   // Read-only mode actions
   setReadOnlyMode: (resourceId: string, assessmentId?: string) => void;
   clearReadOnlyMode: () => void;
+
+  // Save error actions
+  setAssessmentSaveError: (error: string | null) => void;
 
   // Reset action for logout
   resetUIState: () => void;
@@ -79,6 +85,7 @@ export const useUIStore = create<UIState>()((set) => ({
   isReadOnly: false,
   viewingResourceId: null,
   viewingAssessmentId: null,
+  assessmentSaveError: null,
   isLoading: false,
   error: null,
 
@@ -134,6 +141,9 @@ export const useUIStore = create<UIState>()((set) => ({
       viewingAssessmentId: null,
     }); },
 
+  // Save error actions
+  setAssessmentSaveError: (error) => { set({ assessmentSaveError: error }); },
+
   // Reset all UI state for logout
   resetUIState: () =>
     { set({
@@ -148,6 +158,7 @@ export const useUIStore = create<UIState>()((set) => ({
       isReadOnly: false,
       viewingResourceId: null,
       viewingAssessmentId: null,
+      assessmentSaveError: null,
       isLoading: false,
       error: null,
     }); },

@@ -1,5 +1,5 @@
 /**
- * @file src/components/insights/index.ts
+ * @file app/src/components/insights/index.ts
  * @purpose Barrel export for insights components
  * @functionality
  * - Exports insight card component

@@ -48,7 +48,7 @@ export function useAssessmentNavigation({
   initialStep,
   onReachNewPosition,
 }: UseAssessmentNavigationProps): UseAssessmentNavigationReturn {
-  // Synthesis is at phase index 3 (last phase)
+  // Synthesis is always the last phase
   const synthesisPhaseIndex = phases.length - 1;
 
   // Lazy initialization for starting position - prioritizes initial values from store

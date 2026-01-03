@@ -5,6 +5,7 @@
     "button": "Przejdź do oceny"
   },
   "dirty": {
+    "title": "Ocena niekompletna",
     "message": "Masz niezapisane zmiany w ocenie. Ukończ ocenę, aby zapisać i umożliwić nową analizę.",
     "action": "Ukończ ocenę"
   },
@@ -52,5 +53,12 @@
   "reanalyze": {
     "button": "Analizuj ponownie (może znaleźć nowe wzorce)",
     "description": "Każda analiza może ujawnić inne spostrzeżenia w oparciu o interpretację Claude"
+  },
+  "saveError": {
+    "title": "Analiza niezapisana",
+    "message": "Twoja analiza jest wyświetlana, ale nie można jej zapisać na Twoim koncie.",
+    "retry": "Zapisz teraz",
+    "dismiss": "Zamknij",
+    "saving": "Zapisywanie..."
   }
 }

@@ -1,5 +1,5 @@
 /**
- * @file components/assessment/steps/MultiSelectStep.tsx
+ * @file app/src/components/assessment/steps/MultiSelectStep.tsx
  * @purpose Renders multi-select checkbox question with Ink & Stone styling
  * @functionality
  * - Displays question with optional context
